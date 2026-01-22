@@ -1,0 +1,67 @@
+<div class="row flex-nowrap">
+  <div class="col-auto col-md-0 col-xl-0 px-0 bg-dark">
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
+      <button class="btn btn-dark d-block d-sm-none mb-3" type="button" data-bs-toggle="collapse"
+        data-bs-target="#menuCollapse" aria-expanded="false" aria-controls="menuCollapse">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <div class="collapse d-sm-block " id="menuCollapse">
+        <ul class="nav flex-column align-items-start" id="menu">
+            <li>
+            <a href="{% url 'home' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-house fs-4"></i>
+              <span class="ms-1">Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'dashboard' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-bar-chart-line fs-4"></i>
+              <span class="ms-1">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'category_list' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-tags fs-4"></i>
+              <span class="ms-1">Categorias</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'bank_list' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-bank fs-4"></i>
+              <span class="ms-1">Bancos</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'payment_list' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-coin fs-4"></i>
+              <span class="ms-1">Pagamentos</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'inflow_list' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-arrow-down-left-square fs-4"></i>
+              <span class="ms-1">Entradas</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'outflow_list' %}" class="nav-link px-0 align-middle text-white">
+              <i class="bi bi-arrow-up-right-square fs-4"></i>
+              <span class="ms-1">Saídas</span>
+            </a>
+          </li>
+          <li>
+            {% if user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post" id="logout-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link text-decoration-none text-danger nav-link px-0 align-middle">
+                <i class="bi bi-box-arrow-right fs-3"></i>
+                <span class="ms-1">Sair</span>
+              </button>
+            </form>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+      <hr>
+    </div>
+  </div>

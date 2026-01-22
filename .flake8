@@ -1,0 +1,10 @@
+[flake8]
+exclude =
+    __pycache__,
+    build,
+    dist,
+    venv,
+    env,
+    .eggs,
+    *.egg-info
+ignore = E501

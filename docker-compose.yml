@@ -1,0 +1,23 @@
+services:
+
+  gaw_web:
+    build: .
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - gaw_db
+        
+  gaw_db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sge
+
+volumes:
+    postgres_data:

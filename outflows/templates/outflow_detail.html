@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <h3 class="display-6"> Detalhes da Saída</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">{{ object.title }}</h3>
+                <p class="card-text">Banco: <strong>{{ object.bank }}</strong></p>
+                <p class="card-text">Categoria: <strong>{{ object.category }}</strong></p>
+                <p class="card-text">Valor: <strong>{{ object.value }}</strong></p>
+                <p class="card-text">Data de entrada: <strong>{{ object.created_at }}</strong></p>
+            </div>
+        </div>
+        <a href="{% url 'outflow_list' %}" class="btn btn-secondary mt-3">Voltar para a lista de saídas</a>
+    </div>
+
+{% endblock %}

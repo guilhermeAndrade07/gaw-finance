@@ -1,0 +1,143 @@
+<!-- htmlhint inline-script-disabled:false -->
+<h1>Dashboard</h1>
+<p>Análise detalhada das suas finanças!</p>
+<div class=" mt-4">
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-white">Saldo total</h5>
+                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.balance_month }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title text-white">Entradas no mês</h5>
+                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.inflows_month }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title text-white"> Saídas no mês</h5>
+                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.outflows_month }}</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row mt-5">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Fluxo de Caixa Mensal</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Despesas por Categoria Mensal</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gráfico de Fluxo de Caixa
+    const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(cashFlowCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ cash_flow.labels|safe }},
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: {{ cash_flow.inflows|safe }},
+                    backgroundColor: '#28a745',
+                    borderColor: '#1e7e34',
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Saídas',
+                    data: {{ cash_flow.outflows|safe }},
+                    backgroundColor: '#dc3545',
+                    borderColor: '#bb2d3b',
+                    borderWidth: 2,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Despesas por Categoria
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const colors = ['#4BC0C0', '#FFCE56', '#FF6384', '#FFFFFF', '#36A2EB', '#8B4513', '#FF9F40', '#9966FF', '#C9CBCF'];
+    
+    new Chart(categoryCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ expenses.labels|safe }},
+            datasets: [{
+                data: {{ expenses.data|safe }},
+                backgroundColor: colors.slice(0, {{ expenses.labels|safe }}.length),
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': R$ ' + context.parsed.toFixed(2) + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+GAW Finance - Entradas
+{% endblock%}
+
+{% block content %}
+
+<div class="row">
+    <h1>Entradas</h1>
+</div>
+
+
+<div class="row mt-4 mb-3">  
+    <div class="col-md-6">
+        <form method="get" action="{% url 'inflow_list'  %}">
+            <div class="input-group">
+                <input type="text" class="form-control" name="title" placeholder="Título" value="{{request.GET.title}}">
+                <button  type="submit" class="btn btn-success">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <a href="{% url 'inflow_create' %}" class="btn btn-success float-end">
+            <i class="bi bi-plus"></i> Nova Entrada
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Título</th>
+                <th>Banco</th>
+                <th>Valor</th>
+                <th>Data de entrada</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inflow in inflows %}
+            <tr>
+                <td>{{ inflow.title }}</td>
+                <td>{{ inflow.bank }}</td>
+                <td class="text-success">+ R${{ inflow.value }}</td>
+                <td>{{ inflow.created_at }}</td>
+                <td>
+                    <a href="{% url 'inflow_detail' inflow.id %}" class="btn btn-info btn-sm">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'components/_pagination.html' %} 
+
+{% endblock %}
