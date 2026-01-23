@@ -9,29 +9,23 @@ import json
 
 
 def get_finance_metrics():
-    """Retorna métricas financeiras: saldo total, entradas/saídas do mês e saldo do mês"""
 
-    # Data atual
     today = date.today()
     current_month = today.month
     current_year = today.year
 
-    # 1. Saldo total de todos os bancos
     total_balance = Bank.objects.aggregate(Sum('balance'))['balance__sum'] or 0
 
-    # 2. Entradas do mês
     inflows_month = Inflow.objects.filter(
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
 
-    # 3. Saídas do mês
     outflows_month = Outflow.objects.filter(
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
 
-    # 4. Saldo do mês (entradas - saídas)
     balance_month = inflows_month - outflows_month
 
     return {
@@ -48,19 +42,16 @@ def get_monthly_cash_flow():
     inflows_data = []
     outflows_data = []
 
-    # Últimos 12 meses
     for i in range(7, -1, -1):
         date_obj = date.today() - timedelta(days=30 * i)
         month = date_obj.month
         year = date_obj.year
 
-        # Entradas do mês
         inflow = Inflow.objects.filter(
             created_at__month=month,
             created_at__year=year
         ).aggregate(Sum('value'))['value__sum'] or 0
 
-        # Saídas do mês
         outflow = Outflow.objects.filter(
             created_at__month=month,
             created_at__year=year
@@ -78,10 +69,8 @@ def get_monthly_cash_flow():
 
 
 def get_expenses_by_category():
-    """Retorna despesas agrupadas por categoria do mês atual"""
     categories_data = {}
 
-    # Data atual
     today = date.today()
     current_month = today.month
     current_year = today.year
@@ -96,7 +85,6 @@ def get_expenses_by_category():
         if total > 0:
             categories_data[category.name] = float(total)
 
-    # Ordenar por valor decrescente
     sorted_categories = dict(sorted(categories_data.items(), key=lambda x: x[1], reverse=True))
 
     return {

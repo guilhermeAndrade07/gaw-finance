@@ -3,6 +3,5 @@ from banks.models import Bank
 
 
 def total_balance(request):
-    """Context processor para adicionar saldo total ao template"""
     total = Bank.objects.aggregate(Sum('balance'))['balance__sum'] or 0
     return {'total_balance': total}
