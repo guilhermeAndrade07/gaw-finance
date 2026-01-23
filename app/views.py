@@ -8,6 +8,9 @@ from outflows.models import Outflow
 @login_required(login_url='login')
 def home(request):
     value_metrics = metrics.get_finance_metrics()
+    investment_data = metrics.get_investment()
+    
+    value_metrics.update(investment_data)
 
     inflows = Inflow.objects.all()[:5]
     outflows = Outflow.objects.all()[:7]

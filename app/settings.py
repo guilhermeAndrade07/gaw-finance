@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 
-if ENVIRONMENT == 'dev':
+if ENVIRONMENT == 'prd':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

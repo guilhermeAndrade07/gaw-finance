@@ -103,3 +103,22 @@ def get_expenses_by_category():
         'labels': json.dumps(list(sorted_categories.keys())),
         'data': json.dumps(list(sorted_categories.values())),
     }
+
+
+def get_investment():
+    
+    try:
+        category = Category.objects.get(name__iexact='Investimento')
+        total_investment = Outflow.objects.filter(
+            category=category
+        ).aggregate(Sum('value'))['value__sum'] or 0
+        
+        return {
+            'total_investment': number_format(total_investment, decimal_pos=2, force_grouping=True),
+            'total_investment_value': float(total_investment)
+        }
+    except Category.DoesNotExist:
+        return {
+            'total_investment': '0,00',
+            'total_investment_value': 0.0
+        }
