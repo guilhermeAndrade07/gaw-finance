@@ -37,7 +37,7 @@ def get_finance_metrics():
 
 
 def get_monthly_cash_flow():
-    """Retorna fluxo de caixa dos últimos 7 meses"""
+
     months_labels = []
     inflows_data = []
     outflows_data = []
@@ -69,6 +69,7 @@ def get_monthly_cash_flow():
 
 
 def get_expenses_by_category():
+    
     categories_data = {}
 
     today = date.today()
