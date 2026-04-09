@@ -11,19 +11,38 @@ GAW Finance - Entradas
 </div>
 
 
-<div class="row mt-4 mb-3">  
-    <div class="col-md-6">
-        <form method="get" action="{% url 'inflow_list'  %}">
-            <div class="input-group">
-                <input type="text" class="form-control" name="title" placeholder="Título" value="{{request.GET.title}}">
-                <button  type="submit" class="btn btn-success">
-                    <i class="bi bi-search"></i>
+<div class="row mt-4 mb-5 align-items-center">
+    <div class="col-md-9">
+        <form method="get" action="{% url 'inflow_list' %}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="title" placeholder="Título" value="{{ request.GET.title }}">
+                     <button type="submit" class="btn btn-success">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <select class="form-select" name="month">
+                    <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
+                    {% for month_value, month_label in months %}
+                        <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter"></i> Filtrar
                 </button>
+                <a href="{% url 'inflow_list' %}" class="btn btn-outline-secondary">Limpar</a>
             </div>
         </form>
     </div>
-    <div class="col-md-6">
-        <a href="{% url 'inflow_create' %}" class="btn btn-success float-end">
+
+    <div class="col-md-3 d-flex justify-content-md-end justify-content-start mt-2 mt-md-0">
+        <a href="{% url 'inflow_create' %}" class="btn btn-success">
             <i class="bi bi-plus"></i> Nova Entrada
         </a>
     </div>

@@ -16,6 +16,7 @@ class OutflowListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         title = self.request.GET.get('title')
         category = self.request.GET.get('category')
+        month = self.request.GET.get('month')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
@@ -23,11 +24,31 @@ class OutflowListView(LoginRequiredMixin, ListView):
         if category:
             queryset = queryset.filter(category__id=category)
 
+        if month:
+            try:
+                queryset = queryset.filter(created_at__month=int(month))
+            except (ValueError, TypeError):
+                pass
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
+        context['months'] = [
+            ('1', 'Janeiro'),
+            ('2', 'Fevereiro'),
+            ('3', 'Marco'),
+            ('4', 'Abril'),
+            ('5', 'Maio'),
+            ('6', 'Junho'),
+            ('7', 'Julho'),
+            ('8', 'Agosto'),
+            ('9', 'Setembro'),
+            ('10', 'Outubro'),
+            ('11', 'Novembro'),
+            ('12', 'Dezembro'),
+        ]
         return context
 
 

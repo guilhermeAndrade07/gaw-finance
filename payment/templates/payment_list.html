@@ -9,7 +9,7 @@ GAW Finance - Produtos
 <div>
     <div class="card-body text-center">
         <div class="row align-items-center justify-content-center">
-            <div class="col-sm-3">
+            <div class="col-sm-5">
                 <h2>Valor total de pagamentos a fazer:</h2>
             </div>
             <div class="col-sm-2">
@@ -24,21 +24,39 @@ GAW Finance - Produtos
 
 <div class="mt-4"></div>
 
-<div class="row mb-3">  
-    <div class="col-md-6">
-        <form method="get" action="{% url 'payment_list'  %}">
-            <div class="input-group">
-                <input type="text" class="form-control" name="name" placeholder="Título" value="{{request.GET.name}}">
-                <button  type="submit" class="btn btn-success">
-                    <i class="bi bi-search"></i>
+<div class="row mb-5 align-items-center">
+    <div class="col-md-9">
+        <form method="get" action="{% url 'payment_list' %}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="name" placeholder="Título" value="{{ request.GET.name }}">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select" name="month">
+                    <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
+                    {% for month_value, month_label in months %}
+                        <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter"></i> Filtrar
                 </button>
+                <a href="{% url 'payment_list' %}" class="btn btn-outline-secondary">Limpar</a>
             </div>
         </form>
     </div>
-    
-    <div class="col-md-6">
-        <a href="{% url 'payment_create' %}" class="btn btn-success float-end">
-            <i class="bi bi-plus"></i> Nova Pagamento
+
+    <div class="col-md-3 d-flex justify-content-md-end justify-content-start mt-2 mt-md-0">
+        <a href="{% url 'payment_create' %}" class="btn btn-success">
+            <i class="bi bi-plus"></i> Novo Pagamento
         </a>
     </div>
 </div>
@@ -51,6 +69,7 @@ GAW Finance - Produtos
                 <th>Descrição</th>
                 <th>Categoria</th>
                 <th>Valor</th>
+                <th>Parcelas</th>
                 <th>Data de Pagamento</th>
                 <th>Pago</th>
                 <th>Ações</th>
@@ -63,6 +82,7 @@ GAW Finance - Produtos
                 <td>{{ pay.description }}</td>
                 <td>{{ pay.category }}</td>
                 <td>R$ {{ pay.value|floatformat:2 }}</td>
+                <td>{{ pay.parcelas_display }}</td>
                 <td>{{ pay.date_payment }}</td>
                 <td><input class="form-check-input me-3" type="checkbox"></td>
                 <td>

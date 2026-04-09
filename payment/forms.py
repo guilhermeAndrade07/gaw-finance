@@ -4,9 +4,16 @@ from . import models
 
 class PaymentForm(forms.ModelForm):
 
+    parcelas = forms.IntegerField(
+        min_value=1,
+        initial=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        label='Parcelas',
+    )
+
     class Meta:
         model = models.Payment
-        fields = ['name', 'description', 'category', 'date_payment', 'value']
+        fields = ['name', 'description', 'category', 'date_payment', 'value', 'parcelas']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),

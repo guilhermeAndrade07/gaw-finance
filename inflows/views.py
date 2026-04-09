@@ -14,11 +14,36 @@ class InflowListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         title = self.request.GET.get('title')
+        month = self.request.GET.get('month')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
 
+        if month:
+            try:
+                queryset = queryset.filter(created_at__month=int(month))
+            except (ValueError, TypeError):
+                pass
+
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['months'] = [
+            ('1', 'Janeiro'),
+            ('2', 'Fevereiro'),
+            ('3', 'Marco'),
+            ('4', 'Abril'),
+            ('5', 'Maio'),
+            ('6', 'Junho'),
+            ('7', 'Julho'),
+            ('8', 'Agosto'),
+            ('9', 'Setembro'),
+            ('10', 'Outubro'),
+            ('11', 'Novembro'),
+            ('12', 'Dezembro'),
+        ]
+        return context
 
 
 class InflowCreateView(LoginRequiredMixin, CreateView):

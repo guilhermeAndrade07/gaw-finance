@@ -1,12 +1,11 @@
-<div class="row flex-nowrap">
-  <div class="col-auto col-md-0 col-xl-0 px-0 bg-dark">
-    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
-      <button class="btn btn-dark d-block d-sm-none mb-3" type="button" data-bs-toggle="collapse"
-        data-bs-target="#menuCollapse" aria-expanded="false" aria-controls="menuCollapse">
-        <i class="bi bi-list fs-4"></i>
-      </button>
-      <div class="collapse d-sm-block " id="menuCollapse">
-        <ul class="nav flex-column align-items-start" id="menu">
+<aside class="col-auto col-md-0 col-xl-0 px-0 bg-dark border-end border-secondary-subtle">
+  <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white h-100">
+    <button class="btn btn-dark d-block d-sm-none mb-3" type="button" data-bs-toggle="collapse"
+      data-bs-target="#menuCollapse" aria-expanded="false" aria-controls="menuCollapse">
+      <i class="bi bi-list fs-4"></i>
+    </button>
+    <div class="collapse d-sm-block " id="menuCollapse">
+      <ul class="nav flex-column align-items-start" id="menu">
             <li>
             <a href="{% url 'home' %}" class="nav-link px-0 align-middle text-white">
               <i class="bi bi-house fs-4"></i>
@@ -60,8 +59,8 @@
             </form>
             {% endif %}
           </li>
-        </ul>
-      </div>
-      <hr>
+      </ul>
     </div>
+    <hr>
   </div>
+</aside>
