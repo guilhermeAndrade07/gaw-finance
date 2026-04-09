@@ -1,10 +1,19 @@
 from django.utils.formats import number_format
 from django.db.models import Sum
-from datetime import date, timedelta
+from datetime import date
+from calendar import monthrange
 from inflows.models import Inflow
 from outflows.models import Outflow
 from categories.models import Category
 import json
+
+
+def shift_months(base_date, months):
+    month_index = base_date.month - 1 + months
+    year = base_date.year + month_index // 12
+    month = month_index % 12 + 1
+    day = min(base_date.day, monthrange(year, month)[1])
+    return base_date.replace(year=year, month=month, day=day)
 
 
 def get_finance_metrics():
@@ -43,9 +52,10 @@ def get_monthly_cash_flow():
     months_labels = []
     inflows_data = []
     outflows_data = []
+    today = date.today()
 
     for i in range(7, -1, -1):
-        date_obj = date.today() - timedelta(days=30 * i)
+        date_obj = shift_months(today, -i)
         month = date_obj.month
         year = date_obj.year
 
@@ -116,7 +126,7 @@ def get_months_list():
     today = date.today()
     
     for i in range(0, 8):
-        date_obj = today - timedelta(days=30 * i)
+        date_obj = shift_months(today, -i)
         month_name = months_pt_br[date_obj.month]
         months_list.append({
             'month': date_obj.month,
