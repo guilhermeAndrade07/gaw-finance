@@ -11,7 +11,7 @@
                 <p class="card-text">{{ object.description }}</p>
                 <p class="card-text">Categoria: {{ object.category }}</p>
                 <p class="card-text">Data de pagamento: <strong>{{ object.date_payment }}</strong></p>
-                <p class="card-text">Valor: <strong>R$ {{ object.value }}</strong></p>
+                <p class="card-text">Valor: <strong>R$ {{ object.value|floatformat:"2g" }}</strong></p>
                 <p class="card-text">Parcelas: <strong>{{ object.parcelas_display }}</strong></p>
             </div>
         </div>

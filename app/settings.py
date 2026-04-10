@@ -145,6 +145,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Number formatting in pt-BR style (e.g. 1.000,00)
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
+NUMBER_GROUPING = 3
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

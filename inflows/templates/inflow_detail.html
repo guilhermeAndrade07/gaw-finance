@@ -9,7 +9,7 @@
             <div class="card-body">
                 <h3 class="card-title">{{ object.title }}</h3>
                 <p class="card-text">Banco: <strong>{{ object.bank }}</strong></p>
-                <p class="card-text">Valor: <strong>{{ object.value }}</strong></p>
+                <p class="card-text">Valor: <strong>R$ {{ object.value|floatformat:"2g" }}</strong></p>
             </div>
         </div>
         <a href="{% url 'inflow_list' %}" class="btn btn-secondary mt-3">Voltar para a lista de entradas</a>

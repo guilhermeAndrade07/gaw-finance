@@ -72,7 +72,7 @@
                         -
                     {% endif %}
                 </td>
-                <td>R$ {{ transaction.value|floatformat:2 }}</td>
+                <td>R$ {{ transaction.value|floatformat:"2g" }}</td>
                 <td>
                     {% if transaction.tipo == "Entrada" %}
                         <span class="badge bg-success">{{ transaction.tipo }}</span>

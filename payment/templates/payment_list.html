@@ -18,7 +18,7 @@ GAW Finance - Produtos
             </div>
             <div class="col-sm-2">
                 <div class="card-body text-center">
-                    <p id="payment-total" class="card-text text-warning font-weight-bold display-6 " data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:2 }}</p>
+                    <p id="payment-total" class="card-text text-warning font-weight-bold display-6 " data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:"2g" }}</p>
                 </div>
             </div>
 
@@ -96,7 +96,7 @@ GAW Finance - Produtos
                 <td>{{ pay.name }}</td>
                 <td>{{ pay.description }}</td>
                 <td>{{ pay.category }}</td>
-                <td>R$ {{ pay.value|floatformat:2 }}</td>
+                <td>R$ {{ pay.value|floatformat:"2g" }}</td>
                 <td>{{ pay.parcelas_display }}</td>
                 <td>{{ pay.date_payment }}</td>
                 <td>

@@ -40,7 +40,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="row mt-5">
-    <div class="col-md-7">
+    <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Fluxo de Caixa Mensal</h5>
@@ -64,6 +64,7 @@
                 </select>
             </div>
             <div class="card-body">
+                <p class="mb-3 fw-bold text-danger">Total gasto no mês: <span id="monthlyExpenseTotal">R$ 0,00</span></p>
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
@@ -117,9 +118,27 @@
     // Gráfico de Despesas por Categoria
     let categoryChart = null;
     const colors = ['#4BC0C0', '#FFCE56', '#FF6384', '#FFFFFF', '#36A2EB', '#8B4513', '#FF9F40', '#9966FF', '#C9CBCF'];
+    const monthlyExpenseTotalElement = document.getElementById('monthlyExpenseTotal');
+
+    function formatBRL(value) {
+        return Number(value || 0).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+    }
+
+    function updateMonthlyExpenseTotal(data) {
+        const total = (data || []).reduce((sum, currentValue) => sum + Number(currentValue || 0), 0);
+
+        if (monthlyExpenseTotalElement) {
+            monthlyExpenseTotalElement.textContent = `R$ ${formatBRL(total)}`;
+        }
+    }
     
     function updateCategoryChart(labels, data) {
         const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+
+        updateMonthlyExpenseTotal(data);
         
         if (categoryChart) {
             categoryChart.destroy();

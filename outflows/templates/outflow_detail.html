@@ -10,7 +10,7 @@
                 <h3 class="card-title">{{ object.title }}</h3>
                 <p class="card-text">Banco: <strong>{{ object.bank }}</strong></p>
                 <p class="card-text">Categoria: <strong>{{ object.category }}</strong></p>
-                <p class="card-text">Valor: <strong>{{ object.value }}</strong></p>
+                <p class="card-text">Valor: <strong>R$ {{ object.value|floatformat:"2g" }}</strong></p>
                 <p class="card-text">Data de entrada: <strong>{{ object.created_at }}</strong></p>
             </div>
         </div>
