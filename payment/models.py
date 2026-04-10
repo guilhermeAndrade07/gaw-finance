@@ -11,6 +11,7 @@ class Payment(models.Model):
     date_payment = models.DateField(null=True, blank=True)
     value = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     parcelas = models.PositiveIntegerField(default=1)
+    paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 

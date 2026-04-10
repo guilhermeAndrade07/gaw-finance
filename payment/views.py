@@ -3,9 +3,12 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from rest_framework import generics
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Sum
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from . import models, forms, serializers
 
@@ -15,8 +18,12 @@ class PaymentListView(LoginRequiredMixin, ListView):
     template_name = 'payment_list.html'
     context_object_name = 'payment'
 
+    def _show_hidden(self):
+        return self.request.GET.get('show_hidden') == '1'
+
     def get_queryset(self):
-        queryset = super().get_queryset()
+        show_hidden = self._show_hidden()
+        queryset = super().get_queryset().filter(paid=show_hidden)
         name = self.request.GET.get('name')
         month = self.request.GET.get('month')
 
@@ -33,6 +40,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        show_hidden = self._show_hidden()
         listed_items = context.get('payment', context.get('object_list', []))
 
         if hasattr(listed_items, 'aggregate'):
@@ -41,6 +49,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
             total = sum((item.value or 0) for item in listed_items)
 
         context['payment_total'] = total
+        context['show_hidden'] = show_hidden
         context['months'] = [
             ('1', 'Janeiro'),
             ('2', 'Fevereiro'),
@@ -155,3 +164,26 @@ class PaymentCreateListAPIView(generics.ListCreateAPIView):
 class PaymentRetriveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Payment.objects.all()
     serializer_class = serializers.PaymentSerializer
+    
+class PaymentMarkAsPaidView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        payment = get_object_or_404(models.Payment, pk=pk)
+
+        if payment.paid:
+            return JsonResponse({'success': True, 'already_paid': True})
+
+        payment.paid = True
+        payment.save(update_fields=['paid', 'update_at'])
+        return JsonResponse({'success': True})
+
+
+class PaymentMarkAsUnpaidView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        payment = get_object_or_404(models.Payment, pk=pk)
+
+        if not payment.paid:
+            return JsonResponse({'success': True, 'already_unpaid': True})
+
+        payment.paid = False
+        payment.save(update_fields=['paid', 'update_at'])
+        return JsonResponse({'success': True})

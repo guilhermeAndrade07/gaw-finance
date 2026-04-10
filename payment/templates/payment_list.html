@@ -10,11 +10,15 @@ GAW Finance - Produtos
     <div class="card-body text-center">
         <div class="row align-items-center justify-content-center ">
             <div class="col-sm-5">
-                <h2>Valor total de pagamentos a fazer:</h2>
+                {% if show_hidden %}
+                    <h2>Valor total de pagamentos ocultos:</h2>
+                {% else %}
+                    <h2>Valor total de pagamentos a fazer:</h2>
+                {% endif %}
             </div>
             <div class="col-sm-2">
                 <div class="card-body text-center">
-                    <p class="card-text text-warning font-weight-bold display-6 ">R$ {{ payment_total|floatformat:2 }}</p>
+                    <p id="payment-total" class="card-text text-warning font-weight-bold display-6 " data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:2 }}</p>
                 </div>
             </div>
 
@@ -27,6 +31,7 @@ GAW Finance - Produtos
 <div class="row mb-5 align-items-center">
     <div class="col-md-9">
         <form method="get" action="{% url 'payment_list' %}" class="row g-2 align-items-center">
+            <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
             <div class="col-md-4">
                 <div class="input-group">
                     <input type="text" class="form-control" name="name" placeholder="Título" value="{{ request.GET.name }}">
@@ -55,6 +60,16 @@ GAW Finance - Produtos
     </div>
 
     <div class="col-md-3 d-flex justify-content-md-end justify-content-start mt-2 mt-md-0">
+        {% if show_hidden %}
+            <a href="{% url 'payment_list' %}" class="btn btn-outline-light me-2">
+                <i class="bi bi-eye"></i> Mostrar Pendentes
+            </a>
+        {% else %}
+            <a href="{% url 'payment_list' %}?show_hidden=1" class="btn btn-outline-light me-2">
+                <i class="bi bi-eye-slash"></i> Mostrar Ocultos
+            </a>
+        {% endif %}
+
         <a href="{% url 'payment_create' %}" class="btn btn-success">
             <i class="bi bi-plus"></i> Novo Pagamento
         </a>
@@ -77,14 +92,21 @@ GAW Finance - Produtos
         </thead>
         <tbody>
             {% for pay in payment %}
-            <tr>
+            <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}">
                 <td>{{ pay.name }}</td>
                 <td>{{ pay.description }}</td>
                 <td>{{ pay.category }}</td>
                 <td>R$ {{ pay.value|floatformat:2 }}</td>
                 <td>{{ pay.parcelas_display }}</td>
                 <td>{{ pay.date_payment }}</td>
-                <td><input class="form-check-input me-3" type="checkbox"></td>
+                <td>
+                    <input
+                        class="form-check-input me-3 js-payment-paid-checkbox"
+                        type="checkbox"
+                        data-payment-id="{{ pay.id }}"
+                        {% if pay.paid %}checked{% endif %}
+                    >
+                </td>
                 <td>
                     <a href="{% url 'payment_detail' pay.id %}" class="btn btn-info btn-sm">
                         <i class="bi bi-eye"></i>
@@ -103,6 +125,87 @@ GAW Finance - Produtos
         </tbody>
     </table>
 </div>
+
+<script>
+    (function () {
+        const totalElement = document.getElementById('payment-total');
+        const checkboxes = document.querySelectorAll('.js-payment-paid-checkbox');
+        const csrfToken = '{{ csrf_token }}';
+        const showingHidden = '{{ show_hidden|yesno:"true,false" }}' === 'true';
+
+        if (!totalElement || checkboxes.length === 0) {
+            return;
+        }
+
+        const toNumber = (value) => {
+            const parsed = Number.parseFloat(value);
+            return Number.isNaN(parsed) ? 0 : parsed;
+        };
+
+        const formatBRL = (value) => {
+            return value.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+        };
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', async (event) => {
+                const isChecked = event.target.checked;
+                const wasChecked = !isChecked;
+
+                if (!showingHidden && !isChecked) {
+                    event.target.checked = true;
+                    return;
+                }
+
+                if (showingHidden && isChecked) {
+                    event.target.checked = false;
+                    return;
+                }
+
+                const paymentId = event.target.dataset.paymentId;
+                const row = document.getElementById(`payment-row-${paymentId}`);
+
+                if (!paymentId || !row) {
+                    return;
+                }
+
+                event.target.disabled = true;
+
+                try {
+                    const endpoint = showingHidden
+                        ? `/payment/${paymentId}/mark-unpaid/`
+                        : `/payment/${paymentId}/mark-paid/`;
+
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao marcar pagamento como pago.');
+                    }
+
+                    const currentTotal = toNumber(totalElement.dataset.total);
+                    const rowValue = toNumber(row.dataset.value);
+                    const nextTotal = Math.max(currentTotal - rowValue, 0);
+
+                    totalElement.dataset.total = nextTotal.toFixed(2);
+                    totalElement.textContent = `R$ ${formatBRL(nextTotal)}`;
+                    row.remove();
+                } catch (error) {
+                    event.target.disabled = false;
+                    event.target.checked = wasChecked;
+                    window.alert('Nao foi possivel atualizar o pagamento. Tente novamente.');
+                }
+            });
+        });
+    })();
+</script>
 
 
 {% endblock %}
