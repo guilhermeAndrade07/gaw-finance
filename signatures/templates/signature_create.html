@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}
+GAW Finance - Nova Assinatura
+{% endblock %}
+
+{% block content %}
+<div class="row main-brand-font">
+    <h1>Nova Assinatura</h1>
+</div>
+
+<div class="mt-4"></div>
+
+<div class="card bg-dark border-secondary">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.value.id_for_label }}" class="form-label">{{ form.value.label }}</label>
+                    {{ form.value }}
+                    {{ form.value.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.billing_day.id_for_label }}" class="form-label">{{ form.billing_day.label }}</label>
+                    {{ form.billing_day }}
+                    {{ form.billing_day.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.bank.id_for_label }}" class="form-label">{{ form.bank.label }}</label>
+                    {{ form.bank }}
+                    {{ form.bank.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {{ form.category.errors }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div class="mb-3 form-check">
+                {{ form.is_active }}
+                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                    {{ form.is_active.label }}
+                </label>
+                {{ form.is_active.errors }}
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success">Salvar Assinatura</button>
+                <a href="{% url 'signature_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

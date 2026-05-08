@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}
+GAW Finance - Assinaturas
+{% endblock%}
+
+{% block content %}
+
+<div class="row main-brand-font">
+    <h1>Assinaturas</h1>
+</div>
+
+<div class="mt-4"></div>
+
+<div class="row mb-5 align-items-center">  
+    <div class="col-md-10">
+        <form method="get" action="{% url 'signature_list' %}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="name" placeholder="Nome da Assinatura" value="{{ request.GET.name }}">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <a href="{% url 'signature_list' %}" class="btn btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-2 d-flex justify-content-md-end justify-content-start mt-2 mt-md-0">
+        <a href="{% url 'signature_create' %}" class="btn btn-success">
+            <i class="bi bi-plus"></i> Nova Assinatura
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nome</th>
+                <th>Valor</th>
+                <th>Dia de Cobrança</th>
+                <th>Banco</th>
+                <th>Categoria</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for signature in signatures %}
+            <tr>
+                <td>{{ signature.name }}</td>
+                <td>R$ {{ signature.value|floatformat:"2g" }}</td>
+                <td>Dia {{ signature.billing_day }}</td>
+                <td>{{ signature.bank }}</td>
+                <td>{{ signature.category|default:"-" }}</td>
+                <td>
+                    {% if signature.is_active %}
+                        <span class="badge bg-success">Ativa</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inativa</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'signature_detail' signature.id %}" class="btn btn-info btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'signature_update' signature.id %}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'signature_delete' signature.id %}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% if signature.is_active %}
+                        <form action="{% url 'signature_cancel' signature.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Cancelar Assinatura">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">Nenhuma assinatura registrada</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

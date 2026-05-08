@@ -4,3 +4,9 @@ __pycache__/
 media
 *.pyc
 .env
+devops-specialist
+devops-specialist-workspace
+devops-specialist.skill
+evals
+.github
+.entrypoint.sh

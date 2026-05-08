@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+GAW Finance - Excluir Assinatura
+{% endblock %}
+
+{% block content %}
+<div class="row main-brand-font">
+    <h1>Excluir Assinatura</h1>
+</div>
+
+<div class="mt-4"></div>
+
+<div class="card bg-dark border-danger">
+    <div class="card-body">
+        <h5 class="card-title text-danger">Atenção!</h5>
+        <p class="card-text">Tem certeza que deseja excluir a assinatura <strong>"{{ object.name }}"</strong>?</p>
+        <p class="text-muted small">Esta ação não excluirá os lançamentos financeiros já gerados.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                <a href="{% url 'signature_list' %}" class="btn btn-outline-secondary">Não, Voltar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
