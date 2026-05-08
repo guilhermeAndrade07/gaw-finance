@@ -10,10 +10,11 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
 
 
-class PaymentListView(LoginRequiredMixin, ListView):
+class PaymentListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     model = models.Payment
     template_name = 'payment_list.html'
     context_object_name = 'payment'
@@ -67,7 +68,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
         return context
 
 
-class PaymentCreateView(LoginRequiredMixin, CreateView):
+class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     model = models.Payment
     template_name = 'payment_create.html'
     form_class = forms.PaymentForm
@@ -125,6 +126,7 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
 
             payments_to_create.append(
                 models.Payment(
+                    user=self.request.user,
                     name=f'{name} ({installment_index + 1}/{parcelas})',
                     description=description,
                     category=category,
@@ -138,36 +140,36 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(str(self.success_url))
 
 
-class PaymentDetailView(LoginRequiredMixin, DetailView):
+class PaymentDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = models.Payment
     template_name = 'payment_detail.html'
 
 
-class PaymentUpdateView(LoginRequiredMixin, UpdateView):
+class PaymentUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UserScopedFormMixin, UpdateView):
     model = models.Payment
     template_name = 'payment_update.html'
     form_class = forms.PaymentForm
     success_url = reverse_lazy('payment_list')
 
 
-class PaymentDeleteView(LoginRequiredMixin, DeleteView):
+class PaymentDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
     model = models.Payment
     template_name = 'payment_delete.html'
     success_url = reverse_lazy('payment_list')
 
 
-class PaymentCreateListAPIView(generics.ListCreateAPIView):
+class PaymentCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):
     queryset = models.Payment.objects.all()
     serializer_class = serializers.PaymentSerializer
 
 
-class PaymentRetriveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class PaymentRetriveUpdateDestroyAPIView(UserScopedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Payment.objects.all()
     serializer_class = serializers.PaymentSerializer
     
 class PaymentMarkAsPaidView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        payment = get_object_or_404(models.Payment, pk=pk)
+        payment = get_object_or_404(models.Payment, pk=pk, user=request.user)
 
         if payment.paid:
             return JsonResponse({'success': True, 'already_paid': True})
@@ -179,7 +181,7 @@ class PaymentMarkAsPaidView(LoginRequiredMixin, View):
 
 class PaymentMarkAsUnpaidView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        payment = get_object_or_404(models.Payment, pk=pk)
+        payment = get_object_or_404(models.Payment, pk=pk, user=request.user)
 
         if not payment.paid:
             return JsonResponse({'success': True, 'already_unpaid': True})

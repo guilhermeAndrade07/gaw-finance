@@ -35,6 +35,7 @@ def generate_signature_outflows():
                     # Create the Outflow
                     Outflow.objects.create(
                         title=f"Assinatura: {signature.name}",
+                        user=signature.user,
                         bank=signature.bank,
                         category=signature.category,
                         value=signature.value

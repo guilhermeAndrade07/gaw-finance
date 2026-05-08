@@ -2,10 +2,11 @@ from rest_framework import generics
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
+from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
 
 
-class BankListView(LoginRequiredMixin, ListView):
+class BankListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     model = models.Bank
     template_name = 'bank_list.html'
     context_object_name = 'banks'
@@ -20,36 +21,36 @@ class BankListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class BankCreateView(LoginRequiredMixin, CreateView):
+class BankCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     model = models.Bank
     template_name = 'bank_create.html'
     form_class = forms.BankForm
     success_url = reverse_lazy('bank_list')
 
 
-class BankDetailView(LoginRequiredMixin, DetailView):
+class BankDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = models.Bank
     template_name = 'bank_detail.html'
 
 
-class BankUpdateView(LoginRequiredMixin, UpdateView):
+class BankUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UserScopedFormMixin, UpdateView):
     model = models.Bank
     template_name = 'bank_update.html'
     form_class = forms.BankForm
     success_url = reverse_lazy('bank_list')
 
 
-class BankDeleteView(LoginRequiredMixin, DeleteView):
+class BankDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
     model = models.Bank
     template_name = 'bank_delete.html'
     success_url = reverse_lazy('bank_list')
 
 
-class BankCreateListAPIView(generics.ListCreateAPIView):
+class BankCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):
     queryset = models.Bank.objects.all()
     serializer_class = serializers.BankSerializer
 
 
-class BankRetriveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class BankRetriveUpdateDestroyAPIView(UserScopedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Bank.objects.all()
     serializer_class = serializers.BankSerializer

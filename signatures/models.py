@@ -1,9 +1,11 @@
+from django.contrib.auth.models import User
 from django.db import models
 from banks.models import Bank
 from categories.models import Category
 
 
 class Signature(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='signatures', null=True, blank=True)
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     value = models.DecimalField(max_digits=20, decimal_places=2)

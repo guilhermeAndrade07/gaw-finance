@@ -7,3 +7,4 @@ class BankSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bank
         fields = '__all__'
+        read_only_fields = ['user']

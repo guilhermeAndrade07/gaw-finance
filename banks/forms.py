@@ -3,6 +3,9 @@ from . import models
 
 
 class BankForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = models.Bank

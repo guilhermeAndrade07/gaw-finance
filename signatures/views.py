@@ -4,13 +4,13 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from rest_framework import generics
+from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from .models import Signature
 from .forms import SignatureForm
 from .serializers import SignatureSerializer
-from .services import generate_signature_outflows
 
 
-class SignatureListView(LoginRequiredMixin, ListView):
+class SignatureListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     model = Signature
     template_name = 'signature_list.html'
     context_object_name = 'signatures'
@@ -25,31 +25,31 @@ class SignatureListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from django.db.models import Sum
-        total_value = Signature.objects.filter(is_active=True).aggregate(Sum('value'))['value__sum'] or 0
+        total_value = Signature.objects.filter(user=self.request.user, is_active=True).aggregate(Sum('value'))['value__sum'] or 0
         context['total_signatures_value'] = total_value
         return context
 
 
-class SignatureCreateView(LoginRequiredMixin, CreateView):
+class SignatureCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     model = Signature
     template_name = 'signature_create.html'
     form_class = SignatureForm
     success_url = reverse_lazy('signature_list')
 
 
-class SignatureDetailView(LoginRequiredMixin, DetailView):
+class SignatureDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = Signature
     template_name = 'signature_detail.html'
 
 
-class SignatureUpdateView(LoginRequiredMixin, UpdateView):
+class SignatureUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UserScopedFormMixin, UpdateView):
     model = Signature
     template_name = 'signature_update.html'
     form_class = SignatureForm
     success_url = reverse_lazy('signature_list')
 
 
-class SignatureDeleteView(LoginRequiredMixin, DeleteView):
+class SignatureDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
     model = Signature
     template_name = 'signature_delete.html'
     success_url = reverse_lazy('signature_list')
@@ -57,17 +57,17 @@ class SignatureDeleteView(LoginRequiredMixin, DeleteView):
 
 class SignatureCancelView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        signature = get_object_or_404(Signature, pk=pk)
+        signature = get_object_or_404(Signature, pk=pk, user=request.user)
         signature.is_active = False
         signature.save()
         return redirect('signature_list')
 
 
-class SignatureCreateListAPIView(generics.ListCreateAPIView):
+class SignatureCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):
     queryset = Signature.objects.all()
     serializer_class = SignatureSerializer
 
 
-class SignatureRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class SignatureRetrieveUpdateDestroyAPIView(UserScopedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Signature.objects.all()
     serializer_class = SignatureSerializer

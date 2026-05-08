@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}GAW Finance - Criar Conta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="display-5">Criar Conta</h3>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Criar Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{% url 'login' %}" class="btn btn-secondary mt-3">Voltar para o login</a>
+</div>
+{% endblock %}

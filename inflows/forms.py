@@ -1,8 +1,12 @@
 from django import forms
+from banks.models import Bank
 from . import models
 
 
 class InflowForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bank'].queryset = Bank.objects.filter(user=user) if user else Bank.objects.none()
 
     class Meta:
         model = models.Inflow

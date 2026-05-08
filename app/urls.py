@@ -14,6 +14,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('api/expenses-by-month/', views.get_expenses_by_month, name='get_expenses_by_month'),
 
+    path('', include('accounts.urls')),
     path('api/v1/', include('authentication.urls')),
 
     path('', include('banks.urls')),

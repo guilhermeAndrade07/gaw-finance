@@ -1,9 +1,15 @@
+from banks.models import Bank
+from categories.models import Category
 from django import forms
 from django.core.exceptions import ValidationError
 from . import models
 
 
 class OutflowForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bank'].queryset = Bank.objects.filter(user=user) if user else Bank.objects.none()
+        self.fields['category'].queryset = Category.objects.filter(user=user) if user else Category.objects.none()
 
     class Meta:
         model = models.Outflow

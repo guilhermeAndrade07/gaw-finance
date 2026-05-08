@@ -1,8 +1,10 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
 class Bank(models.Model):
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='banks', null=True, blank=True)
     name = models.CharField(max_length=150)
     account_type = models.TextField(max_length=200)
     agency = models.IntegerField()

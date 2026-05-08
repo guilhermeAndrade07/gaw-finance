@@ -2,10 +2,11 @@ from rest_framework import generics
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, DetailView
+from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
 
 
-class InflowListView(LoginRequiredMixin, ListView):
+class InflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     model = models.Inflow
     template_name = 'inflow_list.html'
     context_object_name = 'inflows'
@@ -46,23 +47,23 @@ class InflowListView(LoginRequiredMixin, ListView):
         return context
 
 
-class InflowCreateView(LoginRequiredMixin, CreateView):
+class InflowCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     model = models.Inflow
     template_name = 'inflow_create.html'
     form_class = forms.InflowForm
     success_url = reverse_lazy('inflow_list')
 
 
-class InflowDetailView(LoginRequiredMixin, DetailView):
+class InflowDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = models.Inflow
     template_name = 'inflow_detail.html'
 
 
-class InflowCreateListAPIView(generics.ListCreateAPIView):
+class InflowCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):
     queryset = models.Inflow.objects.all()
     serializer_class = serializers.InflowSerializer
 
 
-class InflowRetriveAPIView(generics.RetrieveAPIView):
+class InflowRetriveAPIView(UserScopedAPIMixin, generics.RetrieveAPIView):
     queryset = models.Inflow.objects.all()
     serializer_class = serializers.InflowSerializer

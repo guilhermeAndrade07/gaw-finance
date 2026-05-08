@@ -17,18 +17,28 @@ def shift_months(base_date, months):
     return base_date.replace(year=year, month=month, day=day)
 
 
-def get_finance_metrics():
+def get_finance_metrics(user):
+    if not user or not user.is_authenticated:
+        return {
+            'total_balance': '0,00',
+            'inflows_month': '0,00',
+            'outflows_month': '0,00',
+            'balance_month': '0,00',
+            'total_signatures': '0,00',
+        }
 
     today = date.today()
     current_month = today.month
     current_year = today.year
 
     inflows_month = Inflow.objects.filter(
+        user=user,
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
 
     outflows_month = Outflow.objects.filter(
+        user=user,
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
@@ -36,11 +46,11 @@ def get_finance_metrics():
     balance_month = inflows_month - outflows_month
 
     # Saldo total calculado como (soma de todos os inflows) - (soma de todos os outflows)
-    total_inflows = Inflow.objects.aggregate(Sum('value'))['value__sum'] or 0
-    total_outflows = Outflow.objects.aggregate(Sum('value'))['value__sum'] or 0
+    total_inflows = Inflow.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0
+    total_outflows = Outflow.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0
     total_balance = total_inflows - total_outflows
 
-    total_signatures = Signature.objects.filter(is_active=True).aggregate(Sum('value'))['value__sum'] or 0
+    total_signatures = Signature.objects.filter(user=user, is_active=True).aggregate(Sum('value'))['value__sum'] or 0
 
     return {
         'total_balance': number_format(total_balance, decimal_pos=2, force_grouping=True),
@@ -51,7 +61,13 @@ def get_finance_metrics():
     }
 
 
-def get_monthly_cash_flow():
+def get_monthly_cash_flow(user):
+    if not user or not user.is_authenticated:
+        return {
+            'labels': json.dumps([]),
+            'inflows': json.dumps([]),
+            'outflows': json.dumps([]),
+        }
 
     months_labels = []
     inflows_data = []
@@ -64,11 +80,13 @@ def get_monthly_cash_flow():
         year = date_obj.year
 
         inflow = Inflow.objects.filter(
+            user=user,
             created_at__month=month,
             created_at__year=year
         ).aggregate(Sum('value'))['value__sum'] or 0
 
         outflow = Outflow.objects.filter(
+            user=user,
             created_at__month=month,
             created_at__year=year
         ).aggregate(Sum('value'))['value__sum'] or 0
@@ -84,17 +102,24 @@ def get_monthly_cash_flow():
     }
 
 
-def get_expenses_by_category(month=None, year=None):
+def get_expenses_by_category(user, month=None, year=None):
     categories_data = {}
+
+    if not user or not user.is_authenticated:
+        return {
+            'labels': json.dumps([]),
+            'data': json.dumps([]),
+        }
     
     if month is None or year is None:
         today = date.today()
         month = today.month
         year = today.year
 
-    categories = Category.objects.all()
+    categories = Category.objects.filter(user=user)
     for category in categories:
         total = Outflow.objects.filter(
+            user=user,
             category=category,
             created_at__month=month,
             created_at__year=year
@@ -142,10 +167,17 @@ def get_months_list():
     return months_list
 
 
-def get_investment():
+def get_investment(user):
+    if not user or not user.is_authenticated:
+        return {
+            'total_investment': '0,00',
+            'total_investment_value': 0.0
+        }
+
     try:
-        category = Category.objects.get(name__iexact='Investimento')
+        category = Category.objects.get(user=user, name__iexact='Investimento')
         total_investment = Outflow.objects.filter(
+            user=user,
             category=category
         ).aggregate(Sum('value'))['value__sum'] or 0
         return {

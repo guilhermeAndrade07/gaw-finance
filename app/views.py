@@ -4,18 +4,17 @@ from django.http import JsonResponse
 from . import metrics
 from inflows.models import Inflow
 from outflows.models import Outflow
-from signatures.services import generate_signature_outflows
 import json
 
 
 @login_required(login_url='login')
 def home(request):
-    value_metrics = metrics.get_finance_metrics()
-    investment_data = metrics.get_investment()
+    value_metrics = metrics.get_finance_metrics(request.user)
+    investment_data = metrics.get_investment(request.user)
     value_metrics.update(investment_data)
 
-    inflows = Inflow.objects.all()[:5]
-    outflows = Outflow.objects.all()[:7]
+    inflows = Inflow.objects.filter(user=request.user)[:5]
+    outflows = Outflow.objects.filter(user=request.user)[:7]
 
     for inflow in inflows:
         inflow.tipo = 'Entrada'
@@ -33,17 +32,18 @@ def home(request):
     return render(request, 'home.html', context)
 
 
+@login_required(login_url='login')
 def dashboard(request):
-    value_metrics = metrics.get_finance_metrics()
-    cash_flow = metrics.get_monthly_cash_flow()
+    value_metrics = metrics.get_finance_metrics(request.user)
+    cash_flow = metrics.get_monthly_cash_flow(request.user)
     
     month = request.GET.get('month')
     year = request.GET.get('year')
     
     if month and year:
-        expenses = metrics.get_expenses_by_category(int(month), int(year))
+        expenses = metrics.get_expenses_by_category(request.user, int(month), int(year))
     else:
-        expenses = metrics.get_expenses_by_category()
+        expenses = metrics.get_expenses_by_category(request.user)
     
     months_list = metrics.get_months_list()
 
@@ -66,7 +66,7 @@ def get_expenses_by_month(request):
         return JsonResponse({'error': 'Mês e ano são obrigatórios'}, status=400)
     
     try:
-        expenses = metrics.get_expenses_by_category(int(month), int(year))
+        expenses = metrics.get_expenses_by_category(request.user, int(month), int(year))
         return JsonResponse({
             'labels': json.loads(expenses['labels']),
             'data': json.loads(expenses['data']),

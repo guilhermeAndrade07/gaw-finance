@@ -1,10 +1,14 @@
-from django.db import models
-from categories.models import Category
 import re
+
+from django.contrib.auth.models import User
+from django.db import models
+
+from categories.models import Category
 
 
 class Payment(models.Model):
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments', null=True, blank=True)
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='payment', null=True, blank=True)

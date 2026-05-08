@@ -1,8 +1,15 @@
+from banks.models import Bank
+from categories.models import Category
 from django import forms
 from .models import Signature
 
 
 class SignatureForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['bank'].queryset = Bank.objects.filter(user=user) if user else Bank.objects.none()
+        self.fields['category'].queryset = Category.objects.filter(user=user) if user else Category.objects.none()
+
     class Meta:
         model = Signature
         fields = ['name', 'description', 'value', 'billing_day', 'is_active', 'bank', 'category']
