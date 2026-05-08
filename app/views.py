@@ -10,7 +10,6 @@ import json
 
 @login_required(login_url='login')
 def home(request):
-    generate_signature_outflows()
     value_metrics = metrics.get_finance_metrics()
     investment_data = metrics.get_investment()
     value_metrics.update(investment_data)

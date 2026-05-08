@@ -16,14 +16,18 @@ class SignatureListView(LoginRequiredMixin, ListView):
     context_object_name = 'signatures'
 
     def get_queryset(self):
-        # Trigger generation before listing
-        generate_signature_outflows()
-        
         queryset = super().get_queryset()
         name = self.request.GET.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.db.models import Sum
+        total_value = Signature.objects.filter(is_active=True).aggregate(Sum('value'))['value__sum'] or 0
+        context['total_signatures_value'] = total_value
+        return context
 
 
 class SignatureCreateView(LoginRequiredMixin, CreateView):

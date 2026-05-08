@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-warning">
                     <div class="card-body">
                         <h5 class="card-title text-white">Entradas no mês</h5>
@@ -23,11 +23,20 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-danger">
                     <div class="card-body">
                         <h5 class="card-title text-white"> Saídas no mês</h5>
                         <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.outflows_month }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title text-white"> Assinaturas Ativas</h5>
+                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.total_signatures }}</p>
                     </div>
                 </div>
             </div>

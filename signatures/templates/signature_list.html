@@ -6,11 +6,22 @@ GAW Finance - Assinaturas
 
 {% block content %}
 
-<div class="row main-brand-font">
-    <h1>Assinaturas</h1>
+<div class="row main-brand-font align-items-center mb-4">
+    <div class="col-md-6">
+        <h1>Assinaturas</h1>
+    </div>
+    <div class="col-md-6 d-flex justify-content-md-end">
+        <div class="card bg-info shadow-sm border-0" style="min-width: 280px; border-radius: 10px;">
+            <div class="card-body p-2.5 text-center">
+                <h6 class="card-title text-white text-uppercase font-weight-bold mb-1" style="font-size: 1.2rem; letter-spacing: 1px;">Total Assinaturas Ativas</h6>
+                <p class="card-text text-white font-weight-bold display-6" style="font-size: 1.8rem;">
+                    <span style="font-size:1.4rem;">R$</span> {{ total_signatures_value|floatformat:"2g" }}
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="mt-4"></div>
 
 <div class="row mb-5 align-items-center">  
     <div class="col-md-10">

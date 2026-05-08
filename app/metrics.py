@@ -5,6 +5,7 @@ from calendar import monthrange
 from inflows.models import Inflow
 from outflows.models import Outflow
 from categories.models import Category
+from signatures.models import Signature
 import json
 
 
@@ -39,11 +40,14 @@ def get_finance_metrics():
     total_outflows = Outflow.objects.aggregate(Sum('value'))['value__sum'] or 0
     total_balance = total_inflows - total_outflows
 
+    total_signatures = Signature.objects.filter(is_active=True).aggregate(Sum('value'))['value__sum'] or 0
+
     return {
         'total_balance': number_format(total_balance, decimal_pos=2, force_grouping=True),
         'inflows_month': number_format(inflows_month, decimal_pos=2, force_grouping=True),
         'outflows_month': number_format(outflows_month, decimal_pos=2, force_grouping=True),
         'balance_month': number_format(balance_month, decimal_pos=2, force_grouping=True),
+        'total_signatures': number_format(total_signatures, decimal_pos=2, force_grouping=True),
     }
 
 
