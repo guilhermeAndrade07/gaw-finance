@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Novo Investimento{% endblock %}
+
+{% block content %}
+<div class="row main-brand-font">
+    <h1>Novo Investimento</h1>
+</div>
+
+<div class="mt-4"></div>
+
+<div class="card bg-dark border-secondary">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.asset_type.id_for_label }}" class="form-label">{{ form.asset_type.label }}</label>
+                    {{ form.asset_type }}
+                    {{ form.asset_type.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.subtype.id_for_label }}" class="form-label">{{ form.subtype.label }}</label>
+                    {{ form.subtype }}
+                    {{ form.subtype.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.institution.id_for_label }}" class="form-label">{{ form.institution.label }}</label>
+                    {{ form.institution }}
+                    {{ form.institution.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.bank.id_for_label }}" class="form-label">{{ form.bank.label }}</label>
+                    {{ form.bank }}
+                    {{ form.bank.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.current_value.id_for_label }}" class="form-label">{{ form.current_value.label }}</label>
+                    {{ form.current_value }}
+                    {{ form.current_value.errors }}
+                </div>
+            </div>
+
+            <div class="row fixed-income-wrapper">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.maturity_date.id_for_label }}" class="form-label">{{ form.maturity_date.label }}</label>
+                    {{ form.maturity_date }}
+                    {{ form.maturity_date.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.expected_rate.id_for_label }}" class="form-label">{{ form.expected_rate.label }}</label>
+                    {{ form.expected_rate }}
+                    {{ form.expected_rate.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.liquidity_type.id_for_label }}" class="form-label">{{ form.liquidity_type.label }}</label>
+                    {{ form.liquidity_type }}
+                    {{ form.liquidity_type.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.initial_amount.id_for_label }}" class="form-label">{{ form.initial_amount.label }}</label>
+                    {{ form.initial_amount }}
+                    {{ form.initial_amount.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.initial_date.id_for_label }}" class="form-label">{{ form.initial_date.label }}</label>
+                    {{ form.initial_date }}
+                    {{ form.initial_date.errors }}
+                </div>
+                <div class="col-md-4 mb-3 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.register_cash_flow }}
+                        <label class="form-check-label" for="{{ form.register_cash_flow.id_for_label }}">
+                            {{ form.register_cash_flow.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                {{ form.notes }}
+                {{ form.notes.errors }}
+            </div>
+
+            <div class="mb-3 form-check">
+                {{ form.is_active }}
+                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                    {{ form.is_active.label }}
+                </label>
+                {{ form.is_active.errors }}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success">Salvar Investimento</button>
+                <a href="{% url 'investment_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+ </div>
+
+<script>
+    const assetTypeField = document.getElementById('{{ form.asset_type.id_for_label }}');
+    const fixedIncomeWrapper = document.querySelector('.fixed-income-wrapper');
+
+    function toggleFixedIncomeFields() {
+        if (!assetTypeField || !fixedIncomeWrapper) {
+            return;
+        }
+
+        fixedIncomeWrapper.style.display = assetTypeField.value === 'RENDA_FIXA' ? 'flex' : 'none';
+    }
+
+    if (assetTypeField) {
+        assetTypeField.addEventListener('change', toggleFixedIncomeFields);
+        toggleFixedIncomeFields();
+    }
+</script>
+{% endblock %}

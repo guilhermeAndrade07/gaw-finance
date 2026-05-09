@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Nova Movimentacao{% endblock %}
+
+{% block content %}
+<div class="row main-brand-font">
+    <h1>Nova Movimentacao de Investimento</h1>
+</div>
+
+<div class="mt-4"></div>
+
+<div class="card bg-dark border-secondary">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.asset.id_for_label }}" class="form-label">{{ form.asset.label }}</label>
+                    {{ form.asset }}
+                    {{ form.asset.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.operation_type.id_for_label }}" class="form-label">{{ form.operation_type.label }}</label>
+                    {{ form.operation_type }}
+                    {{ form.operation_type.errors }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.value.id_for_label }}" class="form-label">{{ form.value.label }}</label>
+                    {{ form.value }}
+                    {{ form.value.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.movement_date.id_for_label }}" class="form-label">{{ form.movement_date.label }}</label>
+                    {{ form.movement_date }}
+                    {{ form.movement_date.errors }}
+                </div>
+                <div class="col-md-6 mb-3 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.register_cash_flow }}
+                        <label class="form-check-label" for="{{ form.register_cash_flow.id_for_label }}">
+                            {{ form.register_cash_flow.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                {{ form.notes }}
+                {{ form.notes.errors }}
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success">Salvar Movimentacao</button>
+                <a href="{% url 'investment_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

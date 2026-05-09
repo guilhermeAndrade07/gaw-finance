@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'outflows',
     'payment',
     'signatures',
+    'investments',
 ]
 
 LOGIN_URL = 'login'

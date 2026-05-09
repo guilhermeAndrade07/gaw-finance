@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Investimentos{% endblock %}
+
+{% block content %}
+<div class="row main-brand-font align-items-center mb-4">
+    <div class="col-md-6">
+        <h1>Investimentos</h1>
+        <p class="text-muted mb-0">Acompanhe carteira, aportes e resgates.</p>
+    </div>
+    <div class="col-md-6 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+        <div class="d-flex gap-2">
+            <a href="{% url 'investment_movement_create' %}" class="btn btn-outline-info">
+                <i class="bi bi-arrow-left-right"></i> Nova Movimentacao
+            </a>
+            <a href="{% url 'investment_create' %}" class="btn btn-success">
+                <i class="bi bi-plus"></i> Novo Investimento
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card bg-success">
+            <div class="card-body">
+                <h5 class="card-title text-white">Carteira Atual</h5>
+                <p class="card-text text-white display-6">R$ {{ total_current_value|floatformat:"2g" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card bg-primary">
+            <div class="card-body">
+                <h5 class="card-title text-white">Ativos Cadastrados</h5>
+                <p class="card-text text-white display-6">{{ assets|length }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card bg-info">
+            <div class="card-body">
+                <h5 class="card-title text-white">Ativos Ativos</h5>
+                <p class="card-text text-white display-6">{{ active_assets_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <form method="get" action="{% url 'investment_list' %}" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" class="form-control" name="name" placeholder="Nome do investimento" value="{{ request.GET.name }}">
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" name="asset_type">
+                    <option value="">Todos os tipos</option>
+                    {% for value, label in asset_types %}
+                        <option value="{{ value }}" {% if request.GET.asset_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-search"></i>
+                </button>
+                <a href="{% url 'investment_list' %}" class="btn btn-outline-secondary w-100">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% for group in grouped_assets %}
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">{{ group.label }}</h3>
+        <span class="badge bg-secondary fs-6">Total R$ {{ group.total|floatformat:"2g" }}</span>
+    </div>
+
+    <div class="row">
+        {% for asset in group.items %}
+        <div class="col-md-6 col-xl-4 mb-3">
+            <div class="card h-100 border-secondary bg-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">{{ asset.name }}</h5>
+                            <p class="text-muted mb-0">{{ asset.subtype|default:"Sem subtipo" }}</p>
+                        </div>
+                        {% if asset.is_active %}
+                            <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="mb-1"><strong>Banco:</strong> {{ asset.bank.name }}</p>
+                    <p class="mb-1"><strong>Instituicao:</strong> {{ asset.institution|default:"-" }}</p>
+                    <p class="mb-1"><strong>Liquidez:</strong> {{ asset.get_liquidity_type_display|default:"-" }}</p>
+                    <p class="mb-3"><strong>Valor atual:</strong> R$ {{ asset.current_value|floatformat:"2g" }}</p>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'investment_detail' asset.id %}" class="btn btn-info btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'investment_update' asset.id %}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'investment_movement_create' %}?asset={{ asset.id }}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </a>
+                        <a href="{% url 'investment_delete' asset.id %}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="alert alert-secondary">Nenhum investimento cadastrado.</div>
+{% endfor %}
+{% endblock %}

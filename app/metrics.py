@@ -3,6 +3,7 @@ from django.db.models import Sum
 from datetime import date
 from calendar import monthrange
 from inflows.models import Inflow
+from investments.models import InvestmentAsset
 from outflows.models import Outflow
 from categories.models import Category
 from signatures.models import Signature
@@ -175,16 +176,15 @@ def get_investment(user):
         }
 
     try:
-        category = Category.objects.get(user=user, name__iexact='Investimento')
-        total_investment = Outflow.objects.filter(
+        total_investment = InvestmentAsset.objects.filter(
             user=user,
-            category=category
-        ).aggregate(Sum('value'))['value__sum'] or 0
+            is_active=True
+        ).aggregate(Sum('current_value'))['current_value__sum'] or 0
         return {
             'total_investment': number_format(total_investment, decimal_pos=2, force_grouping=True),
             'total_investment_value': float(total_investment)
         }
-    except Category.DoesNotExist:
+    except Exception:
         return {
             'total_investment': '0,00',
             'total_investment_value': 0.0
