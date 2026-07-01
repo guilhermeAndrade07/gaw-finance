@@ -45,26 +45,16 @@
           <table class="table table-borderless mb-0">
             <tbody>
               <tr>
+                <td class="text-muted fw-medium">Usuario</td>
+                <td>{{ account.user.username }}</td>
+              </tr>
+              <tr>
                 <td class="text-muted fw-medium" style="width: 180px;">Nome</td>
                 <td>{{ account.name }}</td>
               </tr>
               <tr>
                 <td class="text-muted fw-medium">Email</td>
                 <td>{{ account.user.email|default:"-" }}</td>
-              </tr>
-              <tr>
-                <td class="text-muted fw-medium">Usuario</td>
-                <td>{{ account.user.username }}</td>
-              </tr>
-              <tr>
-                <td class="text-muted fw-medium">Nome Completo</td>
-                <td>
-                  {% if account.user.first_name or account.user.last_name %}
-                    {{ account.user.first_name }} {{ account.user.last_name }}
-                  {% else %}
-                    -
-                  {% endif %}
-                </td>
               </tr>
               <tr>
                 <td class="text-muted fw-medium">Ultima Atualizacao</td>
