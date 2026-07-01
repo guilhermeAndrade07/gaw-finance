@@ -6,6 +6,8 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Sum
+from django.db.models import Value
+from django.db.models.functions import Coalesce
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
@@ -22,11 +24,28 @@ class PaymentListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
     def _show_hidden(self):
         return self.request.GET.get('show_hidden') == '1'
 
+    def _selected_card(self):
+        card_id = self.request.GET.get('card')
+
+        if not card_id:
+            return None
+
+        try:
+            return models.CreditCard.objects.get(id=int(card_id), user=self.request.user)
+        except (models.CreditCard.DoesNotExist, ValueError, TypeError):
+            return None
+
     def get_queryset(self):
         show_hidden = self._show_hidden()
         queryset = super().get_queryset().filter(paid=show_hidden)
         name = self.request.GET.get('name')
         month = self.request.GET.get('month')
+        selected_card = self._selected_card()
+
+        if not selected_card:
+            return queryset.none()
+
+        queryset = queryset.filter(card=selected_card)
 
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -43,14 +62,32 @@ class PaymentListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         context = super().get_context_data(**kwargs)
         show_hidden = self._show_hidden()
         listed_items = context.get('payment', context.get('object_list', []))
+        cards = models.CreditCard.objects.filter(user=self.request.user).select_related('bank')
+        selected_card = self._selected_card()
 
         if hasattr(listed_items, 'aggregate'):
             total = listed_items.aggregate(Sum('value'))['value__sum'] or 0
         else:
             total = sum((item.value or 0) for item in listed_items)
 
+        credit_limit = Decimal('0.00')
+        credit_used = Decimal('0.00')
+
+        if selected_card:
+            usage_queryset = models.Payment.objects.filter(user=self.request.user, paid=False)
+            usage_queryset = usage_queryset.filter(card=selected_card)
+            credit_limit = selected_card.credit_limit
+            credit_used = usage_queryset.aggregate(
+                total=Coalesce(Sum('value'), Value(Decimal('0.00')))
+            )['total']
+        credit_available = max(credit_limit - credit_used, Decimal('0.00'))
+
         context['payment_total'] = total
         context['show_hidden'] = show_hidden
+        context['cards'] = cards
+        context['selected_card'] = selected_card
+        context['credit_used'] = credit_used
+        context['credit_available'] = credit_available
         context['months'] = [
             ('1', 'Janeiro'),
             ('2', 'Fevereiro'),
@@ -74,6 +111,25 @@ class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     form_class = forms.PaymentForm
     success_url = reverse_lazy('payment_list')
 
+    def get_initial(self):
+        initial = super().get_initial()
+        card_id = self.request.GET.get('card')
+
+        if card_id and models.CreditCard.objects.filter(
+            id=card_id,
+            user=self.request.user,
+            active=True,
+        ).exists():
+            initial['card'] = card_id
+
+        return initial
+
+    def get_success_url(self):
+        if getattr(self.object, 'card_id', None):
+            return f'{self.success_url}?card={self.object.card_id}'
+
+        return str(self.success_url)
+
     @staticmethod
     def _add_months(base_date, months):
         month = base_date.month - 1 + months
@@ -91,6 +147,7 @@ class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
         name = form.cleaned_data.get('name')
         description = form.cleaned_data.get('description')
         category = form.cleaned_data.get('category')
+        card = form.cleaned_data.get('card')
         date_payment = form.cleaned_data.get('date_payment')
         total_value = form.cleaned_data.get('value')
 
@@ -130,6 +187,7 @@ class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
                     name=f'{name} ({installment_index + 1}/{parcelas})',
                     description=description,
                     category=category,
+                    card=card,
                     date_payment=current_date,
                     value=current_value,
                     parcelas=parcelas,
@@ -137,6 +195,9 @@ class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
             )
 
         models.Payment.objects.bulk_create(payments_to_create)
+        if card:
+            return HttpResponseRedirect(f'{self.success_url}?card={card.id}')
+
         return HttpResponseRedirect(str(self.success_url))
 
 
@@ -156,6 +217,49 @@ class PaymentDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView)
     model = models.Payment
     template_name = 'payment_delete.html'
     success_url = reverse_lazy('payment_list')
+
+
+class CreditCardListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
+    model = models.CreditCard
+    template_name = 'credit_card_list.html'
+    context_object_name = 'cards'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('bank')
+        name = self.request.GET.get('name')
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset
+
+
+class CreditCardCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
+    model = models.CreditCard
+    template_name = 'credit_card_create.html'
+    form_class = forms.CreditCardForm
+    success_url = reverse_lazy('credit_card_list')
+
+
+class CreditCardDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+    model = models.CreditCard
+    template_name = 'credit_card_detail.html'
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('bank')
+
+
+class CreditCardUpdateView(LoginRequiredMixin, UserScopedQuerySetMixin, UserScopedFormMixin, UpdateView):
+    model = models.CreditCard
+    template_name = 'credit_card_update.html'
+    form_class = forms.CreditCardForm
+    success_url = reverse_lazy('credit_card_list')
+
+
+class CreditCardDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
+    model = models.CreditCard
+    template_name = 'credit_card_delete.html'
+    success_url = reverse_lazy('credit_card_list')
 
 
 class PaymentCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):

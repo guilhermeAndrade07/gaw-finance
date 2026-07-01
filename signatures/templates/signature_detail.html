@@ -1,60 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %}
-GAW Finance - Detalhes da Assinatura
-{% endblock %}
+{% block title %}GAW Finance - Detalhes da Assinatura{% endblock %}
 
 {% block content %}
-<div class="row main-brand-font">
-    <h1>Detalhes da Assinatura</h1>
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes da Assinatura</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'signature_list' %}">Assinaturas</a></li>
+        <li class="breadcrumb-item active">{{ object.name }}</li>
+      </ol>
+    </div>
+  </div>
 </div>
 
-<div class="mt-4"></div>
-
-<div class="card bg-dark border-secondary">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h3 class="text-success">{{ object.name }}</h3>
-                <p class="lead">R$ {{ object.value|floatformat:"2g" }}</p>
-                <p><strong>Status:</strong> 
-                    {% if object.is_active %}
-                        <span class="badge bg-success">Ativa</span>
-                    {% else %}
-                        <span class="badge bg-danger">Inativa</span>
-                    {% endif %}
-                </p>
-                <p><strong>Dia de Cobrança:</strong> Todo dia {{ object.billing_day }}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Banco:</strong> {{ object.bank.name }}</p>
-                <p><strong>Categoria:</strong> {{ object.category.name|default:"-" }}</p>
-                <p><strong>Descrição:</strong><br> {{ object.description|default:"Sem descrição." }}</p>
-            </div>
-        </div>
-
-        <hr class="border-secondary">
-
-        <div class="mt-3">
-            <p class="text-muted small">
-                <strong>Criado em:</strong> {{ object.created_at|date:"d/m/Y H:i" }}<br>
-                <strong>Última atualização:</strong> {{ object.updated_at|date:"d/m/Y H:i" }}<br>
-                {% if object.last_generated_month %}
-                    <strong>Último lançamento gerado em:</strong> {{ object.last_generated_month }}/{{ object.last_generated_year }}
-                {% endif %}
-            </p>
-        </div>
-
-        <div class="mt-4 d-flex gap-2">
-            <a href="{% url 'signature_update' object.id %}" class="btn btn-warning">Editar</a>
-            <a href="{% url 'signature_list' %}" class="btn btn-outline-secondary">Voltar para Lista</a>
-            {% if object.is_active %}
-            <form action="{% url 'signature_cancel' object.id %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Cancelar Assinatura</button>
-            </form>
-            {% endif %}
-        </div>
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ object.name }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="lead text-success">R$ {{ object.value|floatformat:"2g" }}</p>
+        <p><strong>Status:</strong>
+          {% if object.is_active %}
+            <span class="badge bg-success rounded-pill">Ativa</span>
+          {% else %}
+            <span class="badge bg-danger rounded-pill">Inativa</span>
+          {% endif %}
+        </p>
+        <p><strong>Dia de Cobranca:</strong> Todo dia {{ object.billing_day }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Banco:</strong> {{ object.bank.name }}</p>
+        <p><strong>Categoria:</strong> {{ object.category.name|default:"-" }}</p>
+        <p><strong>Descricao:</strong><br> {{ object.description|default:"Sem descricao." }}</p>
+      </div>
     </div>
+
+    <hr>
+
+    <div class="mt-2">
+      <p class="text-muted small">
+        <strong>Criado em:</strong> {{ object.created_at|date:"d/m/Y H:i" }}<br>
+        <strong>Ultima atualizacao:</strong> {{ object.updated_at|date:"d/m/Y H:i" }}<br>
+        {% if object.last_generated_month %}
+          <strong>Ultimo lancamento gerado em:</strong> {{ object.last_generated_month }}/{{ object.last_generated_year }}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="card-footer d-flex gap-2">
+    <a href="{% url 'signature_update' object.id %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'signature_list' %}" class="btn btn-light">Voltar para Lista</a>
+    {% if object.is_active %}
+    <form action="{% url 'signature_cancel' object.id %}" method="post" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Cancelar Assinatura</button>
+    </form>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

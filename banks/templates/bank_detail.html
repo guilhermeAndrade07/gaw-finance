@@ -1,19 +1,46 @@
 {% extends 'base.html' %}
 
+{% block title %}GAW Finance - Detalhes do Banco{% endblock %}
+
 {% block content %}
 
-    <div class="container mt-4">
-        <h3 class="display-6"> Detalhes do Banco</h3>
-
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">{{object.name}}</h3>
-                <p class="card-text"><strong>Tipo de conta:</strong> {{object.account_type}}</p>
-                <p class="card-text"><strong>Agência:</strong> {{object.agency}}</p>
-                <p class="card-text"><strong>Conta:</strong> {{object.account}}</p>
-            </div>
-        </div>
-        <a href="{% url 'bank_list' %}" class="btn btn-secondary mt-3">Voltar para a lista de bancos</a>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes do Banco</h4>
     </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'bank_list' %}">Bancos</a></li>
+        <li class="breadcrumb-item active">{{ object.name }}</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ object.name }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Tipo de Conta</label>
+        <p class="fw-medium">{{ object.account_type }}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Agencia</label>
+        <p class="fw-medium">{{ object.agency }}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Conta</label>
+        <p class="fw-medium">{{ object.account }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'bank_list' %}" class="btn btn-light">Voltar para a lista</a>
+  </div>
+</div>
 
 {% endblock %}

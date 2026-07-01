@@ -1,87 +1,198 @@
-<!-- htmlhint inline-script-disabled:false -->
-<h1 class="main-brand-font ">Dashboard</h1>
-<p>Análise detalhada das suas finanças!</p>
-<div class=" mt-4">
-    <div class="card-body">
-        <div class="row">
-
-            <div class="col-md-3">
-                <div class="card bg-success">
-                    <div class="card-body">
-                        <h5 class="card-title text-white">Saldo total</h5>
-                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.total_balance }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card bg-warning">
-                    <div class="card-body">
-                        <h5 class="card-title text-white">Entradas no mês</h5>
-                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.inflows_month }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card bg-danger">
-                    <div class="card-body">
-                        <h5 class="card-title text-white"> Saídas no mês</h5>
-                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.outflows_month }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card bg-info">
-                    <div class="card-body">
-                        <h5 class="card-title text-white"> Assinaturas Ativas</h5>
-                        <p class="card-text text-white font-weight-bold display-6">R$ {{ metrics.total_signatures }}</p>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Dashboard</h4>
+      <p class="text-muted mb-0">Bem-vindo, {{ user.first_name|default:user.username }}! Analise detalhada das suas financas!</p>
     </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="row mt-5">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Fluxo de Caixa Mensal</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="cashFlowChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Despesas por Categoria Mensal</h5>
-            </div>
-            <div class="card-body">
-                <select class="form-select" id="monthSelector" aria-label="Selecionar mês">
-                    {% for month in months_list %}
-                        <option value="{{ month.value }}">{{ month.display }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="card-body">
-                <p class="mb-3 fw-bold text-danger">Total gasto no mês: <span id="monthlyExpenseTotal">R$ 0,00</span></p>
-                <canvas id="categoryChart"></canvas>
-            </div>
-        </div>
-    </div>
+<div class="row mt-3 mb-2">
+  <div class="col-md-4">
+    <select class="form-select" id="bankSelector" aria-label="Selecionar banco">
+      <option value="">Todos os Bancos</option>
+      {% for bank in banks %}
+        <option value="{{ bank.id }}" {% if selected_bank_id == bank.id|stringformat:"s" %}selected{% endif %}>{{ bank.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
 </div>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 mt-3">
+  <div class="col mb-3">
+    <div class="card h-100">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between">
+          <div class="rounded-circle bg-success widget-two-icon align-self-center d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px;">
+            <i class="mdi mdi-currency-usd text-white" style="font-size:22px;"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Saldo Total">Saldo Total</p>
+            <h3 class="fw-medium my-1">R$ {{ metrics.total_balance }}</h3>
+            <p class="m-0">Atual</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col mb-3">
+    <div class="card h-100">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between">
+          <div class="rounded-circle bg-warning widget-two-icon align-self-center d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px;">
+            <i class="mdi mdi-arrow-down-bold text-white" style="font-size:22px;"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Entradas no Mes">Entradas no Mes</p>
+            <h3 class="fw-medium my-1">R$ {{ metrics.inflows_month }}</h3>
+            <p class="m-0">Receitas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col mb-3">
+    <div class="card h-100">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between">
+          <div class="rounded-circle bg-danger widget-two-icon align-self-center d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px;">
+            <i class="mdi mdi-arrow-up-bold text-white" style="font-size:22px;"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Saidas no Mes">Saidas no Mes</p>
+            <h3 class="fw-medium my-1">R$ {{ metrics.outflows_month }}</h3>
+            <p class="m-0">Despesas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col mb-3">
+    <div class="card h-100">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between">
+          <div class="rounded-circle bg-info widget-two-icon align-self-center d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px;">
+            <i class="mdi mdi-calendar-check text-white" style="font-size:22px;"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Assinaturas Ativas">Assinaturas Ativas</p>
+            <h3 class="fw-medium my-1">R$ {{ metrics.total_signatures }}</h3>
+            <p class="m-0">Mensal</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col mb-3">
+    <div class="card h-100">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex justify-content-between">
+          <div class="rounded-circle bg-primary widget-two-icon align-self-center d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px;">
+            <i class="mdi mdi-trending-up text-white" style="font-size:22px;"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Investimentos">Investimentos</p>
+            <h3 class="fw-medium my-1">R$ {{ metrics.total_investment }}</h3>
+            <p class="m-0">Carteira</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-xl-8">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="header-title">Fluxo de Caixa Mensal</h4>
+        <p class="card-subtitle">Entradas e saidas ao longo do tempo.</p>
+      </div>
+      <div class="card-body">
+        <canvas id="cashFlowChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="header-title">Despesas por Categoria</h4>
+        <p class="card-subtitle">Distribuicao mensal.</p>
+      </div>
+      <div class="card-body">
+        <select class="form-select mb-3" id="monthSelector" aria-label="Selecionar mes">
+          {% for month in months_list %}
+            <option value="{{ month.value }}">{{ month.display }}</option>
+          {% endfor %}
+        </select>
+        <p class="mb-3 fw-bold text-danger">Total gasto no mes: <span id="monthlyExpenseTotal">R$ 0,00</span></p>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header">
+    <h4 class="header-title">Suas Ultimas Transacoes</h4>
+    <p class="card-subtitle">Movimentacoes recentes registradas no sistema.</p>
+  </div>
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Titulo</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Banco</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Tipo</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in latest_transactions %}
+          <tr>
+            <td><h5 class="m-0 fw-medium">{{ transaction.title }}</h5></td>
+            <td>{{ transaction.bank.name }}</td>
+            <td>
+              {% if transaction.category %}
+                {{ transaction.category.name }}
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>R$ {{ transaction.value|floatformat:"2g" }}</td>
+            <td>
+              {% if transaction.tipo == "Entrada" %}
+                <span class="badge bg-success rounded-pill">Entrada</span>
+              {% else %}
+                <span class="badge bg-danger rounded-pill">Saida</span>
+              {% endif %}
+            </td>
+            <td>{{ transaction.created_at|date:"d/m/Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">Nenhuma transacao registrada</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
 <script>
-    // Gráfico de Fluxo de Caixa
     const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
     new Chart(cashFlowCtx, {
         type: 'bar',
@@ -96,7 +207,7 @@
                     borderWidth: 2,
                 },
                 {
-                    label: 'Saídas',
+                    label: 'Saidas',
                     data: {{ cash_flow.outflows|safe }},
                     backgroundColor: '#dc3545',
                     borderColor: '#bb2d3b',
@@ -124,7 +235,6 @@
         }
     });
 
-    // Gráfico de Despesas por Categoria
     let categoryChart = null;
     const colors = ['#4BC0C0', '#FFCE56', '#FF6384', '#FFFFFF', '#36A2EB', '#8B4513', '#FF9F40', '#9966FF', '#C9CBCF'];
     const monthlyExpenseTotalElement = document.getElementById('monthlyExpenseTotal');
@@ -183,15 +293,25 @@
             }
         });
     }
-    
-    updateCategoryChart({{ expenses.labels|safe }}, {{ expenses.data|safe }});
-    
-    // Listener para mudança de mês
+    </script>
+
+    <script>
+    const initialLabels = JSON.parse('{{ expenses.labels|escapejs }}');
+    const initialData = JSON.parse('{{ expenses.data|escapejs }}');
+    updateCategoryChart(initialLabels, initialData);
+
+    const selectedBankId = '{{ selected_bank_id }}';
+
     document.getElementById('monthSelector').addEventListener('change', function(e) {
         const monthYear = e.target.value;
         const [year, month] = monthYear.split('-');
         
-        fetch(`/api/expenses-by-month/?month=${month}&year=${year}`)
+        let url = `/api/expenses-by-month/?month=${month}&year=${year}`;
+        if (selectedBankId) {
+            url += `&bank=${selectedBankId}`;
+        }
+        
+        fetch(url)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -200,6 +320,17 @@
                 console.error('Erro ao atualizar dados:', data.error);
             }
         })
-        .catch(error => console.error('Erro na requisição:', error));
+        .catch(error => console.error('Erro na requisicao:', error));
     });
-</script>
+
+    document.getElementById('bankSelector').addEventListener('change', function(e) {
+        const params = new URLSearchParams(window.location.search);
+        const bankValue = e.target.value;
+        if (bankValue) {
+            params.set('bank', bankValue);
+        } else {
+            params.delete('bank');
+        }
+        window.location.search = params.toString();
+    });
+    </script>

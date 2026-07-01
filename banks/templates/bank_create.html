@@ -1,20 +1,72 @@
 {% extends 'base.html' %}
 
+{% block title %}GAW Finance - Cadastrar Banco{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-    <h3 class="display-4"> Cadastrar Banco </h3>
-
-    <div class="card">
-        <div class="card-body">
-            <form method="post" class="form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Salvar Banco</button>
-            </form>
-        </div>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Cadastrar Banco</h4>
     </div>
-    <a href="{% url 'bank_list' %}" class="btn btn-secondary mt-3">Cancelar e Voltar para lista de bancos</a>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'bank_list' %}">Bancos</a></li>
+        <li class="breadcrumb-item active">Novo</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">Novo Banco</h4>
+    <p class="card-subtitle">Preencha os dados da conta bancaria.</p>
+  </div>
+  <div class="card-body">
+    <form method="post" class="form">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+          {{ form.name }}
+          {{ form.name.errors }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.account_type.id_for_label }}" class="form-label">{{ form.account_type.label }}</label>
+          {{ form.account_type }}
+          {{ form.account_type.errors }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.agency.id_for_label }}" class="form-label">{{ form.agency.label }}</label>
+          {{ form.agency }}
+          {{ form.agency.errors }}
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.account.id_for_label }}" class="form-label">{{ form.account.label }}</label>
+          {{ form.account }}
+          {{ form.account.errors }}
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.initial_balance.id_for_label }}" class="form-label">{{ form.initial_balance.label }}</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            {{ form.initial_balance }}
+          </div>
+          {{ form.initial_balance.errors }}
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Salvar Banco</button>
+        <a href="{% url 'bank_list' %}" class="btn btn-light">Cancelar</a>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}

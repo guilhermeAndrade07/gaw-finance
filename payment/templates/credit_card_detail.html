@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}GAW Finance - Detalhes do Cartao{% endblock %}
+
+{% block content %}
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes do Cartao</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'credit_card_list' %}">Cartoes</a></li>
+        <li class="breadcrumb-item active">{{ object.name }}</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ object.name }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Banco</label>
+        <p class="fw-medium">{{ object.bank.name }}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Limite</label>
+        <p class="fw-medium">R$ {{ object.credit_limit|floatformat:"2g" }}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Ativo</label>
+        <p class="fw-medium">{% if object.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Nao</span>{% endif %}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'credit_card_list' %}" class="btn btn-light">Voltar para a lista de Cartoes</a>
+  </div>
+</div>
+
+{% endblock %}

@@ -18,7 +18,7 @@ def shift_months(base_date, months):
     return base_date.replace(year=year, month=month, day=day)
 
 
-def get_finance_metrics(user):
+def get_finance_metrics(user, bank=None):
     if not user or not user.is_authenticated:
         return {
             'total_balance': '0,00',
@@ -32,24 +32,35 @@ def get_finance_metrics(user):
     current_month = today.month
     current_year = today.year
 
-    inflows_month = Inflow.objects.filter(
-        user=user,
+    inflow_qs = Inflow.objects.filter(user=user)
+    outflow_qs = Outflow.objects.filter(user=user)
+
+    if bank:
+        inflow_qs = inflow_qs.filter(bank=bank)
+        outflow_qs = outflow_qs.filter(bank=bank)
+
+    inflows_month = inflow_qs.filter(
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
 
-    outflows_month = Outflow.objects.filter(
-        user=user,
+    outflows_month = outflow_qs.filter(
         created_at__month=current_month,
         created_at__year=current_year
     ).aggregate(Sum('value'))['value__sum'] or 0
 
     balance_month = inflows_month - outflows_month
 
-    # Saldo total calculado como (soma de todos os inflows) - (soma de todos os outflows)
-    total_inflows = Inflow.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0
-    total_outflows = Outflow.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0
-    total_balance = total_inflows - total_outflows
+    if bank:
+        total_inflows = inflow_qs.aggregate(Sum('value'))['value__sum'] or 0
+        total_outflows = outflow_qs.aggregate(Sum('value'))['value__sum'] or 0
+        total_balance = bank.initial_balance + total_inflows - total_outflows
+    else:
+        from banks.models import Bank
+        total_initial = Bank.objects.filter(user=user).aggregate(Sum('initial_balance'))['initial_balance__sum'] or 0
+        total_inflows = inflow_qs.aggregate(Sum('value'))['value__sum'] or 0
+        total_outflows = outflow_qs.aggregate(Sum('value'))['value__sum'] or 0
+        total_balance = total_initial + total_inflows - total_outflows
 
     total_signatures = Signature.objects.filter(user=user, is_active=True).aggregate(Sum('value'))['value__sum'] or 0
 
@@ -62,7 +73,7 @@ def get_finance_metrics(user):
     }
 
 
-def get_monthly_cash_flow(user):
+def get_monthly_cash_flow(user, bank=None):
     if not user or not user.is_authenticated:
         return {
             'labels': json.dumps([]),
@@ -80,17 +91,23 @@ def get_monthly_cash_flow(user):
         month = date_obj.month
         year = date_obj.year
 
-        inflow = Inflow.objects.filter(
+        inflow_qs = Inflow.objects.filter(
             user=user,
             created_at__month=month,
             created_at__year=year
-        ).aggregate(Sum('value'))['value__sum'] or 0
+        )
+        outflow_qs = Outflow.objects.filter(
+            user=user,
+            created_at__month=month,
+            created_at__year=year
+        )
 
-        outflow = Outflow.objects.filter(
-            user=user,
-            created_at__month=month,
-            created_at__year=year
-        ).aggregate(Sum('value'))['value__sum'] or 0
+        if bank:
+            inflow_qs = inflow_qs.filter(bank=bank)
+            outflow_qs = outflow_qs.filter(bank=bank)
+
+        inflow = inflow_qs.aggregate(Sum('value'))['value__sum'] or 0
+        outflow = outflow_qs.aggregate(Sum('value'))['value__sum'] or 0
 
         months_labels.append(date_obj.strftime('%b/%Y'))
         inflows_data.append(float(inflow))
@@ -103,7 +120,7 @@ def get_monthly_cash_flow(user):
     }
 
 
-def get_expenses_by_category(user, month=None, year=None):
+def get_expenses_by_category(user, month=None, year=None, bank=None):
     categories_data = {}
 
     if not user or not user.is_authenticated:
@@ -119,12 +136,15 @@ def get_expenses_by_category(user, month=None, year=None):
 
     categories = Category.objects.filter(user=user)
     for category in categories:
-        total = Outflow.objects.filter(
+        outflow_qs = Outflow.objects.filter(
             user=user,
             category=category,
             created_at__month=month,
             created_at__year=year
-        ).aggregate(Sum('value'))['value__sum'] or 0
+        )
+        if bank:
+            outflow_qs = outflow_qs.filter(bank=bank)
+        total = outflow_qs.aggregate(Sum('value'))['value__sum'] or 0
         if total > 0:
             categories_data[category.name] = float(total)
 

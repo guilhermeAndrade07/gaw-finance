@@ -27,6 +27,12 @@ class BankCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     form_class = forms.BankForm
     success_url = reverse_lazy('bank_list')
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.balance = self.object.initial_balance
+        self.object.save()
+        return super().form_valid(form)
+
 
 class BankDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
     model = models.Bank

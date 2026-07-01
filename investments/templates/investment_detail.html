@@ -3,115 +3,147 @@
 {% block title %}GAW Finance - Detalhes do Investimento{% endblock %}
 
 {% block content %}
-<div class="row main-brand-font align-items-center">
-    <div class="col-md-8">
-        <h1>{{ asset.name }}</h1>
-        <p class="text-muted">{{ asset.get_asset_type_display }}{% if asset.subtype %} • {{ asset.subtype }}{% endif %}</p>
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">{{ asset.name }}</h4>
+      <p class="text-muted mb-0">{{ asset.get_asset_type_display }}{% if asset.subtype %} &bull; {{ asset.subtype }}{% endif %}</p>
     </div>
-    <div class="col-md-4 d-flex justify-content-md-end justify-content-start gap-2 mt-3 mt-md-0">
-        <a href="{% url 'investment_movement_create' %}?asset={{ asset.id }}" class="btn btn-outline-info">
-            <i class="bi bi-arrow-left-right"></i> Movimentar
-        </a>
-        <a href="{% url 'investment_update' asset.id %}" class="btn btn-warning">Atualizar Saldo</a>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'investment_list' %}">Investimentos</a></li>
+        <li class="breadcrumb-item active">{{ asset.name }}</li>
+      </ol>
     </div>
+  </div>
 </div>
 
-<div class="mt-4"></div>
-
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card bg-success">
-            <div class="card-body">
-                <h6 class="card-title text-white">Valor Atual</h6>
-                <p class="card-text text-white display-6">R$ {{ asset.current_value|floatformat:"2g" }}</p>
-            </div>
+<div class="row mt-3">
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-success widget-two-icon align-self-center">
+            <i class="mdi mdi-currency-usd avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Valor Atual">Valor Atual</p>
+            <h3 class="fw-medium my-2">R$ {{ asset.current_value|floatformat:"2g" }}</h3>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-primary">
-            <div class="card-body">
-                <h6 class="card-title text-white">Aportes</h6>
-                <p class="card-text text-white display-6">R$ {{ total_applied|floatformat:"2g" }}</p>
-            </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-primary widget-two-icon align-self-center">
+            <i class="mdi mdi-arrow-up-bold avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Aportes">Aportes</p>
+            <h3 class="fw-medium my-2">R$ {{ total_applied|floatformat:"2g" }}</h3>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-secondary">
-            <div class="card-body">
-                <h6 class="card-title text-white">Resgates</h6>
-                <p class="card-text text-white display-6">R$ {{ total_redeemed|floatformat:"2g" }}</p>
-            </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-secondary widget-two-icon align-self-center">
+            <i class="mdi mdi-arrow-down-bold avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Resgates">Resgates</p>
+            <h3 class="fw-medium my-2">R$ {{ total_redeemed|floatformat:"2g" }}</h3>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card {% if profit_loss >= 0 %}bg-info{% else %}bg-danger{% endif %}">
-            <div class="card-body">
-                <h6 class="card-title text-white">Resultado</h6>
-                <p class="card-text text-white display-6">R$ {{ profit_loss|floatformat:"2g" }}</p>
-            </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle {% if profit_loss >= 0 %}bg-info{% else %}bg-danger{% endif %} widget-two-icon align-self-center">
+            <i class="mdi mdi-chart-line avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Resultado">Resultado</p>
+            <h3 class="fw-medium my-2">R$ {{ profit_loss|floatformat:"2g" }}</h3>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="card bg-dark border-secondary mb-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Banco:</strong> {{ asset.bank.name }}</p>
-                <p><strong>Instituicao:</strong> {{ asset.institution|default:"-" }}</p>
-                <p><strong>Liquidez:</strong> {{ asset.get_liquidity_type_display|default:"-" }}</p>
-                <p><strong>Status:</strong> {% if asset.is_active %}Ativo{% else %}Inativo{% endif %}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>Taxa esperada:</strong> {{ asset.expected_rate|default:"-" }}</p>
-                <p><strong>Vencimento:</strong> {{ asset.maturity_date|date:"d/m/Y"|default:"-" }}</p>
-                <p><strong>Observacoes:</strong> {{ asset.notes|default:"-" }}</p>
-            </div>
-        </div>
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">Informacoes do Ativo</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="mb-2"><strong>Banco:</strong> {{ asset.bank.name }}</p>
+        <p class="mb-2"><strong>Instituicao:</strong> {{ asset.institution|default:"-" }}</p>
+        <p class="mb-2"><strong>Liquidez:</strong> {{ asset.get_liquidity_type_display|default:"-" }}</p>
+        <p class="mb-0"><strong>Status:</strong> {% if asset.is_active %}<span class="badge bg-success rounded-pill">Ativo</span>{% else %}<span class="badge bg-danger rounded-pill">Inativo</span>{% endif %}</p>
+      </div>
+      <div class="col-md-6">
+        <p class="mb-2"><strong>Taxa esperada:</strong> {{ asset.expected_rate|default:"-" }}</p>
+        <p class="mb-2"><strong>Vencimento:</strong> {{ asset.maturity_date|date:"d/m/Y"|default:"-" }}</p>
+        <p class="mb-0"><strong>Observacoes:</strong> {{ asset.notes|default:"-" }}</p>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="card bg-dark border-secondary">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Movimentacoes</h5>
-        <a href="{% url 'investment_movement_create' %}?asset={{ asset.id }}" class="btn btn-sm btn-outline-info">
-            Nova Movimentacao
-        </a>
+<div class="card mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h4 class="header-title mb-0">Movimentacoes</h4>
+    <a href="{% url 'investment_movement_create' %}?asset={{ asset.id }}" class="btn btn-sm btn-info">
+      <i data-lucide="plus" class="font-16 me-1"></i> Nova Movimentacao
+    </a>
+  </div>
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Operacao</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Fluxo de Caixa</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Observacoes</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for movement in movements %}
+          <tr>
+            <td>{{ movement.movement_date|date:"d/m/Y" }}</td>
+            <td>{{ movement.get_operation_type_display }}</td>
+            <td>R$ {{ movement.value|floatformat:"2g" }}</td>
+            <td>{% if movement.register_cash_flow %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-secondary rounded-pill">Nao</span>{% endif %}</td>
+            <td>{{ movement.notes|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Nenhuma movimentacao registrada.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Operacao</th>
-                        <th>Valor</th>
-                        <th>Fluxo de Caixa</th>
-                        <th>Observacoes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for movement in movements %}
-                    <tr>
-                        <td>{{ movement.movement_date|date:"d/m/Y" }}</td>
-                        <td>{{ movement.get_operation_type_display }}</td>
-                        <td>R$ {{ movement.value|floatformat:"2g" }}</td>
-                        <td>{% if movement.register_cash_flow %}Sim{% else %}Nao{% endif %}</td>
-                        <td>{{ movement.notes|default:"-" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">Nenhuma movimentacao registrada.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+  </div>
 </div>
 
-<div class="mt-4 d-flex gap-2">
-    <a href="{% url 'investment_list' %}" class="btn btn-outline-secondary">Voltar para Lista</a>
-    <a href="{% url 'investment_delete' asset.id %}" class="btn btn-danger">Excluir Investimento</a>
+<div class="mt-3 d-flex gap-2">
+  <a href="{% url 'investment_list' %}" class="btn btn-light">Voltar para Lista</a>
+  <a href="{% url 'investment_delete' asset.id %}" class="btn btn-danger">Excluir Investimento</a>
 </div>
 {% endblock %}

@@ -1,134 +1,220 @@
 {% extends "base.html" %}
 
-{% block title %}
-GAW Finance - Produtos
-{% endblock%}
+{% block title %}GAW Finance - Cartao de Credito{% endblock %}
 
 {% block content %}
 
-<div>
-    <div class="card-body text-center">
-        <div class="row align-items-center justify-content-center ">
-            <div class="col-sm-5">
-                {% if show_hidden %}
-                    <h2>Valor total de pagamentos ocultos:</h2>
-                {% else %}
-                    <h2>Valor total de pagamentos a fazer:</h2>
-                {% endif %}
-            </div>
-            <div class="col-sm-2">
-                <div class="card-body text-center">
-                    <p id="payment-total" class="card-text text-warning font-weight-bold display-6 " data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:"2g" }}</p>
-                </div>
-            </div>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Cartao de Credito</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Cartao de Credito</li>
+      </ol>
+    </div>
+  </div>
+</div>
 
+<div class="row mt-3">
+  <div class="col-xl-4 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-warning widget-two-icon align-self-center">
+            <i class="mdi mdi-shopping avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate">
+              {% if show_hidden %}Compras Pagas{% else %}Compras em Aberto{% endif %}
+            </p>
+            <h3 id="payment-total" class="fw-medium my-2" data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:"2g" }}</h3>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+  <div class="col-xl-4 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-danger widget-two-icon align-self-center">
+            <i class="mdi mdi-credit-card-minus avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate">Saldo Utilizado</p>
+            <h3 id="credit-used" class="fw-medium my-2" data-total="{{ credit_used|default_if_none:'0' }}">R$ {{ credit_used|floatformat:"2g" }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4 col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="avatar-lg rounded-circle bg-success widget-two-icon align-self-center">
+            <i class="mdi mdi-credit-card-plus avatar-title font-30 text-white"></i>
+          </div>
+          <div class="wigdet-two-content media-body text-end text-truncate">
+            <p class="m-0 text-uppercase fw-medium text-truncate">Saldo Disponivel</p>
+            <h3 id="credit-available" class="fw-medium my-2" data-total="{{ credit_available|default_if_none:'0' }}">R$ {{ credit_available|floatformat:"2g" }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="mt-4"></div>
-
-<div class="row mb-5 align-items-center">
-    <div class="col-md-9">
-        <form method="get" action="{% url 'payment_list' %}" class="row g-2 align-items-center">
-            <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="name" placeholder="Título" value="{{ request.GET.name }}">
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <select class="form-select" name="month">
-                    <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
-                    {% for month_value, month_label in months %}
-                        <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-filter"></i> Filtrar
+<div class="row mb-3 mt-2 align-items-center">
+  <div class="col-lg-9">
+    <form method="get" action="{% url 'payment_list' %}" class="row g-2 align-items-center">
+      <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
+      <div class="col-md-3">
+        <select class="form-select" name="card" required>
+          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartao</option>
+          {% for card in cards %}
+            <option value="{{ card.id }}" {% if request.GET.card == card.id|stringformat:"s" %} selected {% endif %}>
+              {{ card.name }} - {{ card.bank.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="app-search">
+          <div class="app-search-box">
+            <div class="input-group">
+              <input type="text" class="form-control" name="name" placeholder="Buscar compra..." value="{{ request.GET.name }}">
+              <div class="input-group-append">
+                <button class="btn btn-icon" type="submit">
+                  <i data-lucide="search" class="font-16"></i>
                 </button>
-                <a href="{% url 'payment_list' %}" class="btn btn-outline-secondary">Limpar</a>
+              </div>
             </div>
-        </form>
-    </div>
-
-    <div class="col-md-3 d-flex justify-content-md-end justify-content-start mt-2 mt-md-0">
-        {% if show_hidden %}
-            <a href="{% url 'payment_list' %}" class="btn btn-outline-light me-2">
-                <i class="bi bi-eye"></i> Mostrar Pendentes
-            </a>
-        {% else %}
-            <a href="{% url 'payment_list' %}?show_hidden=1" class="btn btn-outline-light me-2">
-                <i class="bi bi-eye-slash"></i> Mostrar Ocultos
-            </a>
-        {% endif %}
-
-        <a href="{% url 'payment_create' %}" class="btn btn-success">
-            <i class="bi bi-plus"></i> Novo Pagamento
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="month">
+          <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os meses</option>
+          {% for month_value, month_label in months %}
+            <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="mdi mdi-filter me-1"></i> Filtrar
+        </button>
+        <a href="{% url 'payment_list' %}" class="btn btn-light">Limpar</a>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-3 text-lg-end mt-2 mt-lg-0">
+    <div class="d-flex gap-2 justify-content-lg-end">
+      <a href="{% url 'credit_card_list' %}" class="btn btn-light">
+        <i class="mdi mdi-credit-card me-1"></i> Cartoes
+      </a>
+      {% if selected_card %}
+        <a href="{% url 'payment_create' %}?card={{ selected_card.id }}" class="btn btn-success">
+          <i data-lucide="plus" class="font-16 me-1"></i> Nova Compra
         </a>
+      {% else %}
+        <span class="btn btn-success disabled" aria-disabled="true">
+          <i data-lucide="plus" class="font-16 me-1"></i> Nova Compra
+        </span>
+      {% endif %}
     </div>
+  </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Título</th>
-                <th>Descrição</th>
-                <th>Categoria</th>
-                <th>Valor</th>
-                <th>Parcelas</th>
-                <th>Data de Pagamento</th>
-                <th>Pago</th>
-                <th>Ações</th>
-            </tr>
+<div class="mb-2 d-flex justify-content-end">
+  {% if show_hidden %}
+    <a href="{% url 'payment_list' %}{% if request.GET.card %}?card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
+      <i class="mdi mdi-eye me-1"></i> Mostrar Abertas
+    </a>
+  {% else %}
+    <a href="{% url 'payment_list' %}?show_hidden=1{% if request.GET.card %}&card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
+      <i class="mdi mdi-eye-off me-1"></i> Mostrar Pagas
+    </a>
+  {% endif %}
+</div>
+
+{% if not cards %}
+  <div class="alert alert-warning">
+    <i class="mdi mdi-alert me-1"></i> Cadastre um cartao para vincular novas compras e acompanhar limite utilizado.
+  </div>
+{% elif not selected_card %}
+  <div class="alert alert-info">
+    <i class="mdi mdi-information me-1"></i> Selecione um cartao para ver compras, saldo utilizado e saldo disponivel.
+  </div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Compra</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Cartao</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Descricao</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Vencimento</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+          </tr>
         </thead>
         <tbody>
-            {% for pay in payment %}
-            <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}">
-                <td>{{ pay.name }}</td>
-                <td>{{ pay.description }}</td>
-                <td>{{ pay.category }}</td>
-                <td>R$ {{ pay.value|floatformat:"2g" }}</td>
-                <td>{{ pay.parcelas_display }}</td>
-                <td>{{ pay.date_payment }}</td>
-                <td>
-                    <input
-                        class="form-check-input me-3 js-payment-paid-checkbox"
-                        type="checkbox"
-                        data-payment-id="{{ pay.id }}"
-                        {% if pay.paid %}checked{% endif %}
-                    >
-                </td>
-                <td>
-                    <a href="{% url 'payment_detail' pay.id %}" class="btn btn-info btn-sm">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    
-                    <a href="{% url 'payment_update' pay.id %}" class="btn btn-warning btn-sm">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-
-                    <a href="{% url 'payment_delete' pay.id %}" class="btn btn-danger btn-sm">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
+          {% for pay in payment %}
+          <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}" data-has-card="{% if pay.card %}1{% else %}0{% endif %}">
+            <td><h5 class="m-0 fw-medium">{{ pay.name }}</h5></td>
+            <td>{{ pay.card|default:"Sem cartao" }}</td>
+            <td>{{ pay.description }}</td>
+            <td>{{ pay.category }}</td>
+            <td>R$ {{ pay.value|floatformat:"2g" }}</td>
+            <td>{{ pay.parcelas_display }}</td>
+            <td>{{ pay.date_payment }}</td>
+            <td>
+              <input
+                class="form-check-input js-payment-paid-checkbox"
+                type="checkbox"
+                data-payment-id="{{ pay.id }}"
+                {% if pay.paid %}checked{% endif %}
+              >
+            </td>
+            <td>
+              <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
+                <i class="mdi mdi-eye"></i>
+              </a>
+              <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
+                <i class="mdi mdi-pencil"></i>
+              </a>
+              <a href="{% url 'payment_delete' pay.id %}" class="table-action-btn" title="Excluir">
+                <i class="mdi mdi-close"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted">Nenhuma compra encontrada.</td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
     (function () {
         const totalElement = document.getElementById('payment-total');
+        const usedElement = document.getElementById('credit-used');
+        const availableElement = document.getElementById('credit-available');
         const checkboxes = document.querySelectorAll('.js-payment-paid-checkbox');
         const csrfToken = '{{ csrf_token }}';
         const showingHidden = '{{ show_hidden|yesno:"true,false" }}' === 'true';
@@ -147,6 +233,15 @@ GAW Finance - Produtos
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
             });
+        };
+
+        const updateMoneyElement = (element, value) => {
+            if (!element) {
+                return;
+            }
+
+            element.dataset.total = value.toFixed(2);
+            element.textContent = `R$ ${formatBRL(value)}`;
         };
 
         checkboxes.forEach((checkbox) => {
@@ -187,25 +282,38 @@ GAW Finance - Produtos
                     });
 
                     if (!response.ok) {
-                        throw new Error('Erro ao marcar pagamento como pago.');
+                        throw new Error('Erro ao atualizar compra.');
                     }
 
                     const currentTotal = toNumber(totalElement.dataset.total);
                     const rowValue = toNumber(row.dataset.value);
                     const nextTotal = Math.max(currentTotal - rowValue, 0);
 
-                    totalElement.dataset.total = nextTotal.toFixed(2);
-                    totalElement.textContent = `R$ ${formatBRL(nextTotal)}`;
+                    updateMoneyElement(totalElement, nextTotal);
+
+                    if (row.dataset.hasCard === '1') {
+                        if (showingHidden) {
+                            const nextUsed = toNumber(usedElement.dataset.total) + rowValue;
+                            const nextAvailable = Math.max(toNumber(availableElement.dataset.total) - rowValue, 0);
+                            updateMoneyElement(usedElement, nextUsed);
+                            updateMoneyElement(availableElement, nextAvailable);
+                        } else {
+                            const nextUsed = Math.max(toNumber(usedElement.dataset.total) - rowValue, 0);
+                            const nextAvailable = toNumber(availableElement.dataset.total) + rowValue;
+                            updateMoneyElement(usedElement, nextUsed);
+                            updateMoneyElement(availableElement, nextAvailable);
+                        }
+                    }
+
                     row.remove();
                 } catch (error) {
                     event.target.disabled = false;
                     event.target.checked = wasChecked;
-                    window.alert('Nao foi possivel atualizar o pagamento. Tente novamente.');
+                    window.alert('Nao foi possivel atualizar a compra. Tente novamente.');
                 }
             });
         });
     })();
 </script>
-
 
 {% endblock %}

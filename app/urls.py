@@ -10,8 +10,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    path('', views.home, name='home'),
-    path('dashboard/', views.dashboard, name='dashboard'),
+path('', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard_alias'),
     path('api/expenses-by-month/', views.get_expenses_by_month, name='get_expenses_by_month'),
 
     path('', include('accounts.urls')),

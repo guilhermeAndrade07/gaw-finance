@@ -1,70 +1,88 @@
 {% extends "base.html" %}
 
-{% block title %}
-GAW Finance - Banks
-{% endblock%}
+{% block title %}GAW Finance - Bancos{% endblock %}
 
 {% block content %}
 
-<div class="row main-brand-font">
-    <h1>Bancos</h1>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Bancos</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Bancos</li>
+      </ol>
+    </div>
+  </div>
 </div>
 
-
-<div class="row mt-4 mb-3">
-    
-    <div class="col-md-6">
-        <form method="get" action="{% url 'bank_list'  %}">
-            <div class="input-group">
-                <input type="text" class="form-control" name="name" placeholder="Nome" value="{{request.GET.name}}">
-                <button  type="submit" class="btn btn-success">
-                    <i class="bi bi-search"></i>
-                </button>
+<div class="row mt-3 mb-2">
+  <div class="col-sm-6">
+    <form method="get" action="{% url 'bank_list' %}">
+      <div class="app-search">
+        <div class="app-search-box">
+          <div class="input-group">
+            <input type="text" class="form-control" name="name" placeholder="Buscar banco..." value="{{ request.GET.name }}">
+            <div class="input-group-append">
+              <button class="btn btn-icon" type="submit">
+                <i data-lucide="search" class="font-16"></i>
+              </button>
             </div>
-        </form>
-    </div>
-    <div class="col-md-6">
-        <a href="{% url 'bank_create' %}" class="btn btn-success float-end">
-            <i class="bi bi-plus"></i> Novo Banco
-        </a>
-    </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-sm-6 text-sm-end">
+    <a href="{% url 'bank_create' %}" class="btn btn-primary">
+      <i data-lucide="plus" class="font-16 me-1"></i> Novo Banco
+    </a>
+  </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nome</th>
-                <th>Tipo de conta</th>
-                <th>Agência</th>
-                <th>Conta</th>
-                <th>Ações</th>
-            </tr>
+<div class="card">
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Nome</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Tipo de Conta</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Agencia</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Conta</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+          </tr>
         </thead>
         <tbody>
-            {% for bank in banks %}
-            <tr>
-                <td>{{ bank.name }}</td>
-                <td>{{ bank.account_type }}</td>
-                <td>{{ bank.agency }}</td>
-                <td>{{ bank.account}}</td>
-                <td>
-                    <a href="{% url 'bank_detail' bank.id %}" class="btn btn-info btn-sm">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    
-                    <a href="{% url 'bank_update' bank.id %}" class="btn btn-warning btn-sm">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    
-                    <a href="{% url 'bank_delete' bank.id %}" class="btn btn-danger btn-sm">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
+          {% for bank in banks %}
+          <tr>
+            <td><h5 class="m-0 fw-medium">{{ bank.name }}</h5></td>
+            <td>{{ bank.account_type }}</td>
+            <td>{{ bank.agency }}</td>
+            <td>{{ bank.account }}</td>
+            <td>
+              <a href="{% url 'bank_detail' bank.id %}" class="table-action-btn" title="Visualizar">
+                <i class="mdi mdi-eye"></i>
+              </a>
+              <a href="{% url 'bank_update' bank.id %}" class="table-action-btn" title="Editar">
+                <i class="mdi mdi-pencil"></i>
+              </a>
+              <a href="{% url 'bank_delete' bank.id %}" class="table-action-btn" title="Excluir">
+                <i class="mdi mdi-close"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Nenhum banco encontrado</td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

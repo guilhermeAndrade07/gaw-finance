@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Cartoes{% endblock %}
+
+{% block content %}
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Cartoes</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Cartoes</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3 mb-2">
+  <div class="col-sm-6">
+    <form method="get" action="{% url 'credit_card_list' %}">
+      <div class="app-search">
+        <div class="app-search-box">
+          <div class="input-group">
+            <input type="text" class="form-control" name="name" placeholder="Buscar cartao..." value="{{ request.GET.name }}">
+            <div class="input-group-append">
+              <button class="btn btn-icon" type="submit">
+                <i data-lucide="search" class="font-16"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-sm-6 text-sm-end">
+    <div class="d-flex gap-2 justify-content-sm-end">
+      <a href="{% url 'payment_list' %}" class="btn btn-light">
+        <i class="mdi mdi-arrow-left me-1"></i> Compras
+      </a>
+      <a href="{% url 'credit_card_create' %}" class="btn btn-success">
+        <i data-lucide="plus" class="font-16 me-1"></i> Novo Cartao
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Nome</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Banco</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Limite</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ativo</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for card in cards %}
+          <tr>
+            <td><h5 class="m-0 fw-medium">{{ card.name }}</h5></td>
+            <td>{{ card.bank.name }}</td>
+            <td>R$ {{ card.credit_limit|floatformat:"2g" }}</td>
+            <td>{% if card.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Nao</span>{% endif %}</td>
+            <td>
+              <a href="{% url 'credit_card_detail' card.id %}" class="table-action-btn" title="Visualizar">
+                <i class="mdi mdi-eye"></i>
+              </a>
+              <a href="{% url 'credit_card_update' card.id %}" class="table-action-btn" title="Editar">
+                <i class="mdi mdi-pencil"></i>
+              </a>
+              <a href="{% url 'credit_card_delete' card.id %}" class="table-action-btn" title="Excluir">
+                <i class="mdi mdi-close"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Nenhum cartao cadastrado.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,44 +1,90 @@
 {% extends 'base.html' %}
 
-{% block title %}GAW Finance - Contas{% endblock %}
+{% block title %}GAW Finance - Minha Conta{% endblock %}
 
 {% block content %}
-<div class="row main-brand-font">
-    <h1>Contas</h1>
-</div>
 
-<div class="row mt-4 mb-3">
-    <div class="col-md-12">
-        {% if user.is_staff %}
-        <a href="{% url 'account_create' %}" class="btn btn-success float-end">
-            <i class="bi bi-plus"></i> Nova Conta
-        </a>
-        {% endif %}
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Minha Conta</h4>
     </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Minha Conta</li>
+      </ol>
+    </div>
+  </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Data de Criacao</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for account in accounts %}
-            <tr>
-                <td>{{ account.name }}</td>
-                <td>{{ account.user.email }}</td>
-                <td>{{ account.created_at|date:"d/m/Y H:i" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center text-muted">Nenhuma conta encontrada</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="row mt-3 mb-2">
+  <div class="col-md-12 text-end">
+    <a href="{% url 'account_edit' %}" class="btn btn-primary">
+      <i data-lucide="pencil" class="font-16 me-1"></i> Editar Perfil
+    </a>
+  </div>
 </div>
+
+{% for account in accounts %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-4">
+          <div class="avatar-lg rounded-circle bg-primary d-flex align-items-center justify-content-center me-3">
+            <i class="mdi mdi-account font-30 text-white"></i>
+          </div>
+          <div>
+            <h4 class="mb-0 fw-semibold">{{ account.name }}</h4>
+            <p class="text-muted mb-0 font-14">{{ account.user.username }}</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-borderless mb-0">
+            <tbody>
+              <tr>
+                <td class="text-muted fw-medium" style="width: 180px;">Nome</td>
+                <td>{{ account.name }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Email</td>
+                <td>{{ account.user.email|default:"-" }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Usuario</td>
+                <td>{{ account.user.username }}</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Nome Completo</td>
+                <td>
+                  {% if account.user.first_name or account.user.last_name %}
+                    {{ account.user.first_name }} {{ account.user.last_name }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-medium">Ultima Atualizacao</td>
+                <td>{{ account.updated_at|date:"d/m/Y H:i" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="alert alert-secondary text-center">
+      <i class="mdi mdi-account-off font-24 d-block mb-2"></i>
+      Nenhuma conta encontrada para o seu usuario.
+    </div>
+  </div>
+</div>
+{% endfor %}
 {% endblock %}

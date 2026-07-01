@@ -1,18 +1,42 @@
 {% extends 'base.html' %}
 
+{% block title %}GAW Finance - Detalhes da Entrada{% endblock %}
+
 {% block content %}
 
-    <div class="container mt-4">
-        <h3 class="display-6"> Detalhes da Entrada</h3>
-
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">{{ object.title }}</h3>
-                <p class="card-text">Banco: <strong>{{ object.bank }}</strong></p>
-                <p class="card-text">Valor: <strong>R$ {{ object.value|floatformat:"2g" }}</strong></p>
-            </div>
-        </div>
-        <a href="{% url 'inflow_list' %}" class="btn btn-secondary mt-3">Voltar para a lista de entradas</a>
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes da Entrada</h4>
     </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'inflow_list' %}">Entradas</a></li>
+        <li class="breadcrumb-item active">{{ object.title }}</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ object.title }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Banco</label>
+        <p class="fw-medium">{{ object.bank }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Valor</label>
+        <p class="fw-medium text-success">R$ {{ object.value|floatformat:"2g" }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'inflow_list' %}" class="btn btn-light">Voltar para a lista</a>
+  </div>
+</div>
 
 {% endblock %}

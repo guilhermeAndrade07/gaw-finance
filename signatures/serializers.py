@@ -17,5 +17,5 @@ class SignatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Signature
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'value', 'billing_day', 'is_active', 'bank', 'category']
         read_only_fields = ['user']

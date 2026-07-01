@@ -1,52 +1,36 @@
 services:
   gaw_web:
     build: .
-    volumes:
-      - ./media:/gaw-finance/media
-      - static_volume:/gaw-finance/staticfiles
-    container_name: gaw_web
+    env_file:
+      - .env
+    environment:
+      - DJANGO_ENV=docker
     restart: always
-    env_file: .env
+    ports:
+      - 8000:8000
+    volumes:
+      - media_data:/gaw-finance/media
+      - static_data:/gaw-finance/staticfiles
     depends_on:
-      - gaw_db:
+      gaw_db:
         condition: service_healthy
-    expose:
-      - "8000"
-    networks:
-      - gaw_network
 
   gaw_db:
     image: postgres:16
-    container_name: gaw_db_postgres
     restart: always
-    env_file: .env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    networks:
-      - gaw_network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=gaw_db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gaw_db"]
       interval: 5s
       timeout: 5s
-      retries: 5
-
-  nginx_proxy:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: nginx_proxy_manager
-    restart: always
-    ports:
-      - "80:80"
-      - "81:81"
-      - "443:443"
-    volumes:
-      - ./nginx_data:/data
-      - ./nginx_letsencrypt:/etc/letsencrypt
-    networks:
-      - gaw_network
+      retries: 10
 
 volumes:
   postgres_data:
-  static_volume: 
-
-networks:
-  gaw_network:
+  media_data:
+  static_data:

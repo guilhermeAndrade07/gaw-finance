@@ -17,5 +17,5 @@ class OutflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Outflow
-        fields = '__all__'
+        fields = ['id', 'title', 'bank', 'category', 'value']
         read_only_fields = ['user']

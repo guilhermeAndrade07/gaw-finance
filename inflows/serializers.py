@@ -11,5 +11,5 @@ class InflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Inflow
-        fields = '__all__'
+        fields = ['id', 'title', 'bank', 'value']
         read_only_fields = ['user']

@@ -12,7 +12,7 @@ class InvestmentAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestmentAsset
-        fields = '__all__'
+        fields = ['id', 'name', 'asset_type', 'subtype', 'institution', 'bank', 'maturity_date', 'expected_rate', 'liquidity_type', 'current_value', 'notes', 'is_active']
         read_only_fields = ['user']
 
 
@@ -24,5 +24,5 @@ class InvestmentMovementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvestmentMovement
-        fields = '__all__'
+        fields = ['id', 'asset', 'operation_type', 'value', 'movement_date', 'register_cash_flow', 'notes']
         read_only_fields = ['user']

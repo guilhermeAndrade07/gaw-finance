@@ -3,19 +3,30 @@
 {% block title %}GAW Finance - Criar Conta{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3 class="display-5">Criar Conta</h3>
-
+<div class="row justify-content-center w-100">
+  <div class="col-md-6 col-lg-5">
     <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Criar Conta</button>
-            </form>
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <div class="avatar-lg rounded-circle bg-primary mx-auto d-flex align-items-center justify-content-center" style="width:64px;height:64px;">
+            <i class="mdi mdi-account-plus font-30 text-white"></i>
+          </div>
+          <h4 class="font-18 fw-semibold mt-3 mb-1">Criar Conta</h4>
+          <p class="text-muted">Preencha os dados para se cadastrar</p>
         </div>
-    </div>
 
-    <a href="{% url 'login' %}" class="btn btn-secondary mt-3">Voltar para o login</a>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ form.as_p }}
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Criar Conta</button>
+            <a href="{% url 'login' %}" class="btn btn-light">Voltar para o login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -11,7 +11,7 @@ GAW Finance e um sistema de gestao financeira pessoal desenvolvido com Django. A
 - Cadastro de categorias para organizar despesas.
 - Registro de entradas de dinheiro vinculadas a bancos.
 - Registro de saidas de dinheiro vinculadas a bancos e categorias.
-- Controle de pagamentos a realizar, incluindo parcelas e status de pago/nao pago.
+- Controle de cartao de credito, incluindo cadastro de cartoes, limite, compras parceladas e status de pago/nao pago.
 - Controle de assinaturas recorrentes, com banco, categoria, dia de cobranca, cancelamento e geracao de cobrancas.
 - Controle de investimentos, ativos, tipos de investimento, liquidez, valor atual, aportes e resgates.
 - API REST com autenticacao JWT para bancos, categorias, entradas, saidas, pagamentos, assinaturas e investimentos.
@@ -39,7 +39,7 @@ GAW Finance e um sistema de gestao financeira pessoal desenvolvido com Django. A
 - `categories`: categorias financeiras.
 - `inflows`: entradas financeiras.
 - `outflows`: saidas financeiras.
-- `payment`: pagamentos a realizar.
+- `payment`: cartoes de credito e compras parceladas.
 - `signatures`: assinaturas recorrentes.
 - `investments`: ativos de investimento e movimentacoes.
 

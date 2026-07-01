@@ -4,3 +4,9 @@ __pycache__
 .git
 .gitignore
 .flake8
+.env
+db.sqlite3
+media
+requirements_dv.txt
+README.md
+.github
