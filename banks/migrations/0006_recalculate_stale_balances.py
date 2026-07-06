@@ -5,8 +5,6 @@ from django.db import migrations
 
 def recalculate_stale_balances(apps, schema_editor):
     Bank = apps.get_model('banks', 'Bank')
-    Inflow = apps.get_model('inflows', 'Inflow')
-    Outflow = apps.get_model('outflows', 'Outflow')
 
     from django.db.models import Sum
 

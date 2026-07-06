@@ -1,11 +1,17 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+
 from . import metrics
+from banks.models import Bank
 from inflows.models import Inflow
 from outflows.models import Outflow
-from banks.models import Bank
+
 import json
+
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'}, status=200)
 
 
 @login_required(login_url='login')
@@ -35,12 +41,12 @@ def dashboard(request):
 
     month = request.GET.get('month')
     year = request.GET.get('year')
-    
+
     if month and year:
         expenses = metrics.get_expenses_by_category(request.user, int(month), int(year), bank=selected_bank)
     else:
         expenses = metrics.get_expenses_by_category(request.user, bank=selected_bank)
-    
+
     months_list = metrics.get_months_list()
     banks = Bank.objects.filter(user=request.user)
 
@@ -62,14 +68,14 @@ def get_expenses_by_month(request):
     month = request.GET.get('month')
     year = request.GET.get('year')
     bank_id = request.GET.get('bank')
-    
+
     if not month or not year:
         return JsonResponse({'error': 'Mês e ano são obrigatórios'}, status=400)
 
     selected_bank = None
     if bank_id:
         selected_bank = get_object_or_404(Bank, pk=bank_id, user=request.user)
-    
+
     try:
         expenses = metrics.get_expenses_by_category(request.user, int(month), int(year), bank=selected_bank)
         return JsonResponse({

@@ -18,17 +18,18 @@ GAW Finance e um sistema de gestao financeira pessoal desenvolvido com Django. A
 
 ## Tecnologias utilizadas
 
-- Python 3.12
+- Python 3.13
 - Django 6.0.1
 - Django REST Framework
 - Simple JWT
+- django-environ
 - Bootstrap
 - SQLite em desenvolvimento
 - PostgreSQL em producao
 - Gunicorn
 - WhiteNoise
-- Docker e Docker Compose
-- Nginx Proxy Manager
+- Docker e Docker Compose (dev)
+- Docker Swarm + Traefik (producao)
 
 ## Estrutura do projeto
 
@@ -42,6 +43,8 @@ GAW Finance e um sistema de gestao financeira pessoal desenvolvido com Django. A
 - `payment`: cartoes de credito e compras parceladas.
 - `signatures`: assinaturas recorrentes.
 - `investments`: ativos de investimento e movimentacoes.
+- `traefik/`: configuracao do Traefik (static config).
+- `scripts/`: scripts de deploy e backup.
 
 ## Configuracao local
 
@@ -58,16 +61,16 @@ Instale as dependencias:
 pip install -r requirements.txt
 ```
 
-Crie um arquivo `.env` na raiz do projeto. Para desenvolvimento local, as variaveis principais sao:
+Crie um arquivo `.env` na raiz do projeto (use `.env.example` como template):
 
 ```env
+DJANGO_ENV=dev
 SECRET_KEY=sua-chave-local
 DEBUG=True
-DJANGO_ENV=dev
 ALLOWED_HOSTS=localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1
+DATABASE_URL=sqlite:///db.sqlite3
 ```
-
-Quando `DJANGO_ENV=dev`, o projeto usa SQLite em `db.sqlite3`.
 
 Execute as migracoes:
 
@@ -91,3 +94,69 @@ Acesse:
 
 - Aplicacao: `http://127.0.0.1:8000/`
 - Admin: `http://127.0.0.1:8000/admin/`
+- Healthcheck: `http://127.0.0.1:8000/health/`
+
+## Docker (desenvolvimento local)
+
+```bash
+docker compose up -d --build
+```
+
+A aplicacao estara disponivel em `http://localhost:8000/`.
+
+## Deploy em producao (Docker Swarm + Traefik)
+
+### Pre-requisitos na VPS
+
+1. **Docker Swarm ativo:**
+   ```bash
+   docker swarm init
+   ```
+
+2. **Rede overlay publica do Traefik:**
+   ```bash
+   docker network create --driver overlay traefik_public
+   ```
+
+3. **Docker Secrets:**
+   ```bash
+   echo -n 'sua-secret-key' | docker secret create gaw_secret_key -
+   echo -n 'senha-postgres' | docker secret create gaw_db_password -
+   echo -n 'token-cloudflare' | docker secret create CLOUDFLARE_DNS_API_TOKEN -
+   ```
+
+4. **Arquivo `.env.prod`** na raiz do projeto com dominio, email ACME, credenciais do GHCR, etc. (ver `.env.example`).
+
+### Deploy
+
+```bash
+bash scripts/deploy.sh
+```
+
+Redeploy sem rebuild (apenas configuracao):
+
+```bash
+bash scripts/deploy.sh --skip-build
+```
+
+### Backup
+
+```bash
+bash scripts/backup.sh
+```
+
+Os backups sao salvos em `backups/` com rotacao automatica (7 dias por padrao).
+
+## CI/CD
+
+O workflow do GitHub Actions (`.github/workflows/deploy.yml`) faz:
+
+1. **Lint & Test** — flake8 + testes em todo PR/push para `main`.
+2. **Build & Push** — constroi a imagem Docker e publica no GHCR (`ghcr.io/guilhermeAndrade07/gaw-finance:latest`).
+3. **Deploy** — SSH para a VPS e executa `scripts/deploy.sh --skip-build`.
+
+### Secrets necessarias no GitHub
+
+- `SSH_HOST` — IP da VPS.
+- `SSH_USER` — usuario SSH.
+- `SSH_PRIVATE_KEY` — chave privada SSH.

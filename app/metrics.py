@@ -128,7 +128,7 @@ def get_expenses_by_category(user, month=None, year=None, bank=None):
             'labels': json.dumps([]),
             'data': json.dumps([]),
         }
-    
+
     if month is None or year is None:
         today = date.today()
         month = today.month
@@ -171,10 +171,10 @@ def get_months_list():
         11: 'Novembro',
         12: 'Dezembro'
     }
-    
+
     months_list = []
     today = date.today()
-    
+
     for i in range(0, 8):
         date_obj = shift_months(today, -i)
         month_name = months_pt_br[date_obj.month]
@@ -184,7 +184,7 @@ def get_months_list():
             'display': f'{month_name} de {date_obj.year}',
             'value': f"{date_obj.year}-{date_obj.month:02d}"
         })
-    
+
     return months_list
 
 

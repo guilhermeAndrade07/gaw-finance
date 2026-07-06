@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}GAW Finance - Relatorios{% endblock %}
+
+{% block content %}
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Relatorios</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Relatorios</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="avatar-lg rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
+          <i data-lucide="trending-up" class="font-30 text-primary"></i>
+        </div>
+        <h4 class="fw-semibold">Fluxo de Caixa</h4>
+        <p class="text-muted font-14">Relatorio de entradas e saidas do periodo selecionado.</p>
+        <form method="get" action="{% url 'report_cash_flow' %}" class="d-flex gap-2 justify-content-center mb-3">
+          <select name="month" class="form-select form-select-sm" style="width: auto;">
+            <option value="">Todos os meses</option>
+            {% for m in months_list %}
+            <option value="{{ m.month }}">{{ m.display }}</option>
+            {% endfor %}
+          </select>
+          <select name="year" class="form-select form-select-sm" style="width: auto;">
+            <option value="">Todos os anos</option>
+            {% for y in years_list %}
+            <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <a href="{% url 'report_cash_flow' %}" class="btn btn-primary btn-sm">
+          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="avatar-lg rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
+          <i data-lucide="pie-chart" class="font-30 text-danger"></i>
+        </div>
+        <h4 class="fw-semibold">Despesas por Categoria</h4>
+        <p class="text-muted font-14">Relatorio de despesas agrupadas por categoria.</p>
+        <form method="get" action="{% url 'report_expenses_by_category' %}" class="d-flex gap-2 justify-content-center mb-3">
+          <select name="month" class="form-select form-select-sm" style="width: auto;">
+            <option value="">Todos os meses</option>
+            {% for m in months_list %}
+            <option value="{{ m.month }}">{{ m.display }}</option>
+            {% endfor %}
+          </select>
+          <select name="year" class="form-select form-select-sm" style="width: auto;">
+            <option value="">Todos os anos</option>
+            {% for y in years_list %}
+            <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <a href="{% url 'report_expenses_by_category' %}" class="btn btn-primary btn-sm">
+          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="avatar-lg rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
+          <i data-lucide="landmark" class="font-30 text-success"></i>
+        </div>
+        <h4 class="fw-semibold">Investimentos</h4>
+        <p class="text-muted font-14">Relatorio da carteira de investimentos.</p>
+        <a href="{% url 'report_investments' %}" class="btn btn-primary btn-sm mt-4">
+          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

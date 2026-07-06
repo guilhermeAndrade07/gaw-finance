@@ -13,10 +13,10 @@ class Signature(models.Model):
     is_active = models.BooleanField(default=True)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT, related_name='signatures')
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='signatures', null=True, blank=True)
-    
+
     last_generated_month = models.PositiveIntegerField(null=True, blank=True)
     last_generated_year = models.PositiveIntegerField(null=True, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

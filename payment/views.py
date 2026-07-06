@@ -270,7 +270,8 @@ class PaymentCreateListAPIView(UserScopedAPIMixin, generics.ListCreateAPIView):
 class PaymentRetriveUpdateDestroyAPIView(UserScopedAPIMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Payment.objects.all()
     serializer_class = serializers.PaymentSerializer
-    
+
+
 class PaymentMarkAsPaidView(LoginRequiredMixin, View):
     def post(self, request, pk):
         payment = get_object_or_404(models.Payment, pk=pk, user=request.user)

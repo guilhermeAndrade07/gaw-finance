@@ -1,0 +1,53 @@
+site_name: GAW Finance - Documentacao
+site_description: Documentacao do sistema de gestao financeira pessoal GAW Finance
+site_url: https://guilhermeAndrade07.github.io/gaw-finance
+repo_url: https://github.com/guilhermeAndrade07/gaw-finance
+repo_name: gaw-finance
+docs_dir: docs
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Modo escuro
+    - scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+
+nav:
+  - Inicio: index.md
+  - Arquitetura: arquitetura.md
+  - Apps: apps.md
+  - Deploy: deploy.md
+  - Desenvolvimento: desenvolvimento.md
+  - API: api.md

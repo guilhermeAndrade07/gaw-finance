@@ -4,9 +4,12 @@ __pycache__/
 media
 *.pyc
 .env
+.env.prod
 devops-specialist
 devops-specialist-workspace
 devops-specialist.skill
 evals
-.github
 .entrypoint.sh
+staticfiles/
+backups/
+traefik/acme.json
