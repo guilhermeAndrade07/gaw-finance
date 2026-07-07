@@ -24,7 +24,7 @@
       <div class="app-search">
         <div class="app-search-box">
           <div class="input-group">
-            <input type="text" class="form-control" name="name" placeholder="Buscar cartao..." value="{{ request.GET.name }}">
+            <input type="text" class="form-control" name="name" placeholder="Buscar cartão..." value="{{ request.GET.name }}">
             <div class="input-group-append">
               <button class="btn btn-icon" type="submit">
                 <i data-lucide="search" class="font-16"></i>
@@ -41,7 +41,7 @@
         <i class="mdi mdi-arrow-left me-1"></i> Compras
       </a>
       <a href="{% url 'credit_card_create' %}" class="btn btn-success">
-        <i data-lucide="plus" class="font-16 me-1"></i> Novo Cartao
+        <i data-lucide="plus" class="font-16 me-1"></i> Novo Cartão
       </a>
     </div>
   </div>
@@ -56,6 +56,8 @@
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Nome</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Banco</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Limite</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Fechamento</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Vencimento</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Ativo</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
           </tr>
@@ -66,6 +68,8 @@
             <td><h5 class="m-0 fw-medium">{{ card.name }}</h5></td>
             <td>{{ card.bank.name }}</td>
             <td>R$ {{ card.credit_limit|floatformat:"2g" }}</td>
+            <td>{% if card.closing_day %}Dia {{ card.closing_day }}{% else %}-{% endif %}</td>
+            <td>{% if card.due_day %}Dia {{ card.due_day }}{% else %}-{% endif %}</td>
             <td>{% if card.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Nao</span>{% endif %}</td>
             <td>
               <a href="{% url 'credit_card_detail' card.id %}" class="table-action-btn" title="Visualizar">
@@ -81,7 +85,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="5" class="text-center text-muted">Nenhum cartao cadastrado.</td>
+            <td colspan="7" class="text-center text-muted">Nenhum cartão cadastrado.</td>
           </tr>
           {% endfor %}
         </tbody>

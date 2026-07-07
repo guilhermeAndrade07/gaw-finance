@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}GAW Finance - Excluir Cartao{% endblock %}
+{% block title %}GAW Finance - Excluir Cartão{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">Excluir Cartao</h4>
+      <h4 class="font-18 fw-semibold mb-0">Excluir Cartão</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
@@ -21,7 +21,7 @@
 <div class="card mt-3 border-danger">
   <div class="card-body">
     <h5 class="text-danger"><i class="mdi mdi-alert me-1"></i> Atencao!</h5>
-    <p class="card-text">Tem certeza que deseja excluir o cartao <strong>{{ object.name }}</strong>?</p>
+    <p class="card-text">Tem certeza que deseja excluir o cartão <strong>{{ object.name }}</strong>?</p>
 
     <form method="post">
       {% csrf_token %}

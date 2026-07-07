@@ -15,7 +15,7 @@
   <button class="button-close-fullsidebar"><i class="ti ti-x align-middle"></i></button>
   <div data-simplebar="">
     <ul class="side-nav">
-      <li class="side-nav-title">Navegacao</li>
+      <li class="side-nav-title">Navegação</li>
       <li class="side-nav-item">
         <a href="{% url 'dashboard' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="bar-chart-2"></i></span>
@@ -32,7 +32,7 @@
       <li class="side-nav-item">
         <a href="{% url 'outflow_list' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="arrow-up-right"></i></span>
-          <span class="menu-text">Saidas</span>
+          <span class="menu-text">Saídas</span>
         </a>
       </li>
       <li class="side-nav-item">
@@ -48,12 +48,18 @@
         </a>
       </li>
       <li class="side-nav-item">
-        <a href="{% url 'payment_list' %}" class="side-nav-link">
+        <a href="{% url 'invoice_list' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="credit-card"></i></span>
-          <span class="menu-text">Cartao de Credito</span>
+          <span class="menu-text">Cartão de Crédito</span>
         </a>
       </li>
-      <li class="side-nav-title">Configuracoes</li>
+      <li class="side-nav-item">
+        <a href="{% url 'report_list' %}" class="side-nav-link">
+          <span class="menu-icon"><i data-lucide="file-text"></i></span>
+          <span class="menu-text">Relatórios</span>
+        </a>
+      </li>
+      <li class="side-nav-title">Configurações</li>
       <li class="side-nav-item">
         <a href="{% url 'category_list' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="tags"></i></span>
@@ -64,12 +70,6 @@
         <a href="{% url 'bank_list' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="landmark"></i></span>
           <span class="menu-text">Bancos</span>
-        </a>
-      </li>
-      <li class="side-nav-item">
-        <a href="{% url 'report_list' %}" class="side-nav-link">
-          <span class="menu-icon"><i data-lucide="file-text"></i></span>
-          <span class="menu-text">Relatorios</span>
         </a>
       </li>
       <li class="side-nav-item">

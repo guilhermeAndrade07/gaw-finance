@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from banks.models import Bank
+from payment.models import CreditCard
 from categories.models import Category
 
 
@@ -11,7 +11,7 @@ class Signature(models.Model):
     value = models.DecimalField(max_digits=20, decimal_places=2)
     billing_day = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
-    bank = models.ForeignKey(Bank, on_delete=models.PROTECT, related_name='signatures')
+    credit_card = models.ForeignKey(CreditCard, on_delete=models.PROTECT, related_name='signatures', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='signatures', null=True, blank=True)
 
     last_generated_month = models.PositiveIntegerField(null=True, blank=True)

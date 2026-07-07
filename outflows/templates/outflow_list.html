@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}GAW Finance - Saidas{% endblock %}
+{% block title %}GAW Finance - Saídas{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">Saidas</h4>
+      <h4 class="font-18 fw-semibold mb-0">Saídas</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
-        <li class="breadcrumb-item active">Saidas</li>
+        <li class="breadcrumb-item active">Saídas</li>
       </ol>
     </div>
   </div>
@@ -25,7 +25,7 @@
         <div class="app-search">
           <div class="app-search-box">
             <div class="input-group">
-              <input type="text" class="form-control" name="title" placeholder="Buscar saida..." value="{{ request.GET.title }}">
+              <input type="text" class="form-control" name="title" placeholder="Buscar saída..." value="{{ request.GET.title }}">
               <div class="input-group-append">
                 <button class="btn btn-icon" type="submit">
                   <i data-lucide="search" class="font-16"></i>
@@ -77,7 +77,7 @@
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Data de Entrada</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
           </tr>
         </thead>
         <tbody>
@@ -87,7 +87,7 @@
             <td>{{ outflow.bank }}</td>
             <td>{{ outflow.category }}</td>
             <td><span class="text-danger fw-medium">- R$ {{ outflow.value|floatformat:"2g" }}</span></td>
-            <td>{{ outflow.created_at }}</td>
+            <td>{{ outflow.created_at|date:"d/m/Y H:i" }}</td>
             <td>
               <a href="{% url 'outflow_detail' outflow.id %}" class="table-action-btn" title="Visualizar">
                 <i class="mdi mdi-eye"></i>
@@ -96,7 +96,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6" class="text-center text-muted">Nenhuma saida registrada</td>
+            <td colspan="6" class="text-center text-muted">Nenhuma saída registrada</td>
           </tr>
           {% endfor %}
         </tbody>

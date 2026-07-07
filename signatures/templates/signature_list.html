@@ -74,11 +74,11 @@
           <tr>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Nome</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Dia de Cobranca</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Banco</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Dia de Cobrança</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Cartão</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Status</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
           </tr>
         </thead>
         <tbody>
@@ -87,7 +87,7 @@
             <td><h5 class="m-0 fw-medium">{{ signature.name }}</h5></td>
             <td>R$ {{ signature.value|floatformat:"2g" }}</td>
             <td>Dia {{ signature.billing_day }}</td>
-            <td>{{ signature.bank }}</td>
+            <td>{{ signature.credit_card|default:"-" }}</td>
             <td>{{ signature.category|default:"-" }}</td>
             <td>
               {% if signature.is_active %}

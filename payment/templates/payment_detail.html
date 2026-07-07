@@ -11,7 +11,7 @@
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
-        <li class="breadcrumb-item"><a href="{% url 'payment_list' %}">Cartao de Credito</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'payment_list' %}">Cartão de Crédito</a></li>
         <li class="breadcrumb-item active">{{ object.name }}</li>
       </ol>
     </div>
@@ -25,20 +25,16 @@
   <div class="card-body">
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label class="form-label text-muted text-uppercase font-12">Descricao</label>
-        <p class="fw-medium">{{ object.description }}</p>
-      </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label text-muted text-uppercase font-12">Cartao</label>
-        <p class="fw-medium">{{ object.card|default:"Sem cartao" }}</p>
+        <label class="form-label text-muted text-uppercase font-12">Cartão</label>
+        <p class="fw-medium">{{ object.card|default:"Sem cartão" }}</p>
       </div>
       <div class="col-md-6 mb-3">
         <label class="form-label text-muted text-uppercase font-12">Categoria</label>
         <p class="fw-medium">{{ object.category }}</p>
       </div>
       <div class="col-md-6 mb-3">
-        <label class="form-label text-muted text-uppercase font-12">Data de Vencimento</label>
-        <p class="fw-medium">{{ object.date_payment }}</p>
+        <label class="form-label text-muted text-uppercase font-12">Data da Compra</label>
+        <p class="fw-medium">{{ object.date_payment|date:"d/m/Y" }}</p>
       </div>
       <div class="col-md-6 mb-3">
         <label class="form-label text-muted text-uppercase font-12">Valor</label>
@@ -48,10 +44,20 @@
         <label class="form-label text-muted text-uppercase font-12">Parcelas</label>
         <p class="fw-medium">{{ object.parcelas_display }}</p>
       </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Fatura</label>
+        <p class="fw-medium">
+          {% if object.invoice %}
+            <a href="{% url 'invoice_detail' object.invoice.id %}">{{ object.invoice.closing_date|date:"d/m/Y" }}</a>
+          {% else %}
+            -
+          {% endif %}
+        </p>
+      </div>
     </div>
   </div>
   <div class="card-footer">
-    <a href="{% url 'payment_list' %}" class="btn btn-light">Voltar para Cartao de Credito</a>
+    <a href="{% url 'payment_list' %}" class="btn btn-light">Voltar para Cartão de Crédito</a>
   </div>
 </div>
 

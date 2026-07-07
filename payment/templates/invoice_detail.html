@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Detalhes da Fatura{% endblock %}
+
+{% block content %}
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes da Fatura</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'invoice_list' %}">Faturas</a></li>
+        <li class="breadcrumb-item active">{{ object.card.name }}</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ object.card.name }} - {{ object.card.bank.name }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Fechamento</label>
+        <p class="fw-medium">{{ object.closing_date|date:"d/m/Y" }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Vencimento</label>
+        <p class="fw-medium">{{ object.due_date|date:"d/m/Y" }}</p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Status</label>
+        <p class="fw-medium">
+          {% if object.status == 'open' %}
+            <span class="badge bg-info rounded-pill">Aberta</span>
+          {% elif object.status == 'closed' %}
+            <span class="badge bg-warning rounded-pill">Fechada</span>
+          {% else %}
+            <span class="badge bg-success rounded-pill">Paga</span>
+          {% endif %}
+        </p>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Total</label>
+        <p class="fw-medium lead text-success">R$ {{ object.total|floatformat:"2g" }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer d-flex gap-2">
+    <a href="{% url 'invoice_list' %}" class="btn btn-light">Voltar para Faturas</a>
+    {% if object.status != 'paid' %}
+      <button
+        type="button"
+        class="btn btn-success js-invoice-pay-btn"
+        data-invoice-id="{{ object.id }}"
+      >
+        <i class="mdi mdi-check-circle me-1"></i> Marcar como Paga
+      </button>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">Compras da Fatura</h4>
+  </div>
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Compra</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pay in payments %}
+          <tr>
+            <td><h5 class="m-0 fw-medium">{{ pay.name }}</h5></td>
+            <td>{{ pay.category|default:"-" }}</td>
+            <td>{{ pay.date_payment|date:"d/m/Y" }}</td>
+            <td>R$ {{ pay.value|floatformat:"2g" }}</td>
+            <td>{{ pay.parcelas_display }}</td>
+            <td>
+              <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
+                <i class="mdi mdi-eye"></i>
+              </a>
+              <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
+                <i class="mdi mdi-pencil"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">Nenhuma compra nesta fatura.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+    (function () {
+        const csrfToken = '{{ csrf_token }}';
+        document.querySelectorAll('.js-invoice-pay-btn').forEach((btn) => {
+            btn.addEventListener('click', async (event) => {
+                const invoiceId = btn.dataset.invoiceId;
+                if (!invoiceId) return;
+                if (!window.confirm('Confirmar o pagamento desta fatura? Todas as compras serão marcadas como pagas.')) return;
+                try {
+                    const response = await fetch(`/invoices/${invoiceId}/pay/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+                    if (!response.ok) throw new Error('Erro ao pagar fatura.');
+                    window.location.reload();
+                } catch (error) {
+                    window.alert('Não foi possível pagar a fatura. Tente novamente.');
+                }
+            });
+        });
+    })();
+</script>
+
+{% endblock %}

@@ -37,7 +37,7 @@
       </div>
       <div class="col-md-4">
         <select class="form-select" name="month">
-          <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
+          <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Mêses</option>
           {% for month_value, month_label in months %}
             <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
           {% endfor %}
@@ -68,7 +68,7 @@
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Banco</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Data de Entrada</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +77,7 @@
             <td><h5 class="m-0 fw-medium">{{ inflow.title }}</h5></td>
             <td>{{ inflow.bank }}</td>
             <td><span class="text-success fw-medium">+ R$ {{ inflow.value|floatformat:"2g" }}</span></td>
-            <td>{{ inflow.created_at }}</td>
+            <td>{{ inflow.created_at|date:"d/m/Y H:i" }}</td>
             <td>
               <a href="{% url 'inflow_detail' inflow.id %}" class="table-action-btn" title="Visualizar">
                 <i class="mdi mdi-eye"></i>

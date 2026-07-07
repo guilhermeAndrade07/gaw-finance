@@ -84,20 +84,20 @@
 
 <div class="card mt-3">
   <div class="card-header">
-    <h4 class="header-title">Informacoes do Ativo</h4>
+    <h4 class="header-title">Informações do Ativo</h4>
   </div>
   <div class="card-body">
     <div class="row">
       <div class="col-md-6">
         <p class="mb-2"><strong>Banco:</strong> {{ asset.bank.name }}</p>
-        <p class="mb-2"><strong>Instituicao:</strong> {{ asset.institution|default:"-" }}</p>
+        <p class="mb-2"><strong>Instituição:</strong> {{ asset.institution|default:"-" }}</p>
         <p class="mb-2"><strong>Liquidez:</strong> {{ asset.get_liquidity_type_display|default:"-" }}</p>
         <p class="mb-0"><strong>Status:</strong> {% if asset.is_active %}<span class="badge bg-success rounded-pill">Ativo</span>{% else %}<span class="badge bg-danger rounded-pill">Inativo</span>{% endif %}</p>
       </div>
       <div class="col-md-6">
         <p class="mb-2"><strong>Taxa esperada:</strong> {{ asset.expected_rate|default:"-" }}</p>
         <p class="mb-2"><strong>Vencimento:</strong> {{ asset.maturity_date|date:"d/m/Y"|default:"-" }}</p>
-        <p class="mb-0"><strong>Observacoes:</strong> {{ asset.notes|default:"-" }}</p>
+        <p class="mb-0"><strong>Observações:</strong> {{ asset.notes|default:"-" }}</p>
       </div>
     </div>
   </div>
@@ -116,10 +116,10 @@
         <thead>
           <tr>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Operacao</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Operação</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Fluxo de Caixa</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Observacoes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Observações</span></th>
           </tr>
         </thead>
         <tbody>

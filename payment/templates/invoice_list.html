@@ -28,9 +28,9 @@
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate">
-              {% if show_hidden %}Compras Pagas{% else %}Compras em Aberto{% endif %}
+              {% if show_hidden %}Faturas Pagas{% else %}Faturas em Aberto{% endif %}
             </p>
-            <h3 id="payment-total" class="fw-medium my-2" data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:"2g" }}</h3>
+            <h3 id="payment-total" class="fw-medium my-2" data-total="{% if show_hidden %}{{ total_paid|default_if_none:'0' }}{% else %}{{ total_open|add:total_closed|default_if_none:'0' }}{% endif %}">R$ {% if show_hidden %}{{ total_paid|floatformat:"2g" }}{% else %}{{ total_open|add:total_closed|floatformat:"2g" }}{% endif %}</h3>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
 
 <div class="row mb-3 mt-2 align-items-center">
   <div class="col-lg-9">
-    <form method="get" action="{% url 'payment_list' %}" class="row g-2 align-items-center">
+    <form method="get" action="{% url 'invoice_list' %}" class="row g-2 align-items-center">
       <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
       <div class="col-md-3">
         <select class="form-select" name="card" required>
@@ -96,19 +96,11 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3">
-        <select class="form-select" name="month">
-          <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os meses</option>
-          {% for month_value, month_label in months %}
-            <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
-          {% endfor %}
-        </select>
-      </div>
       <div class="col-md-3 d-flex gap-2">
         <button type="submit" class="btn btn-primary">
           <i class="mdi mdi-filter me-1"></i> Filtrar
         </button>
-        <a href="{% url 'payment_list' %}" class="btn btn-light">Limpar</a>
+        <a href="{% url 'invoice_list' %}" class="btn btn-light">Limpar</a>
       </div>
     </form>
   </div>
@@ -116,9 +108,6 @@
     <div class="d-flex gap-2 justify-content-lg-end">
       <a href="{% url 'credit_card_list' %}" class="btn btn-light">
         <i class="mdi mdi-credit-card me-1"></i> Cartoes
-      </a>
-      <a href="{% url 'invoice_list' %}" class="btn btn-light">
-        <i class="mdi mdi-receipt me-1"></i> Faturas
       </a>
       {% if selected_card %}
         <a href="{% url 'payment_create' %}?card={{ selected_card.id }}" class="btn btn-success">
@@ -135,11 +124,11 @@
 
 <div class="mb-2 d-flex justify-content-end">
   {% if show_hidden %}
-    <a href="{% url 'payment_list' %}{% if request.GET.card %}?card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
+    <a href="{% url 'invoice_list' %}{% if request.GET.card %}?card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
       <i class="mdi mdi-eye me-1"></i> Mostrar Abertas
     </a>
   {% else %}
-    <a href="{% url 'payment_list' %}?show_hidden=1{% if request.GET.card %}&card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
+    <a href="{% url 'invoice_list' %}?show_hidden=1{% if request.GET.card %}&card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
       <i class="mdi mdi-eye-off me-1"></i> Mostrar Pagas
     </a>
   {% endif %}
@@ -147,81 +136,116 @@
 
 {% if not cards %}
   <div class="alert alert-warning">
-    <i class="mdi mdi-alert me-1"></i> Cadastre um cartão para vincular novas compras e acompanhar limite utilizado.
+    <i class="mdi mdi-alert me-1"></i> Cadastre um cartão para vincular novas compras e acompanhar faturas.
   </div>
 {% elif not selected_card %}
   <div class="alert alert-info">
-    <i class="mdi mdi-information me-1"></i> Selecione um cartão para ver compras, saldo utilizado e saldo disponível.
+    <i class="mdi mdi-information me-1"></i> Selecione um cartão para ver suas faturas, saldo utilizado e saldo disponível.
+  </div>
+{% elif selected_card.closing_day is None or selected_card.due_day is None %}
+  <div class="alert alert-warning">
+    <i class="mdi mdi-alert me-1"></i> Configure o
+    <a href="{% url 'credit_card_update' selected_card.id %}">dia de fechamento e vencimento</a>
+    deste cartão para gerar faturas automaticamente.
+  </div>
+{% elif not invoices %}
+  <div class="alert alert-info">
+    <i class="mdi mdi-information me-1"></i> Nenhuma fatura encontrada para este cartão.
   </div>
 {% endif %}
 
-<div class="card">
-  <div class="card-body pt-2">
-    <div class="table-responsive">
-      <table class="table table-hover table-actions-bar m-0">
-        <thead>
-          <tr>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Compra</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Cartão</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Descrição</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Data da Compra</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Fatura</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for pay in payment %}
-          <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}" data-has-card="{% if pay.card %}1{% else %}0{% endif %}">
-            <td><h5 class="m-0 fw-medium">{{ pay.name }}</h5></td>
-            <td>{{ pay.card|default:"Sem cartão" }}</td>
-            <td>{{ pay.description }}</td>
-            <td>{{ pay.category }}</td>
-            <td>R$ {{ pay.value|floatformat:"2g" }}</td>
-            <td>{{ pay.parcelas_display }}</td>
-            <td>{{ pay.date_payment|date:"d/m/Y" }}</td>
-            <td>
-              {% if pay.invoice %}
-                <a href="{% url 'invoice_detail' pay.invoice.id %}" class="text-decoration-none">
-                  {{ pay.invoice.closing_date|date:"d/m/Y" }}
-                </a>
-              {% else %}
-                -
-              {% endif %}
-            </td>
-            <td>
-              <input
-                class="form-check-input js-payment-paid-checkbox"
-                type="checkbox"
-                data-payment-id="{{ pay.id }}"
-                {% if pay.paid %}checked{% endif %}
-              >
-            </td>
-            <td>
-              <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
-              </a>
-              <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
-                <i class="mdi mdi-pencil"></i>
-              </a>
-              <a href="{% url 'payment_delete' pay.id %}" class="table-action-btn" title="Excluir">
-                <i class="mdi mdi-close"></i>
-              </a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="10" class="text-center text-muted">Nenhuma compra encontrada.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+{% if invoices %}
+<div class="accordion" id="invoicesAccordion">
+  {% for invoice in invoices %}
+  <div class="card mb-2">
+    <div class="card-header d-flex justify-content-between align-items-center" id="heading-{{ invoice.id }}">
+      <div class="d-flex align-items-center gap-2 flex-grow-1" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ invoice.id }}" aria-expanded="false" aria-controls="collapse-{{ invoice.id }}">
+        <i class="mdi mdi-chevron-right font-20 text-muted js-chevron"></i>
+        <div>
+          <h5 class="m-0 fw-medium">
+            Fatura {{ invoice.closing_date|date:"F Y" }}
+            <span class="text-muted font-13 fw-normal">| Venc. {{ invoice.due_date|date:"d/m/Y" }}</span>
+          </h5>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        {% if invoice.status == 'open' %}
+          <span class="badge bg-info rounded-pill">Aberta</span>
+        {% elif invoice.status == 'closed' %}
+          <span class="badge bg-warning rounded-pill">Fechada</span>
+        {% else %}
+          <span class="badge bg-success rounded-pill">Paga</span>
+        {% endif %}
+        <h5 class="m-0 fw-medium text-success">R$ {{ invoice.total|floatformat:"2g" }}</h5>
+        {% if invoice.status != 'paid' %}
+          <button
+            type="button"
+            class="btn btn-ghost-success btn-sm btn-icon js-invoice-pay-btn"
+            data-invoice-id="{{ invoice.id }}"
+            title="Marcar como Paga"
+          >
+            <i class="mdi mdi-check-circle font-18"></i>
+          </button>
+        {% endif %}
+      </div>
+    </div>
+    <div id="collapse-{{ invoice.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ invoice.id }}" data-bs-parent="#invoicesAccordion">
+      <div class="card-body pt-2">
+        <div class="table-responsive">
+          <table class="table table-hover m-0">
+            <thead>
+              <tr>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Compra</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pay in invoice.prefetched_payments %}
+              <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}" data-has-card="{% if pay.card %}1{% else %}0{% endif %}">
+                <td><h5 class="m-0 fw-medium">{{ pay.name }}</h5></td>
+                <td>{{ pay.category|default:"-" }}</td>
+                <td>{{ pay.date_payment|date:"d/m/Y" }}</td>
+                <td>R$ {{ pay.value|floatformat:"2g" }}</td>
+                <td>{{ pay.parcelas_display }}</td>
+                <td>
+                  <input
+                    class="form-check-input js-payment-paid-checkbox"
+                    type="checkbox"
+                    data-payment-id="{{ pay.id }}"
+                    {% if pay.paid %}checked{% endif %}
+                  >
+                </td>
+                <td>
+                  <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
+                    <i class="mdi mdi-eye"></i>
+                  </a>
+                  <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
+                    <i class="mdi mdi-pencil"></i>
+                  </a>
+                  <a href="{% url 'payment_delete' pay.id %}" class="table-action-btn" title="Excluir">
+                    <i class="mdi mdi-close"></i>
+                  </a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">Nenhuma compra nesta fatura.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
+  {% endfor %}
 </div>
+{% endif %}
 
 <script>
     (function () {
@@ -229,12 +253,9 @@
         const usedElement = document.getElementById('credit-used');
         const availableElement = document.getElementById('credit-available');
         const checkboxes = document.querySelectorAll('.js-payment-paid-checkbox');
+        const payButtons = document.querySelectorAll('.js-invoice-pay-btn');
         const csrfToken = '{{ csrf_token }}';
         const showingHidden = '{{ show_hidden|yesno:"true,false" }}' === 'true';
-
-        if (!totalElement || checkboxes.length === 0) {
-            return;
-        }
 
         const toNumber = (value) => {
             const parsed = Number.parseFloat(value);
@@ -249,10 +270,7 @@
         };
 
         const updateMoneyElement = (element, value) => {
-            if (!element) {
-                return;
-            }
-
+            if (!element) return;
             element.dataset.total = value.toFixed(2);
             element.textContent = `R$ ${formatBRL(value)}`;
         };
@@ -274,10 +292,7 @@
 
                 const paymentId = event.target.dataset.paymentId;
                 const row = document.getElementById(`payment-row-${paymentId}`);
-
-                if (!paymentId || !row) {
-                    return;
-                }
+                if (!paymentId || !row) return;
 
                 event.target.disabled = true;
 
@@ -294,14 +309,11 @@
                         },
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Erro ao atualizar compra.');
-                    }
+                    if (!response.ok) throw new Error('Erro ao atualizar compra.');
 
                     const currentTotal = toNumber(totalElement.dataset.total);
                     const rowValue = toNumber(row.dataset.value);
                     const nextTotal = Math.max(currentTotal - rowValue, 0);
-
                     updateMoneyElement(totalElement, nextTotal);
 
                     if (row.dataset.hasCard === '1') {
@@ -325,6 +337,43 @@
                     window.alert('Não foi possível atualizar a compra. Tente novamente.');
                 }
             });
+        });
+
+        payButtons.forEach((btn) => {
+            btn.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const invoiceId = btn.dataset.invoiceId;
+                if (!invoiceId) return;
+                if (!window.confirm('Confirmar o pagamento desta fatura? Todas as compras serão marcadas como pagas.')) return;
+                try {
+                    const response = await fetch(`/invoices/${invoiceId}/pay/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+                    if (!response.ok) throw new Error('Erro ao pagar fatura.');
+                    window.location.reload();
+                } catch (error) {
+                    window.alert('Não foi possível pagar a fatura. Tente novamente.');
+                }
+            });
+        });
+
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((header) => {
+            const target = header.getAttribute('data-bs-target');
+            const chevron = header.querySelector('.js-chevron');
+            if (!target || !chevron) return;
+            const targetEl = document.querySelector(target);
+            if (targetEl) {
+                targetEl.addEventListener('show.bs.collapse', () => {
+                    chevron.classList.replace('mdi-chevron-right', 'mdi-chevron-down');
+                });
+                targetEl.addEventListener('hide.bs.collapse', () => {
+                    chevron.classList.replace('mdi-chevron-down', 'mdi-chevron-right');
+                });
+            }
         });
     })();
 </script>

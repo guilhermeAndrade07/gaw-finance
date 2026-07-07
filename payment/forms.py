@@ -1,5 +1,6 @@
 from banks.models import Bank
 from categories.models import Category
+from datetime import datetime
 from django import forms
 from django.db.models import Q
 from . import models
@@ -12,17 +13,21 @@ class CreditCardForm(forms.ModelForm):
 
     class Meta:
         model = models.CreditCard
-        fields = ['name', 'bank', 'credit_limit', 'active']
+        fields = ['name', 'bank', 'credit_limit', 'closing_day', 'due_day', 'active']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'bank': forms.Select(attrs={'class': 'form-control'}),
             'credit_limit': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}),
+            'closing_day': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 31}),
+            'due_day': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 31}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
-            'name': 'Nome do cartao',
+            'name': 'Nome do cartão',
             'bank': 'Banco',
             'credit_limit': 'Limite',
+            'closing_day': 'Dia de Fechamento',
+            'due_day': 'Dia de Vencimento',
             'active': 'Ativo',
         }
 
@@ -39,7 +44,10 @@ class PaymentForm(forms.ModelForm):
             card_queryset = models.CreditCard.objects.none()
         self.fields['card'].queryset = card_queryset
         self.fields['card'].required = True
-        self.fields['card'].empty_label = 'Selecione um cartao'
+        self.fields['card'].empty_label = 'Selecione um cartão'
+
+        if self.instance and self.instance.pk and self.instance.date_payment:
+            self.fields['date_payment'].initial = self.instance.date_payment.strftime('%d/%m/%Y')
 
     parcelas = forms.IntegerField(
         min_value=1,
@@ -48,22 +56,40 @@ class PaymentForm(forms.ModelForm):
         label='Parcelas',
     )
 
+    date_payment = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control js-date-mask',
+            'placeholder': 'dd/mm/aaaa',
+            'maxlength': 10,
+        }),
+        label='Data da Compra',
+    )
+
     class Meta:
         model = models.Payment
-        fields = ['card', 'name', 'description', 'category', 'date_payment', 'value', 'parcelas']
+        fields = ['card', 'name', 'category', 'date_payment', 'value', 'parcelas']
         widgets = {
             'card': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'date_payment': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'value': forms.NumberInput(attrs={'class': 'form-control'}),
         }
         labels = {
-            'card': 'Cartao',
+            'card': 'Cartão',
             'name': 'Compra',
-            'description': 'Descricao',
             'category': 'Categoria',
-            'date_payment': 'Data de vencimento',
             'value': 'Valor',
         }
+
+    def clean_date_payment(self):
+        value = self.cleaned_data.get('date_payment')
+        if not value:
+            return None
+        if isinstance(value, str):
+            for fmt in ('%d/%m/%Y', '%Y-%m-%d'):
+                try:
+                    return datetime.strptime(value, fmt).date()
+                except ValueError:
+                    continue
+            raise forms.ValidationError('Informe a data no formato dd/mm/aaaa.')
+        return value

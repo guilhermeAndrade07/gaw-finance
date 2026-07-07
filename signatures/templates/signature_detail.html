@@ -33,12 +33,12 @@
             <span class="badge bg-danger rounded-pill">Inativa</span>
           {% endif %}
         </p>
-        <p><strong>Dia de Cobranca:</strong> Todo dia {{ object.billing_day }}</p>
+        <p><strong>Dia de Cobrança:</strong> Todo dia {{ object.billing_day }}</p>
       </div>
       <div class="col-md-6">
-        <p><strong>Banco:</strong> {{ object.bank.name }}</p>
+        <p><strong>Cartão:</strong> {{ object.credit_card|default:"-" }}</p>
         <p><strong>Categoria:</strong> {{ object.category.name|default:"-" }}</p>
-        <p><strong>Descricao:</strong><br> {{ object.description|default:"Sem descricao." }}</p>
+        <p><strong>Descrição:</strong><br> {{ object.description|default:"Sem descrição." }}</p>
       </div>
     </div>
 
@@ -47,7 +47,7 @@
     <div class="mt-2">
       <p class="text-muted small">
         <strong>Criado em:</strong> {{ object.created_at|date:"d/m/Y H:i" }}<br>
-        <strong>Ultima atualizacao:</strong> {{ object.updated_at|date:"d/m/Y H:i" }}<br>
+        <strong>Última atualização:</strong> {{ object.updated_at|date:"d/m/Y H:i" }}<br>
         {% if object.last_generated_month %}
           <strong>Ultimo lancamento gerado em:</strong> {{ object.last_generated_month }}/{{ object.last_generated_year }}
         {% endif %}

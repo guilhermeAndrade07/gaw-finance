@@ -17,6 +17,11 @@ urlpatterns = [
     path('payment/<int:pk>/update/', views.PaymentUpdateView.as_view(), name='payment_update'),
     path('payment/<int:pk>/delete/', views.PaymentDeleteView.as_view(), name='payment_delete'),
 
+    path('invoices/list/', views.InvoiceListView.as_view(), name='invoice_list'),
+    path('invoices/<int:pk>/detail/', views.InvoiceDetailView.as_view(), name='invoice_detail'),
+    path('invoices/<int:pk>/pay/', views.InvoicePayView.as_view(), name='invoice_pay'),
+    path('invoices/<int:pk>/unpay/', views.InvoiceUnpayView.as_view(), name='invoice_unpay'),
+
     path('api/v1/payment/', views.PaymentCreateListAPIView.as_view(), name='payment-create-list-api-view'),
     path('api/v1/payment/<int:pk>/', views.PaymentRetriveUpdateDestroyAPIView.as_view(), name='payment-detail-api-view'),
 ]

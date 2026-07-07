@@ -99,7 +99,7 @@ def generate_cash_flow_report(user, month=None, year=None):
     doc = _build_doc(buffer, 'Fluxo de Caixa')
     story = []
 
-    _header(story, 'Relatorio de Fluxo de Caixa', user.username)
+    _header(story, 'Relatório de Fluxo de Caixa', user.username)
 
     inflows_qs = Inflow.objects.filter(user=user)
     outflows_qs = Outflow.objects.filter(user=user)
@@ -109,19 +109,19 @@ def generate_cash_flow_report(user, month=None, year=None):
         outflows_qs = outflows_qs.filter(created_at__month=month, created_at__year=year)
         period_label = f'{month:02d}/{year}'
     else:
-        period_label = 'Todo o periodo'
+        period_label = 'Todo o período'
 
-    story.append(Paragraph(f'Periodo: {period_label}', STYLE_SECTION))
+    story.append(Paragraph(f'Período: {period_label}', STYLE_SECTION))
 
     total_inflows = sum(i.value for i in inflows_qs)
     total_outflows = sum(o.value for o in outflows_qs)
     balance = total_inflows - total_outflows
 
     summary_data = [
-        ['Metrica', 'Valor'],
+        ['Métrica', 'Valor'],
         ['Total de Entradas', _fmt(total_inflows)],
-        ['Total de Saidas', _fmt(total_outflows)],
-        ['Saldo do Periodo', _fmt(balance)],
+        ['Total de Saídas', _fmt(total_outflows)],
+        ['Saldo do Período', _fmt(balance)],
     ]
     summary_table = Table(summary_data, colWidths=[8 * cm, 8 * cm])
     summary_table.setStyle(TABLE_STYLE)
@@ -143,7 +143,7 @@ def generate_cash_flow_report(user, month=None, year=None):
     story.append(inflow_table)
     story.append(Spacer(1, 0.8 * cm))
 
-    story.append(Paragraph('Saidas', STYLE_SECTION))
+    story.append(Paragraph('Saídas', STYLE_SECTION))
     outflow_data = [['Data', 'Banco', 'Categoria', 'Valor']]
     for outflow in outflows_qs:
         outflow_data.append([
@@ -153,7 +153,7 @@ def generate_cash_flow_report(user, month=None, year=None):
             _fmt(outflow.value),
         ])
     if len(outflow_data) == 1:
-        outflow_data.append(['-', 'Nenhuma saida', '-', '-'])
+        outflow_data.append(['-', 'Nenhuma saída', '-', '-'])
     outflow_table = Table(outflow_data, colWidths=[3.5 * cm, 5 * cm, 5 * cm, 3.5 * cm])
     outflow_table.setStyle(TABLE_STYLE)
     story.append(outflow_table)
@@ -168,19 +168,19 @@ def generate_expenses_by_category_report(user, month=None, year=None):
     doc = _build_doc(buffer, 'Despesas por Categoria')
     story = []
 
-    _header(story, 'Relatorio de Despesas por Categoria', user.username)
+    _header(story, 'Relatório de Despesas por Categoria', user.username)
 
     outflows_qs = Outflow.objects.filter(user=user)
     if month and year:
         outflows_qs = outflows_qs.filter(created_at__month=month, created_at__year=year)
         period_label = f'{month:02d}/{year}'
     else:
-        period_label = 'Todo o periodo'
+        period_label = 'Todo o período'
 
-    story.append(Paragraph(f'Periodo: {period_label}', STYLE_SECTION))
+    story.append(Paragraph(f'Período: {period_label}', STYLE_SECTION))
 
     categories = Category.objects.filter(user=user)
-    cat_data = [['Categoria', 'Numero de Saidas', 'Total']]
+    cat_data = [['Categoria', 'Número de Saídas', 'Total']]
     total_all = Decimal(0)
 
     for cat in categories:
@@ -219,7 +219,7 @@ def generate_investments_report(user):
     doc = _build_doc(buffer, 'Investimentos')
     story = []
 
-    _header(story, 'Relatorio de Investimentos', user.username)
+    _header(story, 'Relatório de Investimentos', user.username)
 
     assets = InvestmentAsset.objects.filter(user=user).select_related('bank')
 
@@ -227,7 +227,7 @@ def generate_investments_report(user):
     total_active = assets.filter(is_active=True).count()
 
     summary_data = [
-        ['Metrica', 'Valor'],
+        ['Métrica', 'Valor'],
         ['Total Investido', _fmt(total_current)],
         ['Ativos Ativos', str(total_active)],
         ['Total de Ativos', str(assets.count())],
@@ -238,7 +238,7 @@ def generate_investments_report(user):
     story.append(Spacer(1, 0.8 * cm))
 
     story.append(Paragraph('Carteira de Investimentos', STYLE_SECTION))
-    asset_data = [['Ativo', 'Tipo', 'Instituicao', 'Valor Atual', 'Status']]
+    asset_data = [['Ativo', 'Tipo', 'Instituição', 'Valor Atual', 'Status']]
 
     for asset in assets:
         asset_data.append([

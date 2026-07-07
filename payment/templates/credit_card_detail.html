@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}GAW Finance - Detalhes do Cartao{% endblock %}
+{% block title %}GAW Finance - Detalhes do Cartão{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">Detalhes do Cartao</h4>
+      <h4 class="font-18 fw-semibold mb-0">Detalhes do Cartão</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
@@ -31,6 +31,14 @@
       <div class="col-md-4 mb-3">
         <label class="form-label text-muted text-uppercase font-12">Limite</label>
         <p class="fw-medium">R$ {{ object.credit_limit|floatformat:"2g" }}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Dia de Fechamento</label>
+        <p class="fw-medium">{% if object.closing_day %}Dia {{ object.closing_day }}{% else %}-{% endif %}</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Dia de Vencimento</label>
+        <p class="fw-medium">{% if object.due_day %}Dia {{ object.due_day }}{% else %}-{% endif %}</p>
       </div>
       <div class="col-md-4 mb-3">
         <label class="form-label text-muted text-uppercase font-12">Ativo</label>
