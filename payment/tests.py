@@ -9,10 +9,8 @@ from banks.models import Bank
 from categories.models import Category
 from payment.models import CreditCard, Invoice, Payment
 from payment.services import (
-    assign_invoice_to_payment,
     backfill_invoices,
     close_past_invoices,
-    get_or_create_invoice_for_payment,
 )
 
 
@@ -274,7 +272,7 @@ class InvoiceTests(TestCase):
         self.assertTrue(p2.paid)
 
     def test_invoice_list_filters_by_card(self):
-        invoice = Invoice.objects.create(
+        Invoice.objects.create(
             user=self.user, card=self.card,
             closing_date=date(2026, 6, 20),
             due_date=date(2026, 7, 10),

@@ -19,15 +19,15 @@
 </div>
 
 <div class="row mt-3">
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body text-center">
+  <div class="col-lg-4 d-flex">
+    <div class="card w-100">
+      <div class="card-body text-center d-flex flex-column h-100">
         <div class="avatar-lg rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
           <i data-lucide="trending-up" class="font-30 text-primary"></i>
         </div>
         <h4 class="fw-semibold">Fluxo de Caixa</h4>
         <p class="text-muted font-14">Relatório de entradas e saídas do período selecionado.</p>
-        <form method="get" action="{% url 'report_cash_flow' %}" class="d-flex gap-2 justify-content-center mb-3">
+        <form method="get" action="{% url 'report_cash_flow' %}" class="d-flex gap-2 justify-content-center mb-3 mt-auto">
           <select name="month" class="form-select form-select-sm" style="width: auto;">
             <option value="">Todos os meses</option>
             {% for m in months_list %}
@@ -48,15 +48,15 @@
     </div>
   </div>
 
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body text-center">
+  <div class="col-lg-4 d-flex">
+    <div class="card w-100">
+      <div class="card-body text-center d-flex flex-column h-100">
         <div class="avatar-lg rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
           <i data-lucide="pie-chart" class="font-30 text-danger"></i>
         </div>
         <h4 class="fw-semibold">Despesas por Categoria</h4>
         <p class="text-muted font-14">Relatório de despesas agrupadas por categoria.</p>
-        <form method="get" action="{% url 'report_expenses_by_category' %}" class="d-flex gap-2 justify-content-center mb-3">
+        <form method="get" action="{% url 'report_expenses_by_category' %}" class="d-flex gap-2 justify-content-center mb-3 mt-auto">
           <select name="month" class="form-select form-select-sm" style="width: auto;">
             <option value="">Todos os meses</option>
             {% for m in months_list %}
@@ -77,17 +77,19 @@
     </div>
   </div>
 
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body text-center">
+  <div class="col-lg-4 d-flex">
+    <div class="card w-100">
+      <div class="card-body text-center d-flex flex-column h-100">
         <div class="avatar-lg rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
           <i data-lucide="landmark" class="font-30 text-success"></i>
         </div>
         <h4 class="fw-semibold">Investimentos</h4>
         <p class="text-muted font-14">Relatório da carteira de investimentos.</p>
-        <a href="{% url 'report_investments' %}" class="btn btn-primary btn-sm mt-4">
-          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
-        </a>
+        <div class="mt-auto">
+          <a href="{% url 'report_investments' %}" class="btn btn-primary btn-sm">
+            <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+          </a>
+        </div>
       </div>
     </div>
   </div>
