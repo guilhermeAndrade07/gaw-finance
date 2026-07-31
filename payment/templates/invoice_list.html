@@ -280,16 +280,6 @@
                 const isChecked = event.target.checked;
                 const wasChecked = !isChecked;
 
-                if (!showingHidden && !isChecked) {
-                    event.target.checked = true;
-                    return;
-                }
-
-                if (showingHidden && isChecked) {
-                    event.target.checked = false;
-                    return;
-                }
-
                 const paymentId = event.target.dataset.paymentId;
                 const row = document.getElementById(`payment-row-${paymentId}`);
                 if (!paymentId || !row) return;
@@ -297,9 +287,9 @@
                 event.target.disabled = true;
 
                 try {
-                    const endpoint = showingHidden
-                        ? `/payment/${paymentId}/mark-unpaid/`
-                        : `/payment/${paymentId}/mark-paid/`;
+                    const endpoint = isChecked
+                        ? `/payment/${paymentId}/mark-paid/`
+                        : `/payment/${paymentId}/mark-unpaid/`;
 
                     const response = await fetch(endpoint, {
                         method: 'POST',
@@ -313,24 +303,25 @@
 
                     const currentTotal = toNumber(totalElement.dataset.total);
                     const rowValue = toNumber(row.dataset.value);
-                    const nextTotal = Math.max(currentTotal - rowValue, 0);
+                    const totalDelta = (showingHidden === isChecked) ? rowValue : -rowValue;
+                    const nextTotal = Math.max(currentTotal + totalDelta, 0);
                     updateMoneyElement(totalElement, nextTotal);
 
                     if (row.dataset.hasCard === '1') {
-                        if (showingHidden) {
-                            const nextUsed = toNumber(usedElement.dataset.total) + rowValue;
-                            const nextAvailable = Math.max(toNumber(availableElement.dataset.total) - rowValue, 0);
-                            updateMoneyElement(usedElement, nextUsed);
-                            updateMoneyElement(availableElement, nextAvailable);
-                        } else {
-                            const nextUsed = Math.max(toNumber(usedElement.dataset.total) - rowValue, 0);
-                            const nextAvailable = toNumber(availableElement.dataset.total) + rowValue;
-                            updateMoneyElement(usedElement, nextUsed);
-                            updateMoneyElement(availableElement, nextAvailable);
-                        }
+                        const creditDir = isChecked ? -1 : 1;
+                        const nextUsed = Math.max(toNumber(usedElement.dataset.total) + creditDir * rowValue, 0);
+                        const nextAvailable = Math.max(toNumber(availableElement.dataset.total) - creditDir * rowValue, 0);
+                        updateMoneyElement(usedElement, nextUsed);
+                        updateMoneyElement(availableElement, nextAvailable);
                     }
 
-                    row.remove();
+                    if (isChecked) {
+                        row.style.opacity = '0.5';
+                        row.style.textDecoration = 'line-through';
+                    } else {
+                        row.style.opacity = '';
+                        row.style.textDecoration = '';
+                    }
                 } catch (error) {
                     event.target.disabled = false;
                     event.target.checked = wasChecked;

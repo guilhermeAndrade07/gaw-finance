@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load l10n %}
 
 {% block title %}GAW Finance - Relatórios{% endblock %}
 
@@ -18,78 +19,80 @@
   </div>
 </div>
 
-<div class="row mt-3">
-  <div class="col-lg-4 d-flex">
-    <div class="card w-100">
-      <div class="card-body text-center d-flex flex-column h-100">
-        <div class="avatar-lg rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
-          <i data-lucide="trending-up" class="font-30 text-primary"></i>
+<div class="row mt-3 justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <div class="avatar-lg rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
+            <i data-lucide="file-text" class="font-30 text-primary"></i>
+          </div>
+          <h4 class="fw-semibold">Relatório Personalizado</h4>
+          <p class="text-muted font-14">Selecione as informações que deseja incluir no relatório e baixe o PDF.</p>
         </div>
-        <h4 class="fw-semibold">Fluxo de Caixa</h4>
-        <p class="text-muted font-14">Relatório de entradas e saídas do período selecionado.</p>
-        <form method="get" action="{% url 'report_cash_flow' %}" class="d-flex gap-2 justify-content-center mb-3 mt-auto">
-          <select name="month" class="form-select form-select-sm" style="width: auto;">
-            <option value="">Todos os meses</option>
-            {% for m in months_list %}
-            <option value="{{ m.month }}">{{ m.display }}</option>
-            {% endfor %}
-          </select>
-          <select name="year" class="form-select form-select-sm" style="width: auto;">
-            <option value="">Todos os anos</option>
-            {% for y in years_list %}
-            <option value="{{ y }}">{{ y }}</option>
-            {% endfor %}
-          </select>
-        </form>
-        <a href="{% url 'report_cash_flow' %}" class="btn btn-primary btn-sm">
-          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
-        </a>
-      </div>
-    </div>
-  </div>
 
-  <div class="col-lg-4 d-flex">
-    <div class="card w-100">
-      <div class="card-body text-center d-flex flex-column h-100">
-        <div class="avatar-lg rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
-          <i data-lucide="pie-chart" class="font-30 text-danger"></i>
-        </div>
-        <h4 class="fw-semibold">Despesas por Categoria</h4>
-        <p class="text-muted font-14">Relatório de despesas agrupadas por categoria.</p>
-        <form method="get" action="{% url 'report_expenses_by_category' %}" class="d-flex gap-2 justify-content-center mb-3 mt-auto">
-          <select name="month" class="form-select form-select-sm" style="width: auto;">
-            <option value="">Todos os meses</option>
-            {% for m in months_list %}
-            <option value="{{ m.month }}">{{ m.display }}</option>
-            {% endfor %}
-          </select>
-          <select name="year" class="form-select form-select-sm" style="width: auto;">
-            <option value="">Todos os anos</option>
-            {% for y in years_list %}
-            <option value="{{ y }}">{{ y }}</option>
-            {% endfor %}
-          </select>
-        </form>
-        <a href="{% url 'report_expenses_by_category' %}" class="btn btn-primary btn-sm">
-          <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
-        </a>
-      </div>
-    </div>
-  </div>
+        <form method="get" action="{% url 'report_custom' %}" id="report-form">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Mês</label>
+              <select name="month" class="form-select form-select-sm">
+                <option value="">Todos os meses</option>
+                {% for m in months_list %}
+                <option value="{{ m.month|unlocalize }}">{{ m.display }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Ano</label>
+              <select name="year" class="form-select form-select-sm">
+                <option value="">Todos os anos</option>
+                {% for y in years_list %}
+                <option value="{{ y|unlocalize }}">{{ y|unlocalize }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
 
-  <div class="col-lg-4 d-flex">
-    <div class="card w-100">
-      <div class="card-body text-center d-flex flex-column h-100">
-        <div class="avatar-lg rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3">
-          <i data-lucide="landmark" class="font-30 text-success"></i>
-        </div>
-        <h4 class="fw-semibold">Investimentos</h4>
-        <p class="text-muted font-14">Relatório da carteira de investimentos.</p>
-        <div class="mt-auto">
-          <a href="{% url 'report_investments' %}" class="btn btn-primary btn-sm">
-            <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
-          </a>
-        </div>
+          <label class="form-label fw-semibold d-block mb-2">Informações do Relatório</label>
+          <div class="row mb-4">
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="summary" id="sec-summary" checked>
+                <label class="form-check-label" for="sec-summary">Resumo (Entradas / Saídas / Saldo)</label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="inflows" id="sec-inflows" checked>
+                <label class="form-check-label" for="sec-inflows">Detalhamento de Entradas</label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="outflows" id="sec-outflows" checked>
+                <label class="form-check-label" for="sec-outflows">Detalhamento de Saídas</label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="by_category" id="sec-category" checked>
+                <label class="form-check-label" for="sec-category">Despesas por Categoria</label>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="investments" id="sec-investments" checked>
+                <label class="form-check-label" for="sec-investments">Investimentos</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

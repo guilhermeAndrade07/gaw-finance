@@ -451,3 +451,56 @@ class InvoiceTests(TestCase):
             },
         )
         self.assertRedirects(response, f"{reverse('invoice_list')}?card={self.card.id}")
+
+
+class PaymentPaidToggleTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='user-toggle', password='pass123')
+        self.other_user = User.objects.create_user(username='user-other-toggle', password='pass123')
+        self.bank = Bank.objects.create(
+            user=self.user, name='Banco T', account_type='Corrente', agency=1, account=11,
+        )
+        self.category = Category.objects.create(user=self.user, name='Mercado')
+        self.card = CreditCard.objects.create(
+            user=self.user, bank=self.bank, name='Cartao T',
+            credit_limit=Decimal('1000.00'), closing_day=20, due_day=10,
+        )
+        self.payment = Payment.objects.create(
+            user=self.user, card=self.card, name='Compra Agosto',
+            category=self.category, date_payment=date(2026, 8, 5),
+            value=Decimal('80.00'), parcelas=1,
+        )
+
+    def test_mark_paid_sets_paid_true(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('payment_mark_paid', kwargs={'pk': self.payment.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], True)
+        self.payment.refresh_from_db()
+        self.assertTrue(self.payment.paid)
+
+    def test_mark_unpaid_sets_paid_false(self):
+        self.payment.paid = True
+        self.payment.save(update_fields=['paid'])
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('payment_mark_unpaid', kwargs={'pk': self.payment.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], True)
+        self.payment.refresh_from_db()
+        self.assertFalse(self.payment.paid)
+
+    def test_toggle_round_trip_paid_then_unpaid(self):
+        self.client.force_login(self.user)
+        self.client.post(reverse('payment_mark_paid', kwargs={'pk': self.payment.id}))
+        self.payment.refresh_from_db()
+        self.assertTrue(self.payment.paid)
+        self.client.post(reverse('payment_mark_unpaid', kwargs={'pk': self.payment.id}))
+        self.payment.refresh_from_db()
+        self.assertFalse(self.payment.paid)
+
+    def test_mark_paid_is_user_scoped(self):
+        self.client.force_login(self.other_user)
+        response = self.client.post(reverse('payment_mark_paid', kwargs={'pk': self.payment.id}))
+        self.assertEqual(response.status_code, 404)
+        self.payment.refresh_from_db()
+        self.assertFalse(self.payment.paid)

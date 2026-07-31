@@ -1,53 +1,380 @@
 {% extends 'base.html' %}
-{% block title %}Login{% endblock %}
+{% block title %}Login — GAW Finance{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Override base.html page-container centering for split layout */
+  .page-container.d-flex.align-items-center.justify-content-center {
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .login-wrap {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  /* ============ LEFT VISUAL PANEL ============ */
+  .login-visual {
+    position: relative;
+    flex: 0 0 46%;
+    background: linear-gradient(155deg, #0d4f47 0%, #125e54 55%, #0a3d37 100%);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3.5rem 4rem;
+    color: #f7faf9;
+  }
+
+  /* Floating coins */
+  .coin {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(160, 221, 208, 0.18);
+    background: radial-gradient(circle at 35% 35%, rgba(160, 221, 208, 0.08), transparent 70%);
+    animation: float-coin 14s ease-in-out infinite;
+  }
+  .coin--1 { width: 120px; height: 120px; top: 12%;  left: 15%;  animation-delay: 0s;   }
+  .coin--2 { width:  72px; height:  72px; top: 68%;  left: 8%;   animation-delay: 2s;   }
+  .coin--3 { width:  94px; height:  94px; top: 22%;  right: 10%; animation-delay: 4s;   }
+  .coin--4 { width:  56px; height:  56px; top: 75%;  right: 18%; animation-delay: 6s;   }
+  .coin--5 { width:  40px; height:  40px; top: 45%;  left: 50%;  animation-delay: 3s;   }
+
+  @keyframes float-coin {
+    0%, 100% { transform: translateY(0) rotate(0deg);     opacity: 0.5; }
+    25%      { transform: translateY(-22px) rotate(8deg);  opacity: 0.8; }
+    50%      { transform: translateY(-10px) rotate(-6deg); opacity: 0.6; }
+    75%      { transform: translateY(-28px) rotate(4deg);  opacity: 0.7; }
+  }
+
+  /* Growing bar chart */
+  .grow-chart {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 0 3.5rem 3.5rem 0;
+    opacity: 0.85;
+  }
+  .grow-chart span {
+    display: block;
+    width: 22px;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(to top, rgba(100, 197, 177, 0.15), rgba(160, 221, 208, 0.5));
+    animation: grow-bar 6s ease-in-out infinite;
+  }
+  .grow-chart span:nth-child(1) { height: 60px;  animation-delay: 0s; }
+  .grow-chart span:nth-child(2) { height: 95px;  animation-delay: 0.3s; }
+  .grow-chart span:nth-child(3) { height: 72px;  animation-delay: 0.6s; }
+  .grow-chart span:nth-child(4) { height: 130px; animation-delay: 0.9s; }
+  .grow-chart span:nth-child(5) { height: 165px; animation-delay: 1.2s; }
+  .grow-chart span:nth-child(6) { height: 110px; animation-delay: 1.5s; }
+
+  @keyframes grow-bar {
+    0%, 100% { transform: scaleY(0.55); opacity: 0.3; }
+    40%, 60% { transform: scaleY(1);    opacity: 0.9; }
+  }
+  .grow-chart span { transform-origin: bottom; }
+
+  /* Brand block on left panel */
+  .login-visual__brand {
+    position: relative;
+    z-index: 2;
+  }
+  .login-visual__brand .lv-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: rgba(100, 197, 177, 0.18);
+    border: 1px solid rgba(160, 221, 208, 0.25);
+    margin-bottom: 1.75rem;
+  }
+  .login-visual__brand .lv-badge i {
+    font-size: 28px;
+    color: #64c5b1;
+  }
+  .login-visual__brand h2 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0 0 0.5rem 0;
+    color: #f7faf9;
+  }
+  .login-visual__brand h2 span { color: #64c5b1; }
+  .login-visual__brand p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(247, 250, 249, 0.62);
+    max-width: 340px;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* ============ RIGHT FORM PANEL ============ */
+  .login-form {
+    flex: 1;
+    background: #f7faf9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 2.5rem;
+  }
+  .login-form__inner {
+    width: 100%;
+    max-width: 390px;
+  }
+  .lf-logo {
+    display: none;
+  }
+  .lf-title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #1a2e2b;
+    margin: 0 0 0.4rem 0;
+    letter-spacing: -0.3px;
+  }
+  .lf-subtitle {
+    font-size: 0.92rem;
+    color: #6b8580;
+    margin: 0 0 2.25rem 0;
+  }
+  .lf-field {
+    margin-bottom: 1.25rem;
+  }
+  .lf-field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #3d5a54;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.1px;
+  }
+  .lf-field input {
+    width: 100%;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.93rem;
+    border: 1.5px solid #d9e5e2;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1a2e2b;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+  }
+  .lf-field input:focus {
+    border-color: #64c5b1;
+    box-shadow: 0 0 0 3px rgba(100, 197, 177, 0.14);
+  }
+  .lf-field input::placeholder {
+    color: #b0c4c0;
+  }
+  .lf-field--password .lf-input-wrap {
+    position: relative;
+  }
+  .lf-toggle-pass {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #8aa4a0;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .lf-toggle-pass:hover { color: #64c5b1; background: rgba(100, 197, 177, 0.08); }
+  .lf-toggle-pass:focus-visible {
+    outline: 2px solid rgba(100, 197, 177, 0.35);
+    outline-offset: 1px;
+  }
+  .lf-toggle-pass i { font-size: 20px; }
+  .lf-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+  .lf-submit {
+    width: 100%;
+    padding: 0.78rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    background: #64c5b1;
+    color: #fff;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .lf-submit:hover { background: #55a796; }
+  .lf-submit:active { transform: scale(0.99); }
+  .lf-submit:focus-visible {
+    outline: 3px solid rgba(100, 197, 177, 0.35);
+    outline-offset: 2px;
+  }
+  .lf-link {
+    color: #64c5b1;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .lf-link:hover { text-decoration: underline; }
+  .lf-divider {
+    height: 1px;
+    background: #e0ece9;
+    margin: 1.75rem 0;
+    border: none;
+  }
+  .lf-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8aa4a0;
+  }
+  .lf-errors {
+    background: #fdf0f0;
+    border: 1.5px solid #f5c2c2;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .lf-errors ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.85rem;
+    color: #c0392b;
+  }
+  .lf-errors ul li { margin-bottom: 4px; }
+  .lf-errors ul li:last-child { margin-bottom: 0; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 991.98px) {
+    .login-wrap { flex-direction: column; min-height: auto; }
+    .login-visual {
+      flex: 0 0 auto;
+      padding: 2.5rem 2rem;
+      min-height: 280px;
+    }
+    .login-visual__brand p { margin-bottom: 0; }
+    .grow-chart { display: none; }
+    .login-form { padding: 2.5rem 2rem; min-height: 420px; }
+  }
+
+  @media (max-width: 480px) {
+    .login-visual { min-height: 220px; padding: 2rem 1.5rem; }
+    .login-visual__brand h2 { font-size: 1.7rem; }
+    .login-form { padding: 2rem 1.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .coin, .grow-chart span { animation: none; }
+    .coin { opacity: 0.5; }
+    .grow-chart span { transform: scaleY(1); opacity: 0.9; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center w-100">
-  <div class="col-md-6 col-lg-5">
-    <div class="card">
-      <div class="card-body p-4">
-        <div class="text-center mb-4">
-          <div class="avatar-lg rounded-circle bg-primary mx-auto d-flex align-items-center justify-content-center" style="width:64px;height:64px;">
-            <i class="mdi mdi-bank font-30 text-white"></i>
-          </div>
-          <h4 class="font-18 fw-semibold mt-3 mb-1">GAW Finance</h4>
-          <p class="text-muted">Faca o login para continuar</p>
-        </div>
+<div class="login-wrap">
 
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label for="username" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="username" name="username" required>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-          </div>
-          <div class="mb-3">
-            <p class="mb-0 text-muted">Nao tenho conta ainda? <a href="{% url 'account_create' %}">Cadastre-se</a></p>
-          </div>
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary">Entrar</button>
-          </div>
-        </form>
+  <!-- LEFT: Visual panel -->
+  <div class="login-visual">
+    <div class="coin coin--1"></div>
+    <div class="coin coin--2"></div>
+    <div class="coin coin--3"></div>
+    <div class="coin coin--4"></div>
+    <div class="coin coin--5"></div>
 
-        {% if form.errors %}
-          <div class="alert alert-danger mt-3">
-            <ul class="mb-0">
-              {% for field in form %}
-                {% for error in field.errors %}
-                  <li>{{ error }}</li>
-                {% endfor %}
-              {% endfor %}
-              {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endif %}
+    <div class="grow-chart">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="login-visual__brand">
+      <div class="lv-badge">
+        <i class="mdi mdi-bank"></i>
       </div>
+      <h2>GAW <span>Finance</span></h2>
+      <p>Controle financeiro completo para sua empresa. Gestão de contas, transações e relatórios em um só lugar.</p>
     </div>
   </div>
+
+  <!-- RIGHT: Form panel -->
+  <div class="login-form">
+    <div class="login-form__inner">
+      <h1 class="lf-title">Bem-vindo de volta</h1>
+      <p class="lf-subtitle">Entre com seus dados para acessar o painel.</p>
+
+      {% if form.errors %}
+        <div class="lf-errors">
+          <ul>
+            {% for field in form %}{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}{% endfor %}
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="lf-field">
+          <label for="username">Nome de usuário</label>
+          <input type="text" id="username" name="username" autocomplete="username" placeholder="seu_usuario" required>
+        </div>
+        <div class="lf-field lf-field--password">
+          <label for="password">Senha</label>
+          <div class="lf-input-wrap">
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+            <button type="button" class="lf-toggle-pass" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false">
+              <i class="mdi mdi-eye-outline" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="lf-row">
+          <span style="color:#6b8580;">Não tem conta? <a href="{% url 'account_create' %}" class="lf-link">Cadastre-se</a></span>
+        </div>
+        <button type="submit" class="lf-submit">Entrar</button>
+      </form>
+
+      <hr class="lf-divider">
+      <p class="lf-footer">© {% now "Y" %} GAW Finance. Todos os direitos reservados.</p>
+    </div>
+  </div>
+
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function() {
+    var toggle = document.getElementById('togglePassword');
+    var input = document.getElementById('password');
+    var icon = document.getElementById('eyeIcon');
+    if (!toggle || !input || !icon) return;
+
+    toggle.addEventListener('click', function() {
+      var isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      icon.classList.toggle('mdi-eye-outline', isPassword);
+      icon.classList.toggle('mdi-eye-off-outline', !isPassword);
+      toggle.setAttribute('aria-pressed', String(isPassword));
+      toggle.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+      input.focus();
+    });
+  })();
+</script>
 {% endblock %}

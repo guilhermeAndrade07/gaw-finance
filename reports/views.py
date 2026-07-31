@@ -23,44 +23,25 @@ class ReportListView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-class CashFlowReportView(LoginRequiredMixin, View):
+class CustomReportView(LoginRequiredMixin, View):
     login_url = 'login'
 
-    def get(self, request):
-        month = request.GET.get('month')
-        year = request.GET.get('year')
-        month = int(month) if month else None
-        year = int(year) if year else None
-
-        buffer = services.generate_cash_flow_report(request.user, month, year)
-        GeneratedReport.objects.create(user=request.user, report_type='cash_flow')
-        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="fluxo_de_caixa.pdf"'
-        return response
-
-
-class ExpensesByCategoryReportView(LoginRequiredMixin, View):
-    login_url = 'login'
+    @staticmethod
+    def _safe_int(value):
+        if not value:
+            return None
+        try:
+            return int(str(value).replace('.', '').replace(',', ''))
+        except (ValueError, TypeError):
+            return None
 
     def get(self, request):
-        month = request.GET.get('month')
-        year = request.GET.get('year')
-        month = int(month) if month else None
-        year = int(year) if year else None
+        month = self._safe_int(request.GET.get('month'))
+        year = self._safe_int(request.GET.get('year'))
+        sections = request.GET.getlist('sections')
 
-        buffer = services.generate_expenses_by_category_report(request.user, month, year)
-        GeneratedReport.objects.create(user=request.user, report_type='expenses_by_category')
+        buffer = services.generate_custom_report(request.user, sections, month, year)
+        GeneratedReport.objects.create(user=request.user, report_type='custom')
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="despesas_por_categoria.pdf"'
-        return response
-
-
-class InvestmentsReportView(LoginRequiredMixin, View):
-    login_url = 'login'
-
-    def get(self, request):
-        buffer = services.generate_investments_report(request.user)
-        GeneratedReport.objects.create(user=request.user, report_type='investments')
-        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="investimentos.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="relatorio_personalizado.pdf"'
         return response

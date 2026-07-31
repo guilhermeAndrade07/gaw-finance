@@ -126,9 +126,7 @@ Relatorios financeiros em PDF usando ReportLab.
 | Rota | View | Relatorio |
 |---|---|---|
 | `reports/` | `ReportListView` | Pagina de listagem |
-| `reports/cash-flow/` | `CashFlowReportView` | Fluxo de Caixa (PDF) |
-| `reports/expenses-by-category/` | `ExpensesByCategoryReportView` | Despesas por Categoria (PDF) |
-| `reports/investments/` | `InvestmentsReportView` | Investimentos (PDF) |
+| `reports/custom/` | `CustomReportView` | Relatorio Personalizado (PDF) |
 
 - **Modelo**: `GeneratedReport` (rastreia relatorios gerados)
-- **Services**: `generate_cash_flow_report()`, `generate_expenses_by_category_report()`, `generate_investments_report()`
+- **Services**: `generate_custom_report()` (blocos: summary, inflows, outflows, by_category, investments)

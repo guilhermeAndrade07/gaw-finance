@@ -3,9 +3,7 @@ from django.db import models
 
 class GeneratedReport(models.Model):
     REPORT_TYPES = [
-        ('cash_flow', 'Fluxo de Caixa'),
-        ('expenses_by_category', 'Despesas por Categoria'),
-        ('investments', 'Investimentos'),
+        ('custom', 'Personalizado'),
     ]
 
     user = models.ForeignKey(
