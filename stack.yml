@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/guilhermeAndrade07/gaw-finance:latest
+    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
     environment:
       - DJANGO_ENV=${DJANGO_ENV}
       - DEBUG=${DEBUG}
@@ -113,7 +113,7 @@ services:
           - node.role == manager
 
   celery_worker:
-    image: ghcr.io/guilhermeAndrade07/gaw-finance:latest
+    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
     entrypoint: ["./entrypoint-celery.sh"]
     command: celery -A app worker --loglevel=info --concurrency=2
     environment:
@@ -140,7 +140,7 @@ services:
       - gaw_db_password
 
   celery_beat:
-    image: ghcr.io/guilhermeAndrade07/gaw-finance:latest
+    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
     entrypoint: ["./entrypoint-celery.sh"]
     command: celery -A app beat --loglevel=info
     environment:

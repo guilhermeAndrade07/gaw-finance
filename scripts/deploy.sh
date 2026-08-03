@@ -6,7 +6,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="${PROJECT_DIR}/.env.prod"
 STACK_FILE="${PROJECT_DIR}/stack.yml"
 STACK_NAME="gaw_finance"
-IMAGE="ghcr.io/guilhermeAndrade07/gaw-finance:latest"
+IMAGE="ghcr.io/guilhermeandrade07/gaw-finance:latest"
 
 SKIP_BUILD=false
 if [ "${1:-}" = "--skip-build" ]; then

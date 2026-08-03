@@ -60,8 +60,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/guilhermeAndrade07/gaw-finance:latest
-            ghcr.io/guilhermeAndrade07/gaw-finance:${{ github.sha }}
+            ghcr.io/guilhermeandrade07/gaw-finance:latest
+            ghcr.io/guilhermeandrade07/gaw-finance:${{ github.sha }}
 
   deploy:
     name: Deploy to VPS (Swarm)

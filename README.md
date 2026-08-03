@@ -152,7 +152,7 @@ Os backups sao salvos em `backups/` com rotacao automatica (7 dias por padrao).
 O workflow do GitHub Actions (`.github/workflows/deploy.yml`) faz:
 
 1. **Lint & Test** — flake8 + testes em todo PR/push para `main`.
-2. **Build & Push** — constroi a imagem Docker e publica no GHCR (`ghcr.io/guilhermeAndrade07/gaw-finance:latest`).
+2. **Build & Push** — constroi a imagem Docker e publica no GHCR (`ghcr.io/guilhermeandrade07/gaw-finance:latest`).
 3. **Deploy** — SSH para a VPS e executa `scripts/deploy.sh --skip-build`.
 
 ### Secrets necessarias no GitHub
