@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}GAW Finance - Metas de Gasto{% endblock %}
+
+{% block content %}
+
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Metas de Gasto</h4>
+      <p class="text-muted mb-0">Defina limites de gastos por categoria e acompanhe o progresso.</p>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
+        <li class="breadcrumb-item active">Metas</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3 mb-2">
+  <div class="col-sm-8">
+    <form method="get" action="{% url 'goal_list' %}" class="d-flex gap-2">
+      <select class="form-select" name="month" style="max-width: 180px;">
+        <option value="">Todos os meses</option>
+        {% for value, name in months %}
+          <option value="{{ value }}" {% if request.GET.month == value|stringformat:"s" %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+      <select class="form-select" name="year" style="max-width: 120px;">
+        <option value="">Todos os anos</option>
+        {% for year_val in years %}
+          <option value="{{ year_val }}" {% if request.GET.year == year_val|stringformat:"s" %}selected{% endif %}>{{ year_val }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-light" type="submit"><i data-lucide="search" class="font-16"></i></button>
+    </form>
+  </div>
+  <div class="col-sm-4 text-sm-end">
+    <a href="{% url 'goal_dashboard' %}" class="btn btn-info me-1">
+      <i data-lucide="bar-chart-horizontal" class="font-16 me-1"></i> Dashboard
+    </a>
+    <a href="{% url 'goal_create' %}" class="btn btn-primary">
+      <i data-lucide="plus" class="font-16 me-1"></i> Nova Meta
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor da Meta</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Mes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ano</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for goal in goals %}
+          <tr>
+            <td><h5 class="m-0 fw-medium">{{ goal.category_display }}</h5></td>
+            <td>R$ {{ goal.value|floatformat:"2g" }}</td>
+            <td>{{ goal.month }}</td>
+            <td>{{ goal.year }}</td>
+            <td>
+              <a href="{% url 'goal_update' goal.id %}" class="table-action-btn" title="Editar">
+                <i class="mdi mdi-pencil"></i>
+              </a>
+              <a href="{% url 'goal_delete' goal.id %}" class="table-action-btn" title="Excluir">
+                <i class="mdi mdi-close"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Nenhuma meta encontrada. Crie a primeira!</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

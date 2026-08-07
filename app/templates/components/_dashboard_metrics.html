@@ -139,6 +139,68 @@
   </div>
 </div>
 
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="header-title">Metas de Gasto - Mes Atual</h4>
+        <p class="card-subtitle">Resumo do progresso das suas metas de gastos por categoria.</p>
+      </div>
+      <div class="card-body">
+        {% if goal_status.total == 0 %}
+          <div class="text-center py-3">
+            <p class="text-muted mb-2">Voce ainda nao definiu metas para este mes.</p>
+            <a href="{% url 'goal_create' %}" class="btn btn-primary btn-sm">
+              <i data-lucide="plus" class="font-16 me-1"></i> Criar Primeira Meta
+            </a>
+          </div>
+        {% else %}
+          <div class="row text-center">
+            <div class="col-md-3 mb-3">
+              <div class="card h-100">
+                <div class="card-body py-2 px-3">
+                  <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
+                    <i class="mdi mdi-check-circle text-white" style="font-size:22px;"></i>
+                  </div>
+                  <h3 class="fw-medium my-1">{{ goal_status.ok }}</h3>
+                  <p class="text-uppercase fw-medium font-12 text-muted m-0">Abaixo de 70%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card h-100">
+                <div class="card-body py-2 px-3">
+                  <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
+                    <i class="mdi mdi-alert text-white" style="font-size:22px;"></i>
+                  </div>
+                  <h3 class="fw-medium my-1">{{ goal_status.warning }}</h3>
+                  <p class="text-uppercase fw-medium font-12 text-muted m-0">70-100%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card h-100">
+                <div class="card-body py-2 px-3">
+                  <div class="rounded-circle bg-danger d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
+                    <i class="mdi mdi-alert-octagon text-white" style="font-size:22px;"></i>
+                  </div>
+                  <h3 class="fw-medium my-1">{{ goal_status.exceeded }}</h3>
+                  <p class="text-uppercase fw-medium font-12 text-muted m-0">Acima de 100%</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-center">
+              <a href="{% url 'goal_dashboard' %}" class="btn btn-info w-100">
+                <i data-lucide="bar-chart-horizontal" class="font-16 me-1"></i> Ver Dashboard de Metas
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mt-4">
   <div class="card-header">
     <h4 class="header-title">Suas Últimas Transações</h4>

@@ -1,7 +1,9 @@
+from datetime import date
+from decimal import Decimal
+from calendar import monthrange
+
 from django.utils.formats import number_format
 from django.db.models import Sum
-from datetime import date
-from calendar import monthrange
 from inflows.models import Inflow
 from investments.models import InvestmentAsset
 from outflows.models import Outflow
@@ -209,3 +211,110 @@ def get_investment(user):
             'total_investment': '0,00',
             'total_investment_value': 0.0
         }
+
+
+def get_goal_progress(user, month=None, year=None):
+    if not user or not user.is_authenticated:
+        return {
+            'labels': json.dumps([]),
+            'percentages': json.dumps([]),
+            'spent': json.dumps([]),
+            'goals': json.dumps([]),
+        }
+
+    if month is None or year is None:
+        today = date.today()
+        month = today.month
+        year = today.year
+
+    from goals.models import MonthlyGoal
+
+    goals = MonthlyGoal.objects.filter(
+        user=user, month=month, year=year,
+    ).select_related('category')
+
+    progress_list = []
+    for goal in goals:
+        if goal.category is None:
+            outflow_qs = Outflow.objects.filter(
+                user=user, category__isnull=True,
+                created_at__month=month, created_at__year=year,
+            )
+        else:
+            outflow_qs = Outflow.objects.filter(
+                user=user, category=goal.category,
+                created_at__month=month, created_at__year=year,
+            )
+        spent = outflow_qs.aggregate(Sum('value'))['value__sum'] or Decimal('0')
+
+        goal_value = Decimal(goal.value) if not isinstance(goal.value, Decimal) else goal.value
+        if goal_value > 0:
+            percentage = float(round((spent / goal_value) * Decimal('100'), 2))
+        else:
+            percentage = 0.0
+
+        progress_list.append({
+            'name': goal.category_display,
+            'goal': float(goal_value),
+            'spent': float(spent),
+            'percentage': percentage,
+        })
+
+    progress_list.sort(key=lambda x: x['percentage'], reverse=True)
+
+    return {
+        'labels': json.dumps([item['name'] for item in progress_list]),
+        'percentages': json.dumps([item['percentage'] for item in progress_list]),
+        'spent': json.dumps([item['spent'] for item in progress_list]),
+        'goals': json.dumps([item['goal'] for item in progress_list]),
+    }
+
+
+def get_goal_status_counts(user, month=None, year=None):
+    if not user or not user.is_authenticated:
+        return {'ok': 0, 'warning': 0, 'exceeded': 0, 'total': 0}
+
+    if month is None or year is None:
+        today = date.today()
+        month = today.month
+        year = today.year
+
+    from goals.models import MonthlyGoal
+
+    goals = MonthlyGoal.objects.filter(
+        user=user, month=month, year=year,
+    ).select_related('category')
+
+    ok = warning = exceeded = 0
+    for goal in goals:
+        if goal.category is None:
+            outflow_qs = Outflow.objects.filter(
+                user=user, category__isnull=True,
+                created_at__month=month, created_at__year=year,
+            )
+        else:
+            outflow_qs = Outflow.objects.filter(
+                user=user, category=goal.category,
+                created_at__month=month, created_at__year=year,
+            )
+        spent = outflow_qs.aggregate(Sum('value'))['value__sum'] or Decimal('0')
+
+        goal_value = Decimal(goal.value) if not isinstance(goal.value, Decimal) else goal.value
+        if goal_value > 0:
+            ratio = float(spent / goal_value)
+        else:
+            ratio = 0.0
+
+        if ratio > 1.0:
+            exceeded += 1
+        elif ratio >= 0.7:
+            warning += 1
+        else:
+            ok += 1
+
+    return {
+        'ok': ok,
+        'warning': warning,
+        'exceeded': exceeded,
+        'total': goals.count(),
+    }

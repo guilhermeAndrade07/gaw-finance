@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'signatures',
     'investments',
     'reports',
+    'goals',
 ]
 
 LOGIN_URL = 'login'

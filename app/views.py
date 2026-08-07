@@ -50,6 +50,8 @@ def dashboard(request):
     months_list = metrics.get_months_list()
     banks = Bank.objects.filter(user=request.user)
 
+    goal_status = metrics.get_goal_status_counts(request.user)
+
     context = {
         'metrics': value_metrics,
         'cash_flow': cash_flow,
@@ -58,6 +60,7 @@ def dashboard(request):
         'banks': banks,
         'selected_bank_id': str(selected_bank.id) if selected_bank else '',
         'latest_transactions': latest_transactions,
+        'goal_status': goal_status,
     }
 
     return render(request, 'dashboard.html', context)

@@ -59,11 +59,23 @@
           <span class="menu-text">Relatórios</span>
         </a>
       </li>
+      <li class="side-nav-item">
+        <a href="{% url 'goal_dashboard' %}" class="side-nav-link">
+          <span class="menu-icon"><i data-lucide="target"></i></span>
+          <span class="menu-text">Metas</span>
+        </a>
+      </li>
       <li class="side-nav-title">Configurações</li>
       <li class="side-nav-item">
         <a href="{% url 'category_list' %}" class="side-nav-link">
           <span class="menu-icon"><i data-lucide="tags"></i></span>
           <span class="menu-text">Categorias</span>
+        </a>
+      </li>
+      <li class="side-nav-item">
+        <a href="{% url 'goal_list' %}" class="side-nav-link">
+          <span class="menu-icon"><i data-lucide="list"></i></span>
+          <span class="menu-text">Gerenciar Metas</span>
         </a>
       </li>
       <li class="side-nav-item">
