@@ -120,9 +120,10 @@ A aplicacao estara disponivel em `http://localhost:8000/`.
 
 3. **Docker Secrets:**
    ```bash
-   echo -n 'sua-secret-key' | docker secret create gaw_secret_key -
-   echo -n 'senha-postgres' | docker secret create gaw_db_password -
-   echo -n 'token-cloudflare' | docker secret create CLOUDFLARE_DNS_API_TOKEN -
+    echo -n 'sua-secret-key' | docker secret create gaw_secret_key -
+    echo -n 'senha-postgres' | docker secret create gaw_db_password -
+    echo -n 'senha-rabbitmq' | docker secret create gaw_rabbitmq_password -
+    echo -n 'token-cloudflare' | docker secret create CLOUDFLARE_DNS_API_TOKEN -
    ```
 
 4. **Arquivo `.env.prod`** na raiz do projeto com dominio, email ACME, credenciais do GHCR, etc. (ver `.env.example`).

@@ -21,6 +21,7 @@ class InvestmentFlowTests(TestCase):
             account_type='Corrente',
             agency=1234,
             account=56789,
+            initial_balance=Decimal('5000.00'),
             balance=Decimal('5000.00'),
         )
 

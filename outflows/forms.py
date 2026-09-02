@@ -31,8 +31,8 @@ class OutflowForm(forms.ModelForm):
         value = self.cleaned_data.get('value')
         bank = self.cleaned_data.get('bank')
 
-        if bank and value and value > bank.balance:
+        if bank and value and value > bank.current_balance:
             raise ValidationError(
-                f'Saldo insuficiente! Balance disponível: R$ {bank.balance}'
+                f'Saldo insuficiente! Saldo disponível: R$ {bank.current_balance}'
             )
         return value

@@ -18,7 +18,7 @@ parse_env() {
     set -a
     while IFS= read -r line || [ -n "$line" ]; do
         case "$line" in
-            ''|#*) continue ;;
+            ''|'#'*) continue ;;
         esac
         key="${line%%=*}"
         value="${line#*=}"

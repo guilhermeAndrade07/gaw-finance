@@ -23,7 +23,7 @@ parse_env() {
     set -a
     while IFS= read -r line || [ -n "$line" ]; do
         case "$line" in
-            ''|#*) continue ;;
+            ''|'#'*) continue ;;
         esac
         key="${line%%=*}"
         value="${line#*=}"
@@ -44,7 +44,7 @@ if ! docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null | grep -q 'act
     exit 1
 fi
 
-for secret in gaw_secret_key gaw_db_password CLOUDFLARE_DNS_API_TOKEN; do
+for secret in gaw_secret_key gaw_db_password gaw_rabbitmq_password CLOUDFLARE_DNS_API_TOKEN; do
     if ! docker secret inspect "$secret" >/dev/null 2>&1; then
         echo "ERROR: Docker secret '$secret' not found."
         echo "  Create with: echo -n 'value' | docker secret create $secret -"

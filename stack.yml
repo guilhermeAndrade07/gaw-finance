@@ -10,7 +10,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - RABBITMQ_USER=gaw_app
+      - RABBITMQ_HOST=rabbitmq
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - REDIS_URL=redis://redis:6379/0
     networks:
@@ -51,6 +52,7 @@ services:
     secrets:
       - gaw_secret_key
       - gaw_db_password
+      - gaw_rabbitmq_password
 
   db:
     image: postgres:16
@@ -96,6 +98,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:4-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=gaw_app
+      - RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/gaw_rabbitmq_password
     networks:
       - gaw_finance_internal
     volumes:
@@ -111,6 +116,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    secrets:
+      - gaw_rabbitmq_password
 
   celery_worker:
     image: ghcr.io/guilhermeandrade07/gaw-finance:latest
@@ -123,7 +130,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - RABBITMQ_USER=gaw_app
+      - RABBITMQ_HOST=rabbitmq
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - REDIS_URL=redis://redis:6379/0
     networks:
@@ -138,6 +146,7 @@ services:
     secrets:
       - gaw_secret_key
       - gaw_db_password
+      - gaw_rabbitmq_password
 
   celery_beat:
     image: ghcr.io/guilhermeandrade07/gaw-finance:latest
@@ -150,7 +159,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - RABBITMQ_USER=gaw_app
+      - RABBITMQ_HOST=rabbitmq
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - REDIS_URL=redis://redis:6379/0
     networks:
@@ -165,6 +175,7 @@ services:
     secrets:
       - gaw_secret_key
       - gaw_db_password
+      - gaw_rabbitmq_password
 
   traefik:
     image: traefik:v3
@@ -221,6 +232,8 @@ secrets:
   gaw_secret_key:
     external: true
   gaw_db_password:
+    external: true
+  gaw_rabbitmq_password:
     external: true
   CLOUDFLARE_DNS_API_TOKEN:
     external: true

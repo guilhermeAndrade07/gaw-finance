@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Sum
 
 
 class Bank(models.Model):
@@ -19,3 +22,9 @@ class Bank(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def current_balance(self):
+        inflows = self.inflows.aggregate(total=Sum('value'))['total'] or Decimal('0')
+        outflows = self.outflows.aggregate(total=Sum('value'))['total'] or Decimal('0')
+        return self.initial_balance + inflows - outflows
