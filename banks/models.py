@@ -27,4 +27,6 @@ class Bank(models.Model):
     def current_balance(self):
         inflows = self.inflows.aggregate(total=Sum('value'))['total'] or Decimal('0')
         outflows = self.outflows.aggregate(total=Sum('value'))['total'] or Decimal('0')
-        return self.initial_balance + inflows - outflows
+        transfers_sent = self.transfers_sent.aggregate(total=Sum('value'))['total'] or Decimal('0')
+        transfers_received = self.transfers_received.aggregate(total=Sum('value'))['total'] or Decimal('0')
+        return self.initial_balance + inflows - outflows - transfers_sent + transfers_received

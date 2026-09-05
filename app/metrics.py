@@ -54,9 +54,7 @@ def get_finance_metrics(user, bank=None):
     balance_month = inflows_month - outflows_month
 
     if bank:
-        total_inflows = inflow_qs.aggregate(Sum('value'))['value__sum'] or 0
-        total_outflows = outflow_qs.aggregate(Sum('value'))['value__sum'] or 0
-        total_balance = bank.initial_balance + total_inflows - total_outflows
+        total_balance = bank.current_balance
     else:
         from banks.models import Bank
         total_initial = Bank.objects.filter(user=user).aggregate(Sum('initial_balance'))['initial_balance__sum'] or 0

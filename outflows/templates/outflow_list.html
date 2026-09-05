@@ -19,23 +19,29 @@
 </div>
 
 <div class="row mt-3 mb-2 align-items-center">
-  <div class="col-lg-10">
-    <form method="get" action="{% url 'outflow_list' %}" class="row g-2 align-items-center">
-      <div class="col-md-3">
+  <div class="col-12">
+    <form method="get" action="{% url 'outflow_list' %}" class="row g-2 align-items-start">
+      <div class="col-lg-3 col-md-6">
         <div class="app-search">
           <div class="app-search-box">
             <div class="input-group">
               <input type="text" class="form-control" name="title" placeholder="Buscar saída..." value="{{ request.GET.title }}">
               <div class="input-group-append">
-                <button class="btn btn-icon" type="submit">
-                  <i data-lucide="search" class="font-16"></i>
+                <button class="btn btn-primary" type="submit">
+                  <i data-lucide="search"></i>
                 </button>
               </div>
             </div>
           </div>
         </div>
+        <div class="d-flex gap-2 mt-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-filter me-1"></i> Filtrar
+          </button>
+          <a href="{% url 'outflow_list' %}" class="btn btn-light">Limpar</a>
+        </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-lg-2 col-md-6">
         <select class="form-select" name="category">
           <option value="" {% if not request.GET.category %} selected {% endif %}>Todas as Categorias</option>
           {% for category in categories %}
@@ -43,7 +49,7 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-lg-2 col-md-6">
         <select class="form-select" name="month">
           <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
           {% for month_value, month_label in months %}
@@ -51,18 +57,15 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-4 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">
-          <i class="mdi mdi-filter me-1"></i> Filtrar
-        </button>
-        <a href="{% url 'outflow_list' %}" class="btn btn-light">Limpar</a>
+      <div class="col-lg-5 col-md-6 d-flex justify-content-lg-end gap-2 flex-wrap flex-lg-nowrap">
+        <a href="{% url 'transfer_create' %}" class="btn btn-primary">
+          <i data-lucide="repeat-2" class="font-16 me-1"></i> Transferência entre Bancos
+        </a>
+        <a href="{% url 'outflow_create' %}" class="btn btn-danger">
+          <i data-lucide="plus" class="font-16 me-1"></i> Nova Saida
+        </a>
       </div>
     </form>
-  </div>
-  <div class="col-lg-2 text-lg-end mt-2 mt-lg-0">
-    <a href="{% url 'outflow_create' %}" class="btn btn-danger">
-      <i data-lucide="plus" class="font-16 me-1"></i> Nova Saida
-    </a>
   </div>
 </div>
 

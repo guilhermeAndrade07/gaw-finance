@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}GAW Finance - Transferências{% endblock %}
+
+{% block content %}
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Transferências entre Bancos</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'outflow_list' %}">Saídas</a></li>
+        <li class="breadcrumb-item active">Transferências</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3 mb-2">
+  <div class="col-12 text-end">
+    <a href="{% url 'transfer_create' %}" class="btn btn-primary">
+      <i data-lucide="plus" class="font-16 me-1"></i> Nova Transferência
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body pt-2">
+    <div class="table-responsive">
+      <table class="table table-hover table-actions-bar m-0">
+        <thead>
+          <tr>
+            <th>Origem</th>
+            <th>Destino</th>
+            <th>Valor</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transfer in transfers %}
+          <tr>
+            <td>{{ transfer.source_bank }}</td>
+            <td>{{ transfer.destination_bank }}</td>
+            <td><span class="fw-medium">R$ {{ transfer.value|floatformat:"2g" }}</span></td>
+            <td>{{ transfer.created_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              <a href="{% url 'transfer_detail' transfer.id %}" class="table-action-btn" title="Visualizar">
+                <i class="mdi mdi-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">Nenhuma transferência registrada</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

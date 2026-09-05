@@ -53,6 +53,13 @@ Todos os endpoints exigem autenticacao JWT (`Authorization: Bearer <token>`).
 | `/api/v1/outflows/` | GET, POST | Lista / Cria |
 | `/api/v1/outflows/<id>/` | GET | Detalhe |
 
+### Transfers
+
+| Endpoint | Metodo | Descricao |
+|---|---|---|
+| `/api/v1/transfers/` | GET, POST | Lista / Cria transferencia interna |
+| `/api/v1/transfers/<id>/` | GET | Detalhe da transferencia |
+
 ### Payments
 
 | Endpoint | Metodo | Descricao |

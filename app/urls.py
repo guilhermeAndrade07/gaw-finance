@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('categories.urls')),
     path('', include('inflows.urls')),
     path('', include('outflows.urls')),
+    path('', include('transfers.urls')),
     path('', include('payment.urls')),
     path('', include('signatures.urls')),
     path('', include('investments.urls')),

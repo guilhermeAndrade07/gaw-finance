@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}GAW Finance - Detalhes da Transferência{% endblock %}
+
+{% block content %}
+<div class="card page-title-box rounded-0">
+  <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
+    <div class="flex-grow-1">
+      <h4 class="font-18 fw-semibold mb-0">Detalhes da Transferência</h4>
+    </div>
+    <div class="text-end">
+      <ol class="breadcrumb m-0 py-0">
+        <li class="breadcrumb-item"><a href="{% url 'outflow_list' %}">Saídas</a></li>
+        <li class="breadcrumb-item active">Transferência</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">
+    <h4 class="header-title">{{ transfer.title|default:'Transferência entre bancos' }}</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Banco de origem</label>
+        <p class="fw-medium">{{ transfer.source_bank }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Saldo atual da origem</label>
+        <p class="fw-medium">R$ {{ transfer.source_bank.current_balance|floatformat:"2g" }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Banco de destino</label>
+        <p class="fw-medium">{{ transfer.destination_bank }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Saldo atual do destino</label>
+        <p class="fw-medium">R$ {{ transfer.destination_bank.current_balance|floatformat:"2g" }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Valor</label>
+        <p class="fw-medium">R$ {{ transfer.value|floatformat:"2g" }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Data</label>
+        <p class="fw-medium">{{ transfer.created_at|date:"d/m/Y H:i" }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <a href="{% url 'outflow_list' %}" class="btn btn-light">Voltar para Saídas</a>
+    <a href="{% url 'transfer_list' %}" class="btn btn-light">Ver transferências</a>
+  </div>
+</div>
+{% endblock %}

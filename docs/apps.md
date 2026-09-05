@@ -11,6 +11,7 @@ graph LR
     Categories[categories]
     Inflows[inflows]
     Outflows[outflows]
+    Transfers[transfers]
     Payment[payment]
     Signatures[signatures]
     Investments[investments]
@@ -22,6 +23,7 @@ graph LR
     App --> Categories
     App --> Inflows
     App --> Outflows
+    App --> Transfers
     App --> Payment
     App --> Signatures
     App --> Investments
@@ -94,6 +96,15 @@ Saidas de dinheiro vinculadas a bancos e categorias.
 - **Modelo**: `Outflow` (user FK, bank FK, category FK, title, value)
 - **Signals**: `pre_save` (valida saldo), `post_save` (subtrai de Bank.balance)
 - **Views**: 3 CBVs + 2 DRF generics
+
+## transfers
+
+Transferencias internas entre bancos, sem criacao de entrada ou saida.
+
+- **Modelo**: `BankTransfer` (user, source_bank, destination_bank, title, value)
+- **Service**: `create_bank_transfer()` (operacao atomica com bloqueio dos dois bancos)
+- **Views**: 3 CBVs + 2 DRF generics
+- **Regra**: somente criacao e consulta; o valor debita a origem e credita o destino.
 
 ## payment
 

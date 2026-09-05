@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'categories',
     'inflows',
     'outflows',
+    'transfers',
     'payment',
     'signatures',
     'investments',

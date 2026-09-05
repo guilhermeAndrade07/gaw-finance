@@ -36,6 +36,10 @@
         <label class="form-label text-muted text-uppercase font-12">Conta</label>
         <p class="fw-medium">{{ object.account }}</p>
       </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label text-muted text-uppercase font-12">Saldo Atual</label>
+        <p class="fw-medium">R$ {{ object.current_balance|floatformat:"2g" }}</p>
+      </div>
     </div>
   </div>
   <div class="card-footer">
