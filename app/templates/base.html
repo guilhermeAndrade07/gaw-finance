@@ -13,11 +13,12 @@
   <link href="{% static 'app/adminox/css/vendor.min.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'app/adminox/css/app.min.css' %}" rel="stylesheet" type="text/css" id="app-style">
   <link href="{% static 'app/adminox/css/icons.min.css' %}" rel="stylesheet" type="text/css">
+  <script src="https://unpkg.com/lucide@latest" defer></script>
 
   <script>
     (function () {
       var t = localStorage.getItem('gaw_theme');
-      if (t) {
+      if (t === 'light' || t === 'dark') {
         document.documentElement.setAttribute('data-bs-theme', t);
         try {
           var raw = sessionStorage.getItem('__ADMINOX_CONFIG__');
@@ -62,10 +63,8 @@
 
   <script src="{% static 'app/adminox/js/vendor.min.js' %}"></script>
   <script src="{% static 'app/adminox/js/app.js' %}"></script>
-  <script src="{% static 'app/js/custom/sidebar_state.js' %}?v=20260715b"></script>
-  <script src="{% static 'app/js/custom/theme_state.js' %}?v=20260806"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>lucide.createIcons();</script>
+  <script src="{% static 'app/js/custom/sidebar_state.js' %}?v=20260914b"></script>
+  <script src="{% static 'app/js/custom/theme_state.js' %}?v=20260914b"></script>
 
   {% block scripts %}{% endblock %}
 </body>
