@@ -18,51 +18,40 @@
   </div>
 </div>
 
-<div class="row mt-3 mb-2 align-items-center">
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <div class="avatar-lg rounded-circle bg-info widget-two-icon align-self-center">
-            <i class="mdi mdi-calendar-check avatar-title font-30 text-white"></i>
-          </div>
-          <div class="wigdet-two-content media-body text-end text-truncate">
-            <p class="m-0 text-uppercase fw-medium text-truncate" title="Assinaturas Ativas">Assinaturas Ativas</p>
-            <h3 class="fw-medium my-2">R$ {{ total_signatures_value|floatformat:"2g" }}</h3>
-            <p class="m-0">Mensal</p>
+<div class="signature-toolbar mt-3 mb-3">
+  <form method="get" action="{% url 'signature_list' %}" class="signature-filter">
+    <div class="app-search">
+      <div class="app-search-box">
+        <div class="input-group">
+          <input type="text" class="form-control" name="name" placeholder="Buscar assinatura..." value="{{ request.GET.name }}">
+          <div class="input-group-append">
+            <button class="btn btn-icon" type="submit">
+              <i data-lucide="search" class="font-16"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-lg-8 text-lg-end mt-2 mt-lg-0">
-    <a href="{% url 'signature_create' %}" class="btn btn-success">
-      <i data-lucide="plus" class="font-16 me-1"></i> Nova Assinatura
-    </a>
-  </div>
-</div>
+    <a href="{% url 'signature_list' %}" class="btn btn-light signature-clear">Limpar</a>
+  </form>
 
-<div class="row mb-3 mt-2 align-items-center">
-  <div class="col-lg-10">
-    <form method="get" action="{% url 'signature_list' %}" class="row g-2 align-items-center">
-      <div class="col-md-5">
-        <div class="app-search">
-          <div class="app-search-box">
-            <div class="input-group">
-              <input type="text" class="form-control" name="name" placeholder="Buscar assinatura..." value="{{ request.GET.name }}">
-              <div class="input-group-append">
-                <button class="btn btn-icon" type="submit">
-                  <i data-lucide="search" class="font-16"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+  <a href="{% url 'signature_create' %}" class="btn btn-success signature-create">
+    <i data-lucide="plus" class="font-16 me-1"></i> Nova Assinatura
+  </a>
+
+  <div class="card signature-active-card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div class="avatar-lg rounded-circle bg-info widget-two-icon align-self-center">
+          <i class="mdi mdi-calendar-check avatar-title font-30 text-white"></i>
+        </div>
+        <div class="wigdet-two-content media-body text-end text-truncate">
+          <p class="m-0 text-uppercase fw-medium text-truncate" title="Assinaturas Ativas">Assinaturas Ativas</p>
+          <h3 class="fw-medium my-2">R$ {{ total_signatures_value|floatformat:"2g" }}</h3>
+          <p class="m-0">Mensal</p>
         </div>
       </div>
-      <div class="col-md-3 d-flex gap-2">
-        <a href="{% url 'signature_list' %}" class="btn btn-light">Limpar</a>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
