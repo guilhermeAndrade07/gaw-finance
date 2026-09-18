@@ -218,6 +218,7 @@ def get_goal_progress(user, month=None, year=None):
             'percentages': json.dumps([]),
             'spent': json.dumps([]),
             'goals': json.dumps([]),
+            'goal_ids': json.dumps([]),
         }
 
     if month is None or year is None:
@@ -252,6 +253,7 @@ def get_goal_progress(user, month=None, year=None):
             percentage = 0.0
 
         progress_list.append({
+            'id': goal.id,
             'name': goal.category_display,
             'goal': float(goal_value),
             'spent': float(spent),
@@ -261,6 +263,7 @@ def get_goal_progress(user, month=None, year=None):
     progress_list.sort(key=lambda x: x['percentage'], reverse=True)
 
     return {
+        'goal_ids': json.dumps([item['id'] for item in progress_list]),
         'labels': json.dumps([item['name'] for item in progress_list]),
         'percentages': json.dumps([item['percentage'] for item in progress_list]),
         'spent': json.dumps([item['spent'] for item in progress_list]),

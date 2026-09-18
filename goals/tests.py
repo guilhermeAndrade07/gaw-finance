@@ -195,6 +195,7 @@ class MonthlyGoalTests(TestCase):
         self.assertTrue(data['success'])
         self.assertIn('Alimentacao', data['labels'])
         idx = data['labels'].index('Alimentacao')
+        self.assertEqual(data['goal_ids'][idx], MonthlyGoal.objects.get(category=self.category_food).id)
         self.assertAlmostEqual(data['percentages'][idx], 50.0)
         self.assertAlmostEqual(data['spent'][idx], 150.0)
         self.assertAlmostEqual(data['goals'][idx], 300.0)
@@ -212,7 +213,9 @@ class MonthlyGoalTests(TestCase):
         import json
         labels = json.loads(progress['labels'])
         percentages = json.loads(progress['percentages'])
+        goal_ids = json.loads(progress['goal_ids'])
         self.assertEqual(labels, ['Alimentacao'])
+        self.assertEqual(len(goal_ids), 1)
         self.assertEqual(percentages, [0.0])
 
     def test_get_goal_progress_metric_supports_null_category(self):

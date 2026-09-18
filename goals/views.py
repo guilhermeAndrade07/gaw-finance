@@ -134,6 +134,7 @@ def get_goal_progress(request):
     try:
         progress = metrics.get_goal_progress(request.user, int(month), int(year))
         return JsonResponse({
+            'goal_ids': json.loads(progress['goal_ids']),
             'labels': json.loads(progress['labels']),
             'percentages': json.loads(progress['percentages']),
             'spent': json.loads(progress['spent']),
