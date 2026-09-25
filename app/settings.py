@@ -40,7 +40,11 @@ if not SECRET_KEY:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = [h for h in env('ALLOWED_HOSTS') if h and h != '0.0.0.0']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in env('ALLOWED_HOSTS')
+    if host.strip() and host.strip() != '0.0.0.0'
+]
 
 
 # Application definition

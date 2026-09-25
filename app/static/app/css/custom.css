@@ -107,5 +107,68 @@
     width: 100%;
     min-width: 0;
     margin-left: 0;
+    flex: 0 0 auto;
+  }
+
+  .signature-active-card .card-body {
+    padding: 0.75rem;
+  }
+
+  .signature-active-card .avatar-lg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .signature-active-card .avatar-title {
+    font-size: 22px !important;
+  }
+
+  .signature-active-card h3 {
+    font-size: 1.25rem;
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+}
+
+.inflow-actions,
+.outflow-actions {
+  align-items: center;
+}
+
+.inflow-actions .btn,
+.outflow-inline-actions .btn {
+  white-space: nowrap;
+}
+
+.outflow-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.outflow-inline-actions {
+  flex-wrap: nowrap;
+}
+
+.outflow-transfer {
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .inflow-actions {
+    flex-wrap: nowrap;
+  }
+
+  .outflow-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .outflow-inline-actions {
+    width: 100%;
+  }
+
+  .outflow-transfer {
+    width: 100%;
   }
 }

@@ -19,9 +19,9 @@
 </div>
 
 <div class="row mt-3 mb-2 align-items-center">
-  <div class="col-lg-9">
+  <div class="col-12">
     <form method="get" action="{% url 'inflow_list' %}" class="row g-2 align-items-center">
-      <div class="col-md-4">
+      <div class="col-12 col-lg-3 col-md-4">
         <div class="app-search">
           <div class="app-search-box">
             <div class="input-group">
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-12 col-lg-3 col-md-4">
         <select class="form-select" name="month">
           <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Mêses</option>
           {% for month_value, month_label in months %}
@@ -43,18 +43,16 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-4 d-flex gap-2">
+      <div class="col-12 col-lg-6 col-md-4 inflow-actions d-flex gap-2">
         <button type="submit" class="btn btn-primary">
           <i class="mdi mdi-filter me-1"></i> Filtrar
         </button>
         <a href="{% url 'inflow_list' %}" class="btn btn-light">Limpar</a>
+        <a href="{% url 'inflow_create' %}" class="btn btn-success">
+          <i data-lucide="plus" class="font-16 me-1"></i> Nova Entrada
+        </a>
       </div>
     </form>
-  </div>
-  <div class="col-lg-3 text-lg-end mt-2 mt-lg-0">
-    <a href="{% url 'inflow_create' %}" class="btn btn-success">
-      <i data-lucide="plus" class="font-16 me-1"></i> Nova Entrada
-    </a>
   </div>
 </div>
 
