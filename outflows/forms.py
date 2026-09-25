@@ -18,7 +18,7 @@ class OutflowForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'bank': forms.Select(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
         }
         labels = {
             'title': 'Título',

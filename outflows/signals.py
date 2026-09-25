@@ -12,6 +12,8 @@ from outflows.models import Outflow
 @receiver(pre_save, sender=Outflow)
 def validate_outflow_balance(sender, instance, **kwargs):
     """Valida o valor da saida contra o saldo calculado do banco e guarda valor original"""
+    if getattr(instance, '_balance_service_managed', False):
+        return
     if instance.pk and Outflow.objects.filter(pk=instance.pk).exists():
         instance._original_value = Outflow.objects.get(pk=instance.pk).value
     else:
@@ -28,6 +30,8 @@ def validate_outflow_balance(sender, instance, **kwargs):
 @receiver(post_save, sender=Outflow)
 def update_balance_on_outflow(sender, instance, created, **kwargs):
     """Subtrai o valor do outflow do balance do banco (criacao) ou ajusta a diferenca (edicao)"""
+    if getattr(instance, '_balance_service_managed', False):
+        return
     if instance.value > 0:
         if created:
             Bank.objects.filter(pk=instance.bank_id).update(balance=F('balance') - instance.value)
@@ -41,5 +45,7 @@ def update_balance_on_outflow(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Outflow)
 def restore_balance_on_outflow_delete(sender, instance, **kwargs):
     """Devolve ao banco o valor de uma saida excluida"""
+    if getattr(instance, '_balance_service_managed', False):
+        return
     if instance.value > 0 and instance.bank_id:
         Bank.objects.filter(pk=instance.bank_id).update(balance=F('balance') + instance.value)

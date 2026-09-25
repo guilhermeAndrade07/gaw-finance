@@ -332,8 +332,8 @@
       <form method="post" novalidate>
         {% csrf_token %}
         <div class="lf-field">
-          <label for="username">Nome de usuário</label>
-          <input type="text" id="username" name="username" autocomplete="username" placeholder="seu_usuario" required>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="seu@email.com" required value="{{ form.email.value|default_if_none:'' }}">
         </div>
         <div class="lf-field lf-field--password">
           <label for="password">Senha</label>
@@ -345,7 +345,7 @@
           </div>
         </div>
         <div class="lf-row">
-          <span style="color:#6b8580;">Não tem conta? <a href="{% url 'account_create' %}" class="lf-link">Cadastre-se</a></span>
+          <span style="color:#6b8580;">Acesso restrito por convite.</span>
         </div>
         <button type="submit" class="lf-submit">Entrar</button>
       </form>
@@ -358,23 +358,7 @@
 </div>
 {% endblock %}
 
+{% load static %}
 {% block scripts %}
-<script>
-  (function() {
-    var toggle = document.getElementById('togglePassword');
-    var input = document.getElementById('password');
-    var icon = document.getElementById('eyeIcon');
-    if (!toggle || !input || !icon) return;
-
-    toggle.addEventListener('click', function() {
-      var isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      icon.classList.toggle('mdi-eye-outline', isPassword);
-      icon.classList.toggle('mdi-eye-off-outline', !isPassword);
-      toggle.setAttribute('aria-pressed', String(isPassword));
-      toggle.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
-      input.focus();
-    });
-  })();
-</script>
+<script src="{% static 'app/js/password_visibility.js' %}?v=20260925a"></script>
 {% endblock %}

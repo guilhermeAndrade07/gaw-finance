@@ -109,30 +109,7 @@
   </div>
 </div>
 
-<script>
-    (function () {
-        const csrfToken = '{{ csrf_token }}';
-        document.querySelectorAll('.js-invoice-pay-btn').forEach((btn) => {
-            btn.addEventListener('click', async (event) => {
-                const invoiceId = btn.dataset.invoiceId;
-                if (!invoiceId) return;
-                if (!window.confirm('Confirmar o pagamento desta fatura? Todas as compras serão marcadas como pagas.')) return;
-                try {
-                    const response = await fetch(`/invoices/${invoiceId}/pay/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                    });
-                    if (!response.ok) throw new Error('Erro ao pagar fatura.');
-                    window.location.reload();
-                } catch (error) {
-                    window.alert('Não foi possível pagar a fatura. Tente novamente.');
-                }
-            });
-        });
-    })();
-</script>
+{% load static %}
+<script src="{% static 'app/js/payment_actions.js' %}?v=20260925a"></script>
 
 {% endblock %}

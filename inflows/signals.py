@@ -21,6 +21,8 @@ def store_original_inflow_value(sender, instance, **kwargs):
 @receiver(post_save, sender=Inflow)
 def update_balance_on_inflow(sender, instance, created, **kwargs):
     """Soma o valor do inflow ao balance do banco (criacao) ou ajusta a diferenca (edicao)"""
+    if getattr(instance, '_balance_service_managed', False):
+        return
     if instance.value > 0:
         if created:
             Bank.objects.filter(pk=instance.bank_id).update(balance=F('balance') + instance.value)
@@ -34,5 +36,7 @@ def update_balance_on_inflow(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Inflow)
 def remove_balance_on_inflow_delete(sender, instance, **kwargs):
     """Subtrai do banco o valor de uma entrada excluida"""
+    if getattr(instance, '_balance_service_managed', False):
+        return
     if instance.value > 0 and instance.bank_id:
         Bank.objects.filter(pk=instance.bank_id).update(balance=F('balance') - instance.value)

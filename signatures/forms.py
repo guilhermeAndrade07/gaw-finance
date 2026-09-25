@@ -21,7 +21,7 @@ class SignatureForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
             'billing_day': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 31}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'credit_card': forms.Select(attrs={'class': 'form-control'}),

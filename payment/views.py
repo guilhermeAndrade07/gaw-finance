@@ -1,7 +1,7 @@
-import calendar
-from decimal import Decimal, ROUND_HALF_UP
-
 from rest_framework import generics
+from decimal import Decimal
+
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect
@@ -13,7 +13,14 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
-from .services import assign_invoice_to_payment
+from .services import (
+    assign_invoice_to_payment,
+    mark_invoice_paid,
+    mark_invoice_unpaid,
+    mark_payment_paid,
+    mark_payment_unpaid,
+    register_payment,
+)
 
 
 class PaymentListView(LoginRequiredMixin, View):
@@ -51,81 +58,24 @@ class PaymentCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
 
         return str(self.success_url)
 
-    @staticmethod
-    def _add_months(base_date, months):
-        month = base_date.month - 1 + months
-        year = base_date.year + month // 12
-        month = month % 12 + 1
-        day = min(base_date.day, calendar.monthrange(year, month)[1])
-        return base_date.replace(year=year, month=month, day=day)
-
     def form_valid(self, form):
-        parcelas = form.cleaned_data.get('parcelas') or 1
-
-        if parcelas == 1:
-            response = super().form_valid(form)
-            if getattr(self.object, 'card_id', None) and getattr(self.object, 'date_payment', None):
-                assign_invoice_to_payment(self.object)
-            return response
-
-        name = form.cleaned_data.get('name')
-        category = form.cleaned_data.get('category')
-        card = form.cleaned_data.get('card')
-        date_payment = form.cleaned_data.get('date_payment')
-        total_value = form.cleaned_data.get('value')
-
-        payments_to_create = []
-        installment_value = None
-
-        if total_value is not None:
-            installment_value = (Decimal(total_value) / Decimal(parcelas)).quantize(
-                Decimal('0.01'),
-                rounding=ROUND_HALF_UP,
+        try:
+            self.object = register_payment(
+                user=self.request.user,
+                card=form.cleaned_data['card'],
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data.get('description'),
+                category=form.cleaned_data.get('category'),
+                date_payment=form.cleaned_data['date_payment'],
+                value=form.cleaned_data['value'],
+                parcelas=form.cleaned_data.get('parcelas') or 1,
             )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
 
-        accumulated = Decimal('0.00')
-
-        for installment_index in range(parcelas):
-            current_value = total_value
-
-            if installment_value is not None:
-                if installment_index < parcelas - 1:
-                    current_value = installment_value
-                    accumulated += installment_value
-                else:
-                    current_value = (Decimal(total_value) - accumulated).quantize(
-                        Decimal('0.01'),
-                        rounding=ROUND_HALF_UP,
-                    )
-
-            current_date = (
-                self._add_months(date_payment, installment_index)
-                if date_payment is not None
-                else None
-            )
-
-            payments_to_create.append(
-                models.Payment(
-                    user=self.request.user,
-                    name=f'{name} ({installment_index + 1}/{parcelas})',
-                    category=category,
-                    card=card,
-                    date_payment=current_date,
-                    value=current_value,
-                    parcelas=parcelas,
-                )
-            )
-
-        models.Payment.objects.bulk_create(payments_to_create)
-
-        # bulk_create nao dispara signals, entao atribuimos as faturas manualmente
-        if card and card.closing_day is not None and card.due_day is not None:
-            for payment in payments_to_create:
-                if payment.pk and payment.date_payment is not None:
-                    assign_invoice_to_payment(payment)
-
-        if card:
-            return HttpResponseRedirect(f'{self.success_url}?card={card.id}')
+        if self.object.card_id:
+            return HttpResponseRedirect(f'{self.success_url}?card={self.object.card_id}')
 
         return HttpResponseRedirect(str(self.success_url))
 
@@ -214,25 +164,21 @@ class PaymentRetriveUpdateDestroyAPIView(UserScopedAPIMixin, generics.RetrieveUp
 
 class PaymentMarkAsPaidView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        payment = get_object_or_404(models.Payment, pk=pk, user=request.user)
+        get_object_or_404(models.Payment, pk=pk, user=request.user)
+        payment = mark_payment_paid(user=request.user, payment_id=pk)
 
-        if payment.paid:
+        if not getattr(payment, '_status_changed', False):
             return JsonResponse({'success': True, 'already_paid': True})
-
-        payment.paid = True
-        payment.save(update_fields=['paid', 'update_at'])
         return JsonResponse({'success': True})
 
 
 class PaymentMarkAsUnpaidView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        payment = get_object_or_404(models.Payment, pk=pk, user=request.user)
+        get_object_or_404(models.Payment, pk=pk, user=request.user)
+        payment = mark_payment_unpaid(user=request.user, payment_id=pk)
 
-        if not payment.paid:
+        if not getattr(payment, '_status_changed', False):
             return JsonResponse({'success': True, 'already_unpaid': True})
-
-        payment.paid = False
-        payment.save(update_fields=['paid', 'update_at'])
         return JsonResponse({'success': True})
 
 
@@ -331,26 +277,18 @@ class InvoiceDetailView(LoginRequiredMixin, DetailView):
 class InvoicePayView(LoginRequiredMixin, View):
     def post(self, request, pk):
         invoice = get_object_or_404(models.Invoice, pk=pk, card__user=request.user)
+        invoice = mark_invoice_paid(invoice)
 
-        if invoice.status == models.Invoice.PAID:
+        if not getattr(invoice, '_status_changed', False):
             return JsonResponse({'success': True, 'already_paid': True})
-
-        invoice.status = models.Invoice.PAID
-        invoice.save(update_fields=['status', 'updated_at'])
-        invoice.payments.update(paid=True)
         return JsonResponse({'success': True})
 
 
 class InvoiceUnpayView(LoginRequiredMixin, View):
     def post(self, request, pk):
         invoice = get_object_or_404(models.Invoice, pk=pk, card__user=request.user)
+        invoice = mark_invoice_unpaid(invoice)
 
-        if invoice.status != models.Invoice.PAID:
+        if not getattr(invoice, '_status_changed', False):
             return JsonResponse({'success': True, 'already_unpaid': True})
-
-        from datetime import date
-        new_status = models.Invoice.OPEN if invoice.closing_date >= date.today() else models.Invoice.CLOSED
-        invoice.status = new_status
-        invoice.save(update_fields=['status', 'updated_at'])
-        invoice.payments.update(paid=False)
         return JsonResponse({'success': True})

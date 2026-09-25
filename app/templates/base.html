@@ -8,32 +8,16 @@
 
   <title>{% block title %}{% endblock %}</title>
 
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <link rel="icon" type="image/png" href="{% static 'app/favicon_gawSystems.png' %}?v=20260515-144645">
 
   <link href="{% static 'app/adminox/css/vendor.min.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'app/adminox/css/app.min.css' %}" rel="stylesheet" type="text/css" id="app-style">
   <link href="{% static 'app/adminox/css/icons.min.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'app/css/custom.css' %}" rel="stylesheet" type="text/css">
-  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="{% static 'app/vendor/lucide/lucide.min.js' %}" defer></script>
 
-  <script>
-    (function () {
-      var t = localStorage.getItem('gaw_theme');
-      if (t === 'light' || t === 'dark') {
-        document.documentElement.setAttribute('data-bs-theme', t);
-        try {
-          var raw = sessionStorage.getItem('__ADMINOX_CONFIG__');
-          if (raw) {
-            var cfg = JSON.parse(raw);
-            cfg.theme = t;
-            sessionStorage.setItem('__ADMINOX_CONFIG__', JSON.stringify(cfg));
-          } else {
-            sessionStorage.setItem('__ADMINOX_CONFIG__', JSON.stringify({ theme: t }));
-          }
-        } catch (e) {}
-      }
-    })();
-  </script>
+  <script src="{% static 'app/js/theme_bootstrap.js' %}?v=20260925a"></script>
 
   <script src="{% static 'app/adminox/js/config.js' %}"></script>
 

@@ -51,8 +51,9 @@ class PaymentForm(forms.ModelForm):
 
     parcelas = forms.IntegerField(
         min_value=1,
+        max_value=60,
         initial=1,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 60}),
         label='Parcelas',
     )
 
@@ -72,7 +73,7 @@ class PaymentForm(forms.ModelForm):
             'card': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
         }
         labels = {
             'card': 'Cartão',

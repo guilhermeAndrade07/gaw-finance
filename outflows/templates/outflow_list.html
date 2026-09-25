@@ -43,7 +43,7 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col-12 col-lg-2 col-md-6">
+      <div class="col-12 col-lg-1 col-md-6">
         <select class="form-select" name="month">
           <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
           {% for month_value, month_label in months %}
@@ -51,6 +51,15 @@
           {% endfor %}
         </select>
       </div>
+      <div class="col-12 col-lg-1 col-md-6">
+        <select class="form-select" name="year">
+          <option value="" {% if not request.GET.year %} selected {% endif %}>Todos os Anos</option>
+          {% for year in years reversed %}
+            <option value="{{ year }}" {% if request.GET.year == year|stringformat:'s' %} selected {% endif %}>{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
       <div class="col-12 col-lg-5 outflow-actions">
         <div class="outflow-inline-actions d-flex gap-2">
           <button type="submit" class="btn btn-primary">

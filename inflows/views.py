@@ -1,12 +1,18 @@
+from datetime import date
+
 from rest_framework import generics
+from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, DetailView
 from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
+from .services import register_inflow
 
 
 class InflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
+
     model = models.Inflow
     template_name = 'inflow_list.html'
     context_object_name = 'inflows'
@@ -16,6 +22,7 @@ class InflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         queryset = super().get_queryset()
         title = self.request.GET.get('title')
         month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
@@ -23,6 +30,12 @@ class InflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         if month:
             try:
                 queryset = queryset.filter(created_at__month=int(month))
+            except (ValueError, TypeError):
+                pass
+
+        if year:
+            try:
+                queryset = queryset.filter(created_at__year=int(year))
             except (ValueError, TypeError):
                 pass
 
@@ -44,6 +57,7 @@ class InflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
             ('11', 'Novembro'),
             ('12', 'Dezembro'),
         ]
+        context['years'] = range(date.today().year - 4, date.today().year + 1)
         return context
 
 
@@ -53,8 +67,22 @@ class InflowCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     form_class = forms.InflowForm
     success_url = reverse_lazy('inflow_list')
 
+    def form_valid(self, form):
+        try:
+            self.object = register_inflow(
+                user=self.request.user,
+                bank=form.cleaned_data['bank'],
+                value=form.cleaned_data['value'],
+                title=form.cleaned_data.get('title'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class InflowDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+
     model = models.Inflow
     template_name = 'inflow_detail.html'
 

@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
+from auditing import actions
+from auditing.services import record_audit_event
 from app.metrics import get_months_list
 from .models import GeneratedReport
 from . import services
@@ -41,7 +43,15 @@ class CustomReportView(LoginRequiredMixin, View):
         sections = request.GET.getlist('sections')
 
         buffer = services.generate_custom_report(request.user, sections, month, year)
-        GeneratedReport.objects.create(user=request.user, report_type='custom')
+        report = GeneratedReport.objects.create(user=request.user, report_type='custom')
+        record_audit_event(
+            action=actions.REPORT_GENERATE,
+            user=request.user,
+            resource_type='GeneratedReport',
+            resource_id=report.pk,
+            description='Relatorio personalizado gerado.',
+            metadata={'sections': sections, 'month': month, 'year': year},
+        )
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="relatorio_personalizado.pdf"'
         return response

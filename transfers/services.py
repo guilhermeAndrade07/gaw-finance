@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
+from auditing import actions
+from auditing.services import record_audit_event
 from banks.models import Bank
 
 from .models import BankTransfer
@@ -63,6 +65,19 @@ def create_bank_transfer(*, user, source_bank, destination_bank, value, title=No
         Bank.objects.filter(pk=destination.pk).update(
             balance=destination_balance + value,
             update_at=timezone.now(),
+        )
+
+        record_audit_event(
+            action=actions.TRANSFER_CREATE,
+            user=user,
+            resource_type='BankTransfer',
+            resource_id=transfer.pk,
+            description='Transferencia registrada.',
+            metadata={
+                'value': str(value),
+                'source_bank_id': source.pk,
+                'destination_bank_id': destination.pk,
+            },
         )
 
         return transfer

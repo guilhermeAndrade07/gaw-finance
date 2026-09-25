@@ -1,6 +1,8 @@
+from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -10,6 +12,7 @@ from inflows.models import Inflow
 from outflows.models import Outflow
 
 from .models import InvestmentAsset, InvestmentMovement
+from .services import register_investment_movement
 
 
 class InvestmentFlowTests(TestCase):
@@ -88,3 +91,60 @@ class InvestmentFlowTests(TestCase):
         self.assertEqual(asset.current_value, Decimal('750.00'))
         self.assertTrue(Inflow.objects.filter(user=self.user, title__icontains='Resgate de investimento').exists())
         self.assertEqual(self.bank.balance, Decimal('5250.00'))
+
+    def test_redemption_rejects_value_above_current_asset(self):
+        asset = InvestmentAsset.objects.create(
+            user=self.user,
+            bank=self.bank,
+            name='Ativo limite',
+            asset_type=InvestmentAsset.CRYPTO,
+            current_value=Decimal('100.00'),
+        )
+
+        with self.assertRaises(ValidationError):
+            register_investment_movement(
+                user=self.user,
+                asset=asset,
+                operation_type=InvestmentMovement.REDEMPTION,
+                value=Decimal('150.00'),
+                movement_date=date(2026, 5, 8),
+                register_cash_flow=False,
+            )
+
+        asset.refresh_from_db()
+        self.assertEqual(asset.current_value, Decimal('100.00'))
+        self.assertFalse(InvestmentMovement.objects.filter(asset=asset).exists())
+
+    def test_aportion_with_cash_flow_rejects_insufficient_bank_balance(self):
+        zero_bank = Bank.objects.create(
+            user=self.user,
+            name='Banco sem saldo',
+            account_type='Corrente',
+            agency=2,
+            account=22,
+            initial_balance=Decimal('0.00'),
+            balance=Decimal('0.00'),
+        )
+        asset = InvestmentAsset.objects.create(
+            user=self.user,
+            bank=zero_bank,
+            name='Ativo sem saldo',
+            asset_type=InvestmentAsset.CRYPTO,
+            current_value=Decimal('0.00'),
+        )
+
+        with self.assertRaises(ValidationError):
+            register_investment_movement(
+                user=self.user,
+                asset=asset,
+                operation_type=InvestmentMovement.APPORTION,
+                value=Decimal('100.00'),
+                movement_date=date(2026, 5, 8),
+                register_cash_flow=True,
+            )
+
+        zero_bank.refresh_from_db()
+        self.assertEqual(zero_bank.balance, Decimal('0.00'))
+        self.assertEqual(zero_bank.current_balance, Decimal('0.00'))
+        self.assertFalse(InvestmentMovement.objects.filter(asset=asset).exists())
+        self.assertFalse(Outflow.objects.filter(user=self.user).exists())

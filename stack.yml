@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
+    image: ${APP_IMAGE}
     environment:
       - DJANGO_ENV=${DJANGO_ENV}
       - DEBUG=${DEBUG}
@@ -20,35 +20,35 @@ services:
     volumes:
       - media_data:/gaw-finance/media
       - static_data:/gaw-finance/staticfiles
+    stop_grace_period: 30s
     healthcheck:
       test:
         - CMD-SHELL
-        - "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')\""
+        - "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready/', timeout=5)\""
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
     deploy:
       replicas: 2
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+          pids: 512
       update_config:
         parallelism: 1
         order: start-first
         failure_action: rollback
+        monitor: 30s
+        max_failure_ratio: 0
+      rollback_config:
+        parallelism: 1
+        order: start-first
       restart_policy:
         condition: any
         delay: 5s
         max_attempts: 3
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.gaw_finance_app.rule=Host(`${DOMAIN}`, `www.${DOMAIN}`)
-        - traefik.http.routers.gaw_finance_app.entrypoints=websecure
-        - traefik.http.routers.gaw_finance_app.tls=true
-        - traefik.http.routers.gaw_finance_app.tls.certresolver=letsencrypt
-        - traefik.http.routers.gaw_finance_app.tls.domains[0].main=${DOMAIN}
-        - traefik.http.routers.gaw_finance_app.tls.domains[0].sans=*.${DOMAIN}
-        - traefik.http.services.gaw_finance_app.loadbalancer.server.port=8000
-        - traefik.http.services.gaw_finance_app.loadbalancer.healthcheck.path=/health/
-        - traefik.http.services.gaw_finance_app.loadbalancer.healthcheck.interval=30s
     secrets:
       - gaw_secret_key
       - gaw_db_password
@@ -64,6 +64,7 @@ services:
       - gaw_finance_internal
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    stop_grace_period: 60s
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -72,9 +73,15 @@ services:
       start_period: 30s
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1G
+          pids: 512
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
     secrets:
       - gaw_db_password
 
@@ -84,6 +91,7 @@ services:
       - gaw_finance_internal
     volumes:
       - redis_data:/data
+    stop_grace_period: 30s
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -92,9 +100,15 @@ services:
       start_period: 10s
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+          pids: 256
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -105,6 +119,7 @@ services:
       - gaw_finance_internal
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    stop_grace_period: 60s
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 15s
@@ -113,19 +128,27 @@ services:
       start_period: 30s
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+          pids: 512
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
     secrets:
       - gaw_rabbitmq_password
 
   celery_worker:
-    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
+    image: ${APP_IMAGE}
     entrypoint: ["./entrypoint-celery.sh"]
     command: celery -A app worker --loglevel=info --concurrency=2
     environment:
       - DJANGO_ENV=${DJANGO_ENV}
       - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=db
@@ -137,8 +160,20 @@ services:
     networks:
       - gaw_finance_internal
       - gaw_finance_egress
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app inspect ping --destination celery@$$HOSTNAME"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+          pids: 512
       restart_policy:
         condition: any
         delay: 10s
@@ -149,12 +184,14 @@ services:
       - gaw_rabbitmq_password
 
   celery_beat:
-    image: ghcr.io/guilhermeandrade07/gaw-finance:latest
+    image: ${APP_IMAGE}
     entrypoint: ["./entrypoint-celery.sh"]
     command: celery -A app beat --loglevel=info
     environment:
       - DJANGO_ENV=${DJANGO_ENV}
       - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_HOST=db
@@ -166,8 +203,14 @@ services:
     networks:
       - gaw_finance_internal
       - gaw_finance_egress
+    stop_grace_period: 30s
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+          pids: 256
       restart_policy:
         condition: any
         delay: 10s
@@ -193,10 +236,11 @@ services:
       - traefik_public
     volumes:
       - letsencrypt_data:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
     environment:
       - CF_DNS_API_TOKEN_FILE=/run/secrets/CLOUDFLARE_DNS_API_TOKEN
+    stop_grace_period: 30s
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 30s
@@ -205,9 +249,15 @@ services:
       start_period: 10s
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+          pids: 256
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
     secrets:
       - CLOUDFLARE_DNS_API_TOKEN
 
@@ -215,10 +265,9 @@ networks:
   traefik_public:
     external: true
   gaw_finance_internal:
-    driver: overlay
-    internal: true
+    external: true
   gaw_finance_egress:
-    driver: overlay
+    external: true
 
 volumes:
   postgres_data:

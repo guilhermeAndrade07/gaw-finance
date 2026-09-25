@@ -6,7 +6,47 @@
 }
 
 @media (max-width: 767.98px) {
-  .form-card {
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../vendor/fonts/kalam/kalam-300-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../vendor/fonts/kalam/kalam-400-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../vendor/fonts/kalam/kalam-700-latin.woff2') format('woff2');
+}
+
+.brand-text {
+  color: var(--bs-primary);
+  font-family: 'Kalam', cursive;
+}
+
+.side-nav-title {
+  font-family: 'Kalam', cursive;
+  font-weight: 700;
+}
+
+.card-subtitle {
+  font-family: 'Kalam', cursive;
+  font-weight: 400;
+}
+
+.form-card {
+
     max-width: 100%;
   }
 }

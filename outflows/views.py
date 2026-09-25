@@ -1,13 +1,19 @@
+from datetime import date
+
 from rest_framework import generics
+from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, DetailView
 from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
 from . import models, forms, serializers
+from .services import register_outflow
 from categories.models import Category
 
 
 class OutflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
+
     model = models.Outflow
     template_name = 'outflow_list.html'
     context_object_name = 'outflows'
@@ -18,6 +24,7 @@ class OutflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         title = self.request.GET.get('title')
         category = self.request.GET.get('category')
         month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
@@ -28,6 +35,12 @@ class OutflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         if month:
             try:
                 queryset = queryset.filter(created_at__month=int(month))
+            except (ValueError, TypeError):
+                pass
+
+        if year:
+            try:
+                queryset = queryset.filter(created_at__year=int(year))
             except (ValueError, TypeError):
                 pass
 
@@ -50,6 +63,7 @@ class OutflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
             ('11', 'Novembro'),
             ('12', 'Dezembro'),
         ]
+        context['years'] = range(date.today().year - 4, date.today().year + 1)
         return context
 
 
@@ -59,8 +73,23 @@ class OutflowCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     form_class = forms.OutflowForm
     success_url = reverse_lazy('outflow_list')
 
+    def form_valid(self, form):
+        try:
+            self.object = register_outflow(
+                user=self.request.user,
+                bank=form.cleaned_data['bank'],
+                value=form.cleaned_data['value'],
+                title=form.cleaned_data.get('title'),
+                category=form.cleaned_data.get('category'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class OutflowDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):
+
     model = models.Outflow
     template_name = 'outflow_detail.html'
 

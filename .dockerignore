@@ -12,7 +12,6 @@ media
 requirements_dv.txt
 README.md
 .github
-scripts
 traefik
 stack.yml
 docker-compose.yml

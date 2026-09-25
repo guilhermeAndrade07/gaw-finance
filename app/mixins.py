@@ -22,3 +22,22 @@ class UserScopedAPIMixin:
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserScopedSerializerMixin:
+    user_scoped_fields = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        authenticated = getattr(user, 'is_authenticated', False)
+
+        for field_name, model in self.user_scoped_fields.items():
+            if field_name not in self.fields:
+                continue
+            self.fields[field_name].queryset = (
+                model.objects.filter(user=user)
+                if authenticated
+                else model.objects.none()
+            )

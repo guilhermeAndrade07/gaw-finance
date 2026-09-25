@@ -185,6 +185,18 @@ class MonthlyGoalTests(TestCase):
         self.assertContains(response, 'Agosto de 2026')
         self.assertEqual(len(response.context['goals']), 1)
 
+    def test_goal_dashboard_escapes_category_names(self):
+        payload = '<img src=x onerror=alert(1)>'
+        category = Category.objects.create(user=self.user, name=payload)
+        self._create_goal(category=category, value='300.00')
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('goal_dashboard'), {'month': '8', 'year': '2026'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, payload)
+        self.assertNotContains(response, 'details.innerHTML = html')
+
     def test_goal_progress_endpoint_returns_percentages(self):
         self._create_goal(category=self.category_food, value='300.00', month=8, year=2026)
         self._create_outflow(value='150.00', category=self.category_food)

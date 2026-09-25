@@ -1,19 +1,18 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from app.mixins import UserScopedSerializerMixin
 from banks.models import Bank
 
 from .models import BankTransfer
 from .services import create_bank_transfer
 
 
-class BankTransferSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        banks = Bank.objects.filter(user=request.user) if request else Bank.objects.none()
-        self.fields['source_bank'].queryset = banks
-        self.fields['destination_bank'].queryset = banks
+class BankTransferSerializer(UserScopedSerializerMixin, serializers.ModelSerializer):
+    user_scoped_fields = {
+        'source_bank': Bank,
+        'destination_bank': Bank,
+    }
 
     def validate(self, attrs):
         if attrs['source_bank'].pk == attrs['destination_bank'].pk:

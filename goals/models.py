@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -32,11 +34,17 @@ class MonthlyGoal(models.Model):
         Category, on_delete=models.PROTECT, related_name='goals',
         null=True, blank=True,
     )
-    value = models.DecimalField(max_digits=20, decimal_places=2)
+    value = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
     month = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)],
     )
-    year = models.PositiveSmallIntegerField()
+    year = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2000), MaxValueValidator(2100)],
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
@@ -52,6 +60,14 @@ class MonthlyGoal(models.Model):
                 fields=['user', 'month', 'year'],
                 name='unique_goal_per_user_null_category_month_year',
                 condition=Q(category__isnull=True),
+            ),
+            models.CheckConstraint(
+                condition=Q(value__gt=0),
+                name='goal_value_positive',
+            ),
+            models.CheckConstraint(
+                condition=Q(year__gte=2000, year__lte=2100),
+                name='goal_year_range',
             ),
         ]
 

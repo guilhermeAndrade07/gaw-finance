@@ -40,6 +40,10 @@ class BankTransfer(models.Model):
                 condition=~models.Q(source_bank=models.F('destination_bank')),
                 name='bank_transfer_different_banks',
             ),
+            models.CheckConstraint(
+                condition=models.Q(value__gt=0),
+                name='bank_transfer_value_positive',
+            ),
         ]
 
     def clean(self):

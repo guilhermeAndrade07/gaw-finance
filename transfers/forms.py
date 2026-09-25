@@ -20,7 +20,7 @@ class BankTransferForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'source_bank': forms.Select(attrs={'class': 'form-control'}),
             'destination_bank': forms.Select(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
         }
         labels = {
             'title': 'Título',

@@ -2,7 +2,10 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
+
 
 from banks.models import Bank
 
@@ -39,7 +42,13 @@ class InvestmentAsset(models.Model):
     maturity_date = models.DateField(null=True, blank=True)
     expected_rate = models.CharField(max_length=100, null=True, blank=True)
     liquidity_type = models.CharField(max_length=20, choices=LIQUIDITY_TYPE_CHOICES, null=True, blank=True)
-    current_value = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    current_value = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(Decimal('0.00'))],
+    )
+
     notes = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -47,8 +56,15 @@ class InvestmentAsset(models.Model):
 
     class Meta:
         ordering = ['name']
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(current_value__gte=0),
+                name='investment_asset_value_nonnegative',
+            ),
+        ]
 
     def __str__(self):
+
         return self.name
 
 
@@ -64,8 +80,13 @@ class InvestmentMovement(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='investment_movements')
     asset = models.ForeignKey(InvestmentAsset, on_delete=models.CASCADE, related_name='movements')
     operation_type = models.CharField(max_length=20, choices=OPERATION_TYPE_CHOICES)
-    value = models.DecimalField(max_digits=20, decimal_places=2)
+    value = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
     movement_date = models.DateField()
+
     register_cash_flow = models.BooleanField(default=True)
     notes = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,8 +94,15 @@ class InvestmentMovement(models.Model):
 
     class Meta:
         ordering = ['-movement_date', '-created_at']
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(value__gt=0),
+                name='investment_movement_value_positive',
+            ),
+        ]
 
     def clean(self):
+
         if self.value is None or self.value <= Decimal('0.00'):
             raise ValidationError('O valor da movimentacao deve ser maior que zero.')
 

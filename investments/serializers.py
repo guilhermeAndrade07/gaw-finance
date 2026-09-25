@@ -1,14 +1,13 @@
-from banks.models import Bank
 from rest_framework import serializers
+
+from app.mixins import UserScopedSerializerMixin
+from banks.models import Bank
 
 from .models import InvestmentAsset, InvestmentMovement
 
 
-class InvestmentAssetSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        self.fields['bank'].queryset = Bank.objects.filter(user=request.user) if request else Bank.objects.none()
+class InvestmentAssetSerializer(UserScopedSerializerMixin, serializers.ModelSerializer):
+    user_scoped_fields = {'bank': Bank}
 
     class Meta:
         model = InvestmentAsset
@@ -16,11 +15,8 @@ class InvestmentAssetSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
 
-class InvestmentMovementSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        self.fields['asset'].queryset = InvestmentAsset.objects.filter(user=request.user) if request else InvestmentAsset.objects.none()
+class InvestmentMovementSerializer(UserScopedSerializerMixin, serializers.ModelSerializer):
+    user_scoped_fields = {'asset': InvestmentAsset}
 
     class Meta:
         model = InvestmentMovement

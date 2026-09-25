@@ -1,6 +1,10 @@
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.db import connections
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+
+from kombu import Connection
 
 from . import metrics
 from banks.models import Bank
@@ -8,10 +12,46 @@ from inflows.models import Inflow
 from outflows.models import Outflow
 
 import json
+import time
+
+from django.core.cache import cache
 
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
+
+
+def readiness_check(request):
+    checks = {
+        'database': False,
+        'cache': False,
+        'broker': False,
+    }
+
+    try:
+        connections['default'].ensure_connection()
+        checks['database'] = True
+    except Exception:
+        pass
+
+    try:
+        key = 'gaw_finance_readiness_probe'
+        value = str(time.time())
+        cache.set(key, value, 10)
+        checks['cache'] = cache.get(key) == value
+        cache.delete(key)
+    except Exception:
+        pass
+
+    try:
+        with Connection(settings.CELERY_BROKER_URL) as connection:
+            connection.ensure_connection(max_retries=1, timeout=2)
+            checks['broker'] = True
+    except Exception:
+        pass
+
+    status_code = 200 if all(checks.values()) else 503
+    return JsonResponse({'ready': all(checks.values()), 'checks': checks}, status=status_code)
 
 
 @login_required(login_url='login')

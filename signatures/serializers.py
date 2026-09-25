@@ -1,19 +1,16 @@
+from rest_framework import serializers
+
+from app.mixins import UserScopedSerializerMixin
 from categories.models import Category
 from payment.models import CreditCard
-from rest_framework import serializers
 from .models import Signature
 
 
-class SignatureSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get('request')
-        if request:
-            self.fields['credit_card'].queryset = CreditCard.objects.filter(user=request.user)
-            self.fields['category'].queryset = Category.objects.filter(user=request.user)
-        else:
-            self.fields['credit_card'].queryset = CreditCard.objects.none()
-            self.fields['category'].queryset = Category.objects.none()
+class SignatureSerializer(UserScopedSerializerMixin, serializers.ModelSerializer):
+    user_scoped_fields = {
+        'credit_card': CreditCard,
+        'category': Category,
+    }
 
     class Meta:
         model = Signature

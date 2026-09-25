@@ -58,7 +58,7 @@ class InvestmentAssetForm(forms.ModelForm):
             'maturity_date': forms.DateInput(attrs={'class': 'form-control fixed-income-field', 'type': 'date'}),
             'expected_rate': forms.TextInput(attrs={'class': 'form-control fixed-income-field'}),
             'liquidity_type': forms.Select(attrs={'class': 'form-control fixed-income-field'}),
-            'current_value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'current_value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -105,7 +105,7 @@ class InvestmentMovementForm(forms.ModelForm):
         widgets = {
             'asset': forms.Select(attrs={'class': 'form-control'}),
             'operation_type': forms.Select(attrs={'class': 'form-control'}),
-            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'min': '0.01', 'step': '0.01'}),
             'movement_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'register_cash_flow': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),

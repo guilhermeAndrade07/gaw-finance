@@ -30,6 +30,10 @@ environ.Env.read_env(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+ENVIRONMENT = env('DJANGO_ENV', default='dev')
+if ENVIRONMENT not in {'dev', 'docker', 'test', 'prd'}:
+    raise RuntimeError(f'DJANGO_ENV invalido: {ENVIRONMENT}')
+
 SECRET_KEY = env('SECRET_KEY', default='')
 if not SECRET_KEY:
     raise RuntimeError(
@@ -45,9 +49,40 @@ ALLOWED_HOSTS = [
     for host in env('ALLOWED_HOSTS')
     if host.strip() and host.strip() != '0.0.0.0'
 ]
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in env('CSRF_TRUSTED_ORIGINS')
+    if origin.strip()
+]
+
+if ENVIRONMENT == 'prd':
+    if DEBUG:
+        raise RuntimeError('DEBUG deve ser False em producao.')
+    if SECRET_KEY.startswith('django-insecure-') or len(SECRET_KEY) < 50:
+        raise RuntimeError('SECRET_KEY de producao deve ser forte e unica.')
+    if not os.environ.get('ALLOWED_HOSTS') or not ALLOWED_HOSTS:
+        raise RuntimeError('ALLOWED_HOSTS deve ser definido em producao.')
+    if any('*' in host for host in ALLOWED_HOSTS):
+        raise RuntimeError('ALLOWED_HOSTS nao aceita wildcard em producao.')
+    if not CSRF_TRUSTED_ORIGINS:
+        raise RuntimeError('CSRF_TRUSTED_ORIGINS deve ser definido em producao.')
+    if any('*' in origin or not origin.startswith('https://') for origin in CSRF_TRUSTED_ORIGINS):
+        raise RuntimeError('CSRF_TRUSTED_ORIGINS deve conter origens HTTPS exatas.')
+
+    database_url = env('DATABASE_URL', default='')
+    if not database_url.startswith(('postgres://', 'postgresql://')):
+        raise RuntimeError('DATABASE_URL de producao deve usar PostgreSQL.')
+
+    celery_broker_url = env('CELERY_BROKER_URL', default='')
+    if not celery_broker_url.startswith('amqp://') or 'guest:' in celery_broker_url:
+        raise RuntimeError('CELERY_BROKER_URL de producao deve usar RabbitMQ com credencial segura.')
+
+    if not env('REDIS_URL', default='').startswith('redis://'):
+        raise RuntimeError('REDIS_URL de producao deve usar Redis.')
 
 
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -78,6 +113,7 @@ INSTALLED_APPS = [
     'investments',
     'reports',
     'goals',
+    'auditing',
 ]
 
 LOGIN_URL = 'login'
@@ -92,9 +128,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'app.middleware.FinanceAutoTasksMiddleware',
+    'accounts.middleware.MFAMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middleware.SecurityHeadersMiddleware',
+    'auditing.middleware.RequestIDMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -128,6 +166,11 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'accounts.backends.EmailBackend',
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -177,12 +220,26 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'jwt_token': '10/min',
+        'jwt_refresh': '30/min',
+        'jwt_verify': '60/min',
+        'jwt_logout': '10/min',
+    },
+}
+
+
+AUTH_RATE_LIMITS = {
+    'login': {'limit': 10, 'window_seconds': 300},
+    'mfa_setup': {'limit': 8, 'window_seconds': 300},
+    'mfa_verify': {'limit': 8, 'window_seconds': 300},
+    'invite_accept': {'limit': 10, 'window_seconds': 3600},
 }
 
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
@@ -198,18 +255,26 @@ STATICFILES_DIRS = [
     BASE_DIR / 'app' / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATIC_ROOT.mkdir(parents=True, exist_ok=True)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'whitenoise.storage.CompressedManifestStaticFilesStorage'
+            if ENVIRONMENT in {'docker', 'prd'}
+            else 'django.contrib.staticfiles.storage.StaticFilesStorage'
+        ),
+    },
+}
 
-# Environment identifier (dev, docker, test, prd)
-ENVIRONMENT = env('DJANGO_ENV', default='dev')
 
 # Trust X-Forwarded-Proto from reverse proxy when not in debug mode.
 # Prevents redirect loops behind Traefik in production (DEBUG=False).
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_REDIRECT_EXEMPT = [r'^/health/$']
+    SECURE_REDIRECT_EXEMPT = [r'^/health/$', r'^/ready/$']
 
 # Strict transport security and secure cookies only in real production.
 if ENVIRONMENT == 'prd':
@@ -223,9 +288,28 @@ if ENVIRONMENT == 'prd':
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-
-CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
-
+CONTENT_SECURITY_POLICY = '; '.join([
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+])
+PERMISSIONS_POLICY = ', '.join([
+    'camera=()',
+    'display-capture=()',
+    'geolocation=()',
+    'microphone=()',
+])
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 200
+AUDIT_RETENTION_DAYS = 365
+BACKUP_RETENTION_DAYS = 30
 
 # Celery
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='amqp://guest:guest@localhost:5672//')
@@ -235,12 +319,31 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULE = {
+    'close-past-invoices': {
+        'task': 'app.close_past_invoices',
+        'schedule': timedelta(hours=1),
+    },
+    'generate-signature-charges': {
+        'task': 'app.generate_signature_charges',
+        'schedule': timedelta(hours=1),
+    },
+    'prune-audit-events': {
+        'task': 'auditing.prune_audit_events',
+        'schedule': timedelta(days=1),
+    },
+}
 
 
 # Cache (Redis)
+if ENVIRONMENT in {'docker', 'prd'}:
+    cache_backend = 'django_redis.cache.RedisCache'
+else:
+    cache_backend = 'django.core.cache.backends.locmem.LocMemCache'
+
 CACHES = {
     'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
+        'BACKEND': cache_backend,
         'LOCATION': env('REDIS_URL', default='redis://localhost:6379/0'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -252,9 +355,15 @@ CACHES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'auditing.logging.JSONFormatter',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'json',
         },
     },
     'root': {

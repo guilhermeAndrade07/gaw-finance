@@ -49,5 +49,6 @@ nav:
   - Arquitetura: arquitetura.md
   - Apps: apps.md
   - Deploy: deploy.md
+  - Liberacao: liberacao.md
   - Desenvolvimento: desenvolvimento.md
   - API: api.md

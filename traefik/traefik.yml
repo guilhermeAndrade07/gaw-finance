@@ -31,11 +31,9 @@ entryPoints:
         - 131.0.72.0/22
 
 providers:
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
-    swarmMode: true
-    exposedByDefault: false
-    network: traefik_public
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
 
 certificatesResolvers:
   letsencrypt:

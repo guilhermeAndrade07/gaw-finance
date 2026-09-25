@@ -15,6 +15,7 @@ from reportlab.platypus import (
 
 from django.utils import timezone
 from django.utils.formats import date_format
+from xml.sax.saxutils import escape
 
 from inflows.models import Inflow
 from outflows.models import Outflow
@@ -80,7 +81,7 @@ def _truncate(text, max_len=35):
 
 
 def _cell(text):
-    return Paragraph(str(text), STYLE_CELL)
+    return Paragraph(escape(str(text)), STYLE_CELL)
 
 
 def _build_doc(buffer, title):
@@ -97,11 +98,8 @@ def _build_doc(buffer, title):
 
 def _header(story, title, username):
     story.append(Paragraph('GAW Finance', STYLE_TITLE))
-    story.append(Paragraph(title, STYLE_SECTION))
-    story.append(Paragraph(
-        f'Usuario: {username} | Gerado em: {date_format(timezone.localtime(timezone.now()), "d/m/Y H:i")}',
-        STYLE_SUBTITLE,
-    ))
+    story.append(Paragraph(escape(title), STYLE_SECTION))
+    story.append(Paragraph(escape(f'Usuario: {username} | Gerado em: {date_format(timezone.localtime(timezone.now()), "d/m/Y H:i")}'), STYLE_SUBTITLE))
     story.append(Spacer(1, 0.5 * cm))
 
 
@@ -290,7 +288,7 @@ def generate_custom_report(user, sections=None, month=None, year=None):
     _, period_label = _period_filter(
         Outflow.objects.none(), month, year
     )
-    story.append(Paragraph(f'Período: {period_label}', STYLE_SECTION))
+    story.append(Paragraph(escape(f'Período: {period_label}'), STYLE_SECTION))
 
     for i, section in enumerate(sections):
         if i > 0:

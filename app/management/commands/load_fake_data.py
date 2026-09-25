@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from accounts.models import Account
 from banks.models import Bank
+from banks.services import reconcile_bank_balances
 from categories.models import Category
 from inflows.models import Inflow
 from outflows.models import Outflow
@@ -121,6 +122,7 @@ class Command(BaseCommand):
         self._create_payments(user, cards, categories)
         self._create_signatures(user, banks, categories)
         self._create_investments(user, banks)
+        reconcile_bank_balances()
 
         self.stdout.write(self.style.SUCCESS('Fake data loaded successfully.'))
 

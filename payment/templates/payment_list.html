@@ -30,7 +30,7 @@
             <p class="m-0 text-uppercase fw-medium text-truncate">
               {% if show_hidden %}Compras Pagas{% else %}Compras em Aberto{% endif %}
             </p>
-            <h3 id="payment-total" class="fw-medium my-2" data-total="{{ payment_total|default_if_none:'0' }}">R$ {{ payment_total|floatformat:"2g" }}</h3>
+            <h3 id="payment-total" class="fw-medium my-2" data-total="{{ payment_total|default_if_none:'0' }}" data-showing-hidden="{% if show_hidden %}true{% else %}false{% endif %}">R$ {{ payment_total|floatformat:"2g" }}</h3>
           </div>
         </div>
       </div>
@@ -223,101 +223,7 @@
   </div>
 </div>
 
-<script>
-    (function () {
-        const totalElement = document.getElementById('payment-total');
-        const usedElement = document.getElementById('credit-used');
-        const availableElement = document.getElementById('credit-available');
-        const checkboxes = document.querySelectorAll('.js-payment-paid-checkbox');
-        const csrfToken = '{{ csrf_token }}';
-        const showingHidden = '{{ show_hidden|yesno:"true,false" }}' === 'true';
-
-        if (!totalElement || checkboxes.length === 0) {
-            return;
-        }
-
-        const toNumber = (value) => {
-            const parsed = Number.parseFloat(value);
-            return Number.isNaN(parsed) ? 0 : parsed;
-        };
-
-        const formatBRL = (value) => {
-            return value.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
-        };
-
-        const updateMoneyElement = (element, value) => {
-            if (!element) {
-                return;
-            }
-
-            element.dataset.total = value.toFixed(2);
-            element.textContent = `R$ ${formatBRL(value)}`;
-        };
-
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', async (event) => {
-                const isChecked = event.target.checked;
-                const wasChecked = !isChecked;
-
-                const paymentId = event.target.dataset.paymentId;
-                const row = document.getElementById(`payment-row-${paymentId}`);
-
-                if (!paymentId || !row) {
-                    return;
-                }
-
-                event.target.disabled = true;
-
-                try {
-                    const endpoint = isChecked
-                        ? `/payment/${paymentId}/mark-paid/`
-                        : `/payment/${paymentId}/mark-unpaid/`;
-
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Erro ao atualizar compra.');
-                    }
-
-                    const currentTotal = toNumber(totalElement.dataset.total);
-                    const rowValue = toNumber(row.dataset.value);
-                    const totalDelta = (showingHidden === isChecked) ? rowValue : -rowValue;
-                    const nextTotal = Math.max(currentTotal + totalDelta, 0);
-
-                    updateMoneyElement(totalElement, nextTotal);
-
-                    if (row.dataset.hasCard === '1') {
-                        const creditDir = isChecked ? -1 : 1;
-                        const nextUsed = Math.max(toNumber(usedElement.dataset.total) + creditDir * rowValue, 0);
-                        const nextAvailable = Math.max(toNumber(availableElement.dataset.total) - creditDir * rowValue, 0);
-                        updateMoneyElement(usedElement, nextUsed);
-                        updateMoneyElement(availableElement, nextAvailable);
-                    }
-
-                    if (isChecked) {
-                        row.style.opacity = '0.5';
-                        row.style.textDecoration = 'line-through';
-                    } else {
-                        row.style.opacity = '';
-                        row.style.textDecoration = '';
-                    }
-                } catch (error) {
-                    event.target.disabled = false;
-                    event.target.checked = wasChecked;
-                    window.alert('Não foi possível atualizar a compra. Tente novamente.');
-                }
-            });
-        });
-    })();
-</script>
+{% load static %}
+<script src="{% static 'app/js/payment_actions.js' %}?v=20260925a"></script>
 
 {% endblock %}

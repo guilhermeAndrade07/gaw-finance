@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
 from banks.models import Bank
 from categories.models import Category
@@ -87,9 +87,16 @@ class Payment(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='payment', null=True, blank=True)
-    date_payment = models.DateField(null=True, blank=True)
-    value = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    parcelas = models.PositiveIntegerField(default=1)
+    date_payment = models.DateField()
+    value = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+    )
+    parcelas = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(60)],
+    )
     paid = models.BooleanField(default=False)
     invoice = models.ForeignKey(
         Invoice,
@@ -103,6 +110,16 @@ class Payment(models.Model):
 
     class Meta:
         ordering = ['name']
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(value__gt=0),
+                name='payment_value_positive',
+            ),
+            models.CheckConstraint(
+                condition=Q(parcelas__gte=1, parcelas__lte=60),
+                name='payment_installments_range',
+            ),
+        ]
 
     @property
     def parcelas_display(self):

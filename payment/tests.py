@@ -2,8 +2,10 @@ from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework.test import APIClient
 
 from banks.models import Bank
 from categories.models import Category
@@ -11,6 +13,9 @@ from payment.models import CreditCard, Invoice, Payment
 from payment.services import (
     backfill_invoices,
     close_past_invoices,
+    mark_payment_paid,
+    mark_payment_unpaid,
+    register_payment,
 )
 
 
@@ -504,3 +509,177 @@ class PaymentPaidToggleTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.payment.refresh_from_db()
         self.assertFalse(self.payment.paid)
+
+
+class PaymentServiceTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='payment-service-user', password='pass123')
+        self.other_user = User.objects.create_user(username='payment-service-other', password='pass123')
+        self.category = Category.objects.create(user=self.user, name='Servico')
+        self.bank = Bank.objects.create(
+            user=self.user,
+            name='Banco service',
+            account_type='Corrente',
+            agency=1,
+            account=11,
+        )
+        self.other_bank = Bank.objects.create(
+            user=self.other_user,
+            name='Banco other service',
+            account_type='Corrente',
+            agency=2,
+            account=22,
+        )
+        self.card = CreditCard.objects.create(
+            user=self.user,
+            bank=self.bank,
+            name='Cartao service',
+            credit_limit=Decimal('1000.00'),
+            closing_day=20,
+            due_day=10,
+        )
+        self.other_card = CreditCard.objects.create(
+            user=self.other_user,
+            bank=self.other_bank,
+            name='Cartao other service',
+            credit_limit=Decimal('1000.00'),
+            closing_day=20,
+            due_day=10,
+        )
+
+    def test_register_payment_creates_installments_and_invoices(self):
+        payment = register_payment(
+            user=self.user,
+            card=self.card,
+            name='Notebook',
+            date_payment=date(2026, 6, 15),
+            value=Decimal('300.00'),
+            parcelas=3,
+            category=self.category,
+        )
+
+        payments = Payment.objects.filter(user=self.user, card=self.card).order_by('date_payment')
+        self.assertEqual(payments.count(), 3)
+        self.assertEqual([item.value for item in payments], [
+            Decimal('100.00'),
+            Decimal('100.00'),
+            Decimal('100.00'),
+        ])
+        self.assertEqual([item.name for item in payments], [
+            'Notebook (1/3)',
+            'Notebook (2/3)',
+            'Notebook (3/3)',
+        ])
+        self.assertEqual(Invoice.objects.filter(card=self.card).count(), 3)
+        self.assertTrue(all(item.invoice_id for item in payments))
+        self.assertEqual(payment.pk, payments[0].pk)
+
+    def test_register_payment_rejects_value_above_credit_limit(self):
+        register_payment(
+            user=self.user,
+            card=self.card,
+            name='Compra atual',
+            date_payment=date(2026, 6, 5),
+            value=Decimal('900.00'),
+        )
+
+        with self.assertRaises(ValidationError):
+            register_payment(
+                user=self.user,
+                card=self.card,
+                name='Compra acima do limite',
+                date_payment=date(2026, 6, 10),
+                value=Decimal('150.00'),
+            )
+
+        self.assertFalse(Payment.objects.filter(name='Compra acima do limite').exists())
+
+    def test_register_payment_rejects_foreign_card(self):
+        with self.assertRaises(ValidationError):
+            register_payment(
+                user=self.user,
+                card=self.other_card,
+                name='Compra invalida',
+                date_payment=date(2026, 6, 10),
+                value=Decimal('100.00'),
+            )
+
+    def test_payment_toggle_updates_invoice_status(self):
+        invoice = Invoice.objects.create(
+            user=self.user,
+            card=self.card,
+            closing_date=date(2026, 6, 20),
+            due_date=date(2026, 7, 10),
+            status=Invoice.CLOSED,
+        )
+        p1 = Payment.objects.create(
+            user=self.user,
+            card=self.card,
+            name='Compra 1',
+            category=self.category,
+            date_payment=date(2026, 6, 5),
+            value=Decimal('50.00'),
+            invoice=invoice,
+        )
+        p2 = Payment.objects.create(
+            user=self.user,
+            card=self.card,
+            name='Compra 2',
+            category=self.category,
+            date_payment=date(2026, 6, 6),
+            value=Decimal('50.00'),
+            invoice=invoice,
+        )
+
+        mark_payment_paid(user=self.user, payment_id=p1.pk)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.CLOSED)
+
+        mark_payment_paid(user=self.user, payment_id=p2.pk)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.PAID)
+
+        mark_payment_unpaid(user=self.user, payment_id=p1.pk)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.status, Invoice.CLOSED)
+
+    def test_api_creates_installments(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        response = client.post(
+            reverse('payment-create-list-api-view'),
+            {
+                'card': self.card.pk,
+                'name': 'Compra API',
+                'category': self.category.pk,
+                'date_payment': '2026-06-15',
+                'value': '300.00',
+                'parcelas': 3,
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 201)
+        payments = Payment.objects.filter(user=self.user, card=self.card).order_by('date_payment')
+        self.assertEqual(payments.count(), 3)
+        self.assertEqual(Invoice.objects.filter(card=self.card).count(), 3)
+        self.assertTrue(all(item.invoice_id for item in payments))
+
+    def test_api_rejects_value_above_credit_limit(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        response = client.post(
+            reverse('payment-create-list-api-view'),
+            {
+                'card': self.card.pk,
+                'name': 'Compra acima do limite',
+                'category': self.category.pk,
+                'date_payment': '2026-06-15',
+                'value': '1500.00',
+                'parcelas': 1,
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Payment.objects.filter(name='Compra acima do limite').exists())

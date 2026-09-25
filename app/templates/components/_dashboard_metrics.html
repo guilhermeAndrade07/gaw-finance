@@ -1,3 +1,4 @@
+{% load static %}
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
@@ -252,147 +253,19 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" crossorigin="anonymous"></script>
-
-<script>
-    const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
-    new Chart(cashFlowCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ cash_flow.labels|safe }},
-            datasets: [
-                {
-                    label: 'Entradas',
-                    data: {{ cash_flow.inflows|safe }},
-                    backgroundColor: '#28a745',
-                    borderColor: '#1e7e34',
-                    borderWidth: 2,
-                },
-                {
-                    label: 'Saídas',
-                    data: {{ cash_flow.outflows|safe }},
-                    backgroundColor: '#dc3545',
-                    borderColor: '#bb2d3b',
-                    borderWidth: 2,
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'R$ ' + value.toFixed(2);
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    let categoryChart = null;
-    const colors = ['#4BC0C0', '#FFCE56', '#FF6384', '#FFFFFF', '#36A2EB', '#8B4513', '#FF9F40', '#9966FF', '#C9CBCF'];
-    const monthlyExpenseTotalElement = document.getElementById('monthlyExpenseTotal');
-
-    function formatBRL(value) {
-        return Number(value || 0).toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-    }
-
-    function updateMonthlyExpenseTotal(data) {
-        const total = (data || []).reduce((sum, currentValue) => sum + Number(currentValue || 0), 0);
-
-        if (monthlyExpenseTotalElement) {
-            monthlyExpenseTotalElement.textContent = `R$ ${formatBRL(total)}`;
-        }
-    }
-    
-    function updateCategoryChart(labels, data) {
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-
-        updateMonthlyExpenseTotal(data);
-        
-        if (categoryChart) {
-            categoryChart.destroy();
-        }
-        
-        categoryChart = new Chart(categoryCtx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors.slice(0, labels.length),
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                return context.label + ': R$ ' + context.parsed.toFixed(2) + ' (' + percentage + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-    </script>
-
-    <script>
-    const initialLabels = JSON.parse('{{ expenses.labels|escapejs }}');
-    const initialData = JSON.parse('{{ expenses.data|escapejs }}');
-    updateCategoryChart(initialLabels, initialData);
-
-    const selectedBankId = '{{ selected_bank_id }}';
-
-    document.getElementById('monthSelector').addEventListener('change', function(e) {
-        const monthYear = e.target.value;
-        const [year, month] = monthYear.split('-');
-        
-        let url = `/api/expenses-by-month/?month=${month}&year=${year}`;
-        if (selectedBankId) {
-            url += `&bank=${selectedBankId}`;
-        }
-        
-        fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateCategoryChart(data.labels, data.data);
-            } else {
-                console.error('Erro ao atualizar dados:', data.error);
-            }
-        })
-        .catch(error => console.error('Erro na requisicao:', error));
-    });
-
-    document.getElementById('bankSelector').addEventListener('change', function(e) {
-        const params = new URLSearchParams(window.location.search);
-        const bankValue = e.target.value;
-        if (bankValue) {
-            params.set('bank', bankValue);
-        } else {
-            params.delete('bank');
-        }
-        window.location.search = params.toString();
-    });
-    </script>
+<script id="dashboard-data" type="application/json">
+{
+  "cashFlow": {
+    "labels": {{ cash_flow.labels }},
+    "inflows": {{ cash_flow.inflows }},
+    "outflows": {{ cash_flow.outflows }}
+  },
+  "expenses": {
+    "labels": {{ expenses.labels }},
+    "data": {{ expenses.data }}
+  },
+  "selectedBankId": "{{ selected_bank_id }}"
+}
+</script>
+<script src="{% static 'app/vendor/chartjs/chart.umd.min.js' %}"></script>
+<script src="{% static 'app/js/dashboard.js' %}?v=20260925a"></script>

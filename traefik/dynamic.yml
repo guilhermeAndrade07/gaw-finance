@@ -1,0 +1,16 @@
+http:
+  routers:
+    gaw_finance_app:
+      entryPoints:
+        - websecure
+      rule: "Host(`gawfinance.gawsystems.com.br`) || Host(`www.gawfinance.gawsystems.com.br`)"
+      service: gaw_finance_app
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    gaw_finance_app:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://tasks.gaw_finance_app:8000"

@@ -6,10 +6,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from app.tasks import generate_signature_charges as generate_signature_charges_task
 from banks.models import Bank
 from categories.models import Category
 from payment.models import CreditCard, Payment
-from signatures.models import Signature
+from signatures.models import Signature, SignatureCharge
 from signatures.services import generate_signature_charges
 
 
@@ -65,6 +66,11 @@ class SignatureChargeTests(TestCase):
         generate_signature_charges()
         generate_signature_charges()
         self.assertEqual(Payment.objects.filter(user=self.user, card=self.card).count(), 1)
+
+    def test_task_generates_charge(self):
+        self._create_signature(billing_day=self.today.day)
+        generate_signature_charges_task.run()
+        self.assertTrue(Payment.objects.filter(user=self.user, card=self.card).exists())
 
     def test_inactive_signature_no_charge(self):
         self._create_signature(billing_day=self.today.day, is_active=False)
@@ -156,8 +162,54 @@ class SignatureChargeTests(TestCase):
         self.assertIsNotNone(sig)
         self.assertEqual(sig.credit_card_id, self.card.id)
 
-    def test_middleware_triggers_charge_on_request(self):
+    def test_request_does_not_trigger_charge(self):
         self._create_signature(billing_day=self.today.day)
         self.client.force_login(self.user)
         self.client.get(reverse('signature_list'))
-        self.assertTrue(Payment.objects.filter(user=self.user, card=self.card).exists())
+        self.assertFalse(Payment.objects.filter(user=self.user, card=self.card).exists())
+
+
+class SignatureChargeIdempotencyTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='signature-charge-user', password='pass123')
+        self.bank = Bank.objects.create(
+            user=self.user,
+            name='Banco charge',
+            account_type='Corrente',
+            agency=1,
+            account=11,
+        )
+        self.card = CreditCard.objects.create(
+            user=self.user,
+            bank=self.bank,
+            name='Cartao charge',
+            credit_limit=Decimal('1000.00'),
+        )
+        self.category = Category.objects.create(user=self.user, name='Streaming')
+        self.today = date.today()
+
+    def test_existing_charge_prevents_duplicate_even_without_last_generated(self):
+        signature = Signature.objects.create(
+            user=self.user,
+            name='Spotify Charge',
+            value=Decimal('19.90'),
+            billing_day=self.today.day,
+            is_active=True,
+            credit_card=self.card,
+            category=self.category,
+        )
+        generate_signature_charges()
+        Signature.objects.filter(pk=signature.pk).update(
+            last_generated_month=None,
+            last_generated_year=None,
+        )
+        generate_signature_charges()
+
+        self.assertEqual(Payment.objects.filter(user=self.user, card=self.card).count(), 1)
+        self.assertTrue(
+            SignatureCharge.objects.filter(
+                signature=signature,
+                reference_month=self.today.month,
+                reference_year=self.today.year,
+            ).exists()
+        )
