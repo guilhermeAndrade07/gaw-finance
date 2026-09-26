@@ -16,6 +16,7 @@ graph LR
     Signatures[signatures]
     Investments[investments]
     Reports[reports]
+    Integrations[integrations]
 
     App --> Accounts
     App --> Auth
@@ -28,6 +29,7 @@ graph LR
     App --> Signatures
     App --> Investments
     App --> Reports
+    App --> Integrations
 ```
 
 ## app
@@ -141,3 +143,17 @@ Relatorios financeiros em PDF usando ReportLab.
 
 - **Modelo**: `GeneratedReport` (rastreia relatorios gerados)
 - **Services**: `generate_custom_report()` (blocos: summary, inflows, outflows, by_category, investments)
+
+## integrations
+
+Integracao com WhatsApp via Evolution API com interpretacao por LLM.
+
+**Fluxo**: WhatsApp -> Evolution API -> Webhook `/api/v1/whatsapp/webhook/` -> Task Celery -> LLM interpreta -> services (outflows/inflows/reports) -> resposta via Evolution API.
+
+- **Modelos**: `WhatsAppBinding` (user, phone E.164, is_active — cadastrado no Admin), `WhatsAppMessageLog` (message_id unico para idempotencia, raw_body, intent, status, resposta)
+- **Webhook**: valida `X-Webhook-Secret`, ignora numeros nao vinculados e mensagens duplicadas
+- **LLM**: providers `opencode` e `openai` (endpoints compatíveis com API OpenAI), configurados via `LLM_PROVIDER`/`LLM_API_KEY`/`LLM_BASE_URL`/`LLM_MODEL`
+- **Resolvers**: busca fuzzy de `Bank` e `Category` por nome, sempre escopada no usuario
+- **Handlers**: registra despesas (`register_outflow`), receitas (`register_inflow`) e responde consultas (gastos do mes, por categoria, saldo de banco, ultimas despesas)
+- **Tasks**: `process_whatsapp_message` (interpreta e executa), `send_whatsapp_reply` (envia resposta)
+- **Variaveis**: `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE_NAME`, `WHATSAPP_WEBHOOK_SECRET`

@@ -253,19 +253,6 @@
   </div>
 </div>
 
-<script id="dashboard-data" type="application/json">
-{
-  "cashFlow": {
-    "labels": {{ cash_flow.labels }},
-    "inflows": {{ cash_flow.inflows }},
-    "outflows": {{ cash_flow.outflows }}
-  },
-  "expenses": {
-    "labels": {{ expenses.labels }},
-    "data": {{ expenses.data }}
-  },
-  "selectedBankId": "{{ selected_bank_id }}"
-}
-</script>
+{{ dashboard_data|json_script:"dashboard-data" }}
 <script src="{% static 'app/vendor/chartjs/chart.umd.min.js' %}"></script>
 <script src="{% static 'app/js/dashboard.js' %}?v=20260925a"></script>

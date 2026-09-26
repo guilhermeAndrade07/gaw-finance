@@ -8,6 +8,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=amqp://gaw_app:gaw_dev@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - EVOLUTION_API_URL=http://evolution-api:8080
+      - ALLOWED_HOSTS=localhost,127.0.0.1,app,192.168.15.75
     ports:
       - "8000:8000"
     volumes:
@@ -48,15 +50,70 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=gaw_app
       - RABBITMQ_DEFAULT_PASS=gaw_dev
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-custom.conf:ro
     ports:
       - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  celery:
+    build: .
+    entrypoint: ["./entrypoint-celery.sh"]
+    command: ["celery", "-A", "app", "worker", "-l", "info", "--concurrency", "2"]
+    env_file: .env
+    environment:
+      - DJANGO_ENV=dev
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/gaw_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=amqp://gaw_app:gaw_dev@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - EVOLUTION_API_URL=http://evolution-api:8080
+      - ALLOWED_HOSTS=localhost,127.0.0.1,app,192.168.15.75
+    volumes:
+      - media_data:/gaw-finance/media
+      - static_data:/gaw-finance/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    env_file: .env
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:-gaw-evolution-key}
+      - DATABASE_ENABLED=true
+      - DATABASE_CONNECTION_URI=postgres://postgres:postgres@db:5432/gaw_db?schema=evolution
+      - DATABASE_PROVIDER=postgresql
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379/2
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - WEBHOOK_GLOBAL_ENABLED=false
+      - WEBHOOK_GLOBAL_URL=http://app:8000/api/v1/whatsapp/webhook/
+      - WEBHOOK_GLOBAL_BY_EVENTS=true
+      - WEBHOOK_GLOBAL_EVENTS=MESSAGES_UPSERT
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_URL=false
+      - CONFIG_SESSION_PHONE_CLIENT_NAME=GAW Finance
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
   media_data:
   static_data:
+  evolution_instances:

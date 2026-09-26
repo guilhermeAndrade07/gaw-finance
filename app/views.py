@@ -92,6 +92,19 @@ def dashboard(request):
 
     goal_status = metrics.get_goal_status_counts(request.user)
 
+    dashboard_data = {
+        'cashFlow': {
+            'labels': json.loads(cash_flow['labels']),
+            'inflows': json.loads(cash_flow['inflows']),
+            'outflows': json.loads(cash_flow['outflows']),
+        },
+        'expenses': {
+            'labels': json.loads(expenses['labels']),
+            'data': json.loads(expenses['data']),
+        },
+        'selectedBankId': str(selected_bank.id) if selected_bank else '',
+    }
+
     context = {
         'metrics': value_metrics,
         'cash_flow': cash_flow,
@@ -101,6 +114,7 @@ def dashboard(request):
         'selected_bank_id': str(selected_bank.id) if selected_bank else '',
         'latest_transactions': latest_transactions,
         'goal_status': goal_status,
+        'dashboard_data': dashboard_data,
     }
 
     return render(request, 'dashboard.html', context)

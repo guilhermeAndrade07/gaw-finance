@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     'reports',
     'goals',
     'auditing',
+    'integrations',
 ]
 
 LOGIN_URL = 'login'
@@ -311,6 +312,20 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 200
 AUDIT_RETENTION_DAYS = 365
 BACKUP_RETENTION_DAYS = 30
 
+# WhatsApp / Evolution API
+EVOLUTION_API_URL = env('EVOLUTION_API_URL', default='http://localhost:8080')
+EVOLUTION_API_KEY = env('EVOLUTION_API_KEY', default='')
+EVOLUTION_INSTANCE_NAME = env('EVOLUTION_INSTANCE_NAME', default='gaw-finance')
+WHATSAPP_WEBHOOK_SECRET = env('WHATSAPP_WEBHOOK_SECRET', default='')
+
+# LLM
+LLM_PROVIDER = env('LLM_PROVIDER', default='opencode')
+if LLM_PROVIDER not in {'opencode', 'openai'}:
+    raise RuntimeError(f'LLM_PROVIDER invalido: {LLM_PROVIDER}')
+LLM_API_KEY = env('LLM_API_KEY', default='')
+LLM_BASE_URL = env('LLM_BASE_URL', default='')
+LLM_MODEL = env('LLM_MODEL', default='gpt-4o-mini')
+
 # Celery
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='amqp://guest:guest@localhost:5672//')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/1')
@@ -318,6 +333,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_DEFAULT_QUEUE_DURABLE = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     'close-past-invoices': {

@@ -21,6 +21,7 @@ urlpatterns = [
 
     path('', include('accounts.urls')),
     path('api/v1/', include('authentication.urls')),
+    path('api/v1/', include('integrations.urls')),
     path('dj-celery-panel/', include('dj_celery_panel.urls')),
 
     path('', include('banks.urls')),

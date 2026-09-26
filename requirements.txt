@@ -25,6 +25,7 @@ prompt_toolkit==3.0.52
 psycopg2-binary==2.9.11
 pyotp==2.9.0
 qrcode==7.4.2
+requests==2.34.2
 pypdf==6.16.1
 PyJWT==2.13.0
 python-crontab==3.3.0
