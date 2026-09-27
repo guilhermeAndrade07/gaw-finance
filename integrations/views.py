@@ -92,6 +92,13 @@ def whatsapp_webhook(request):
     if message is None:
         return JsonResponse({'detail': 'ignored'}, status=200)
 
+    if WhatsAppMessageLog.objects.filter(
+        message_id=message['message_id'],
+        direction=WhatsAppMessageLog.DIRECTION_OUT,
+    ).exists():
+        logger.info('WhatsApp: eco do bot ignorado %s', message['message_id'])
+        return JsonResponse({'detail': 'self echo ignored'}, status=200)
+
     log, created = WhatsAppMessageLog.objects.get_or_create(
         message_id=message['message_id'],
         defaults={
