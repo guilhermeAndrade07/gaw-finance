@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import connections
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 
 from kombu import Connection
 
@@ -115,6 +116,7 @@ def dashboard(request):
         'latest_transactions': latest_transactions,
         'goal_status': goal_status,
         'dashboard_data': dashboard_data,
+        'today': timezone.localdate(),
     }
 
     return render(request, 'dashboard.html', context)

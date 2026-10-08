@@ -19,14 +19,14 @@
 </div>
 
 <div class="row mt-3 mb-2">
-  <div class="col-sm-6">
+  <div class="col-sm-6 col-lg-4">
     <form method="get" action="{% url 'category_list' %}">
-      <div class="app-search">
+      <div class="app-search list-search">
         <div class="app-search-box">
           <div class="input-group">
             <input type="text" class="form-control" name="name" placeholder="Buscar categoria..." value="{{ request.GET.name }}">
             <div class="input-group-append">
-              <button class="btn btn-icon" type="submit">
+              <button class="btn btn-icon" type="submit" aria-label="Buscar">
                 <i data-lucide="search" class="font-16"></i>
               </button>
             </div>
@@ -35,7 +35,7 @@
       </div>
     </form>
   </div>
-  <div class="col-sm-6 mt-3 mt-sm-0 text-start text-sm-end">
+  <div class="col-sm-6 col-lg-8 mt-3 mt-sm-0 text-start text-sm-end">
     <a href="{% url 'category_create' %}" class="btn btn-primary">
       <i data-lucide="plus" class="font-16 me-1"></i> Nova Categoria
     </a>

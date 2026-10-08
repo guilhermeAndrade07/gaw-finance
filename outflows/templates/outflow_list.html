@@ -22,12 +22,12 @@
   <div class="col-12">
     <form method="get" action="{% url 'outflow_list' %}" class="row g-2 align-items-start">
       <div class="col-12 col-lg-3 col-md-6">
-        <div class="app-search">
+        <div class="app-search list-search">
           <div class="app-search-box">
             <div class="input-group">
               <input type="text" class="form-control" name="title" placeholder="Buscar saída..." value="{{ request.GET.title }}">
               <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
+                <button class="btn btn-icon" type="submit" aria-label="Buscar">
                   <i data-lucide="search"></i>
                 </button>
               </div>

@@ -2,7 +2,7 @@
     const dataElement = document.getElementById('goal-dashboard-data');
     if (!dataElement) return;
 
-    const dashboardData = JSON.parse(dataElement.textContent);
+    let currentData = JSON.parse(dataElement.textContent);
     let goalChart = null;
 
     function formatBRL(value) {
@@ -10,6 +10,23 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });
+    }
+
+    function isDarkTheme() {
+        return document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    }
+
+    function resolveColor(varName, darkFallback, lightFallback) {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        return value || (isDarkTheme() ? darkFallback : lightFallback);
+    }
+
+    function chartAxisColors() {
+        return {
+            tick: resolveColor('--bs-body-color', 'rgba(255, 255, 255, 0.87)', '#212529'),
+            grid: isDarkTheme() ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+            border: isDarkTheme() ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.12)',
+        };
     }
 
     function colorForPercentage(pct) {
@@ -21,6 +38,7 @@
     function renderGoalChart(labels, percentages) {
         const ctx = document.getElementById('goalChart').getContext('2d');
         const backgroundColors = percentages.map(pct => colorForPercentage(pct));
+        const axisColors = chartAxisColors();
 
         if (goalChart) {
             goalChart.destroy();
@@ -47,8 +65,8 @@
                         callbacks: {
                             label: function(context) {
                                 const idx = context.dataIndex;
-                                const spentVal = dashboardData.spent[idx] || 0;
-                                const goalVal = dashboardData.goals[idx] || 0;
+                                const spentVal = currentData.spent[idx] || 0;
+                                const goalVal = currentData.goals[idx] || 0;
                                 const pct = context.parsed.x.toFixed(1);
                                 return `Gasto: R$ ${formatBRL(spentVal)} / Meta: R$ ${formatBRL(goalVal)} (${pct}%)`;
                             }
@@ -60,11 +78,23 @@
                         min: 0,
                         max: 100,
                         ticks: {
+                            color: axisColors.tick,
                             callback: function(value) { return value + '%'; }
+                        },
+                        grid: {
+                            color: axisColors.grid,
+                            borderColor: axisColors.border,
                         }
                     },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            color: axisColors.tick,
+                        },
+                        grid: {
+                            color: axisColors.grid,
+                            borderColor: axisColors.border,
+                        }
                     }
                 }
             }
@@ -200,9 +230,19 @@
         });
     }
 
-    renderGoalChart(dashboardData.labels, dashboardData.percentages);
-    renderGoalDetails(dashboardData);
-    renderGoalTable(dashboardData);
+    renderGoalChart(currentData.labels, currentData.percentages);
+    renderGoalDetails(currentData);
+    renderGoalTable(currentData);
+
+    // Re-renders the chart when the user toggles light/dark mode.
+    new MutationObserver(function () {
+        if (goalChart) {
+            renderGoalChart(currentData.labels, currentData.percentages);
+        }
+    }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-bs-theme'],
+    });
 
     const monthSelector = document.getElementById('goalMonthSelector');
     if (monthSelector) {
@@ -214,6 +254,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        currentData = data;
                         renderGoalChart(data.labels, data.percentages);
                         renderGoalDetails(data);
                         renderGoalTable(data);

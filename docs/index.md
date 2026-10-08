@@ -12,6 +12,7 @@ O GAW Finance ajuda a organizar:
 - **Saidas** - registro de gastos vinculados a categorias
 - **Cartao de Credito** - compras parceladas e controle de limite
 - **Assinaturas** - cobrancas recorrentes mensais
+- **Metas** - limites de gasto mensal por categoria com acompanhamento de progresso
 - **Investimentos** - ativos, aportes e resgates
 - **Relatorios** - exportacao em PDF (fluxo de caixa, despesas por categoria, investimentos)
 

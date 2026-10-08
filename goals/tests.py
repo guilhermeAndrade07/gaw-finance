@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
+import re
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -184,6 +185,33 @@ class MonthlyGoalTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Agosto de 2026')
         self.assertEqual(len(response.context['goals']), 1)
+
+    def test_dashboard_renders_valid_json_data_element(self):
+        import json
+
+        self._create_goal(category=self.category_food, value='300.00', month=8, year=2026)
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('goal_dashboard'), {'month': '8', 'year': '2026'})
+        self.assertEqual(response.status_code, 200)
+
+        html = response.content.decode()
+        self.assertEqual(response.context['goals_data'], {
+            'labels': ['Alimentacao'],
+            'percentages': [0.0],
+            'spent': [0.0],
+            'goals': [300.0],
+            'goal_ids': [MonthlyGoal.objects.get(category=self.category_food).id],
+        })
+
+        match = re.search(
+            r'<script id="goal-dashboard-data" type="application/json">(.*?)</script>',
+            html,
+            re.S,
+        )
+        self.assertIsNotNone(match, 'elemento json_script nao encontrado')
+        payload = json.loads(match.group(1))
+        self.assertEqual(payload['labels'], ['Alimentacao'])
+        self.assertEqual(payload['goals'], [300.0])
 
     def test_goal_dashboard_escapes_category_names(self):
         payload = '<img src=x onerror=alert(1)>'

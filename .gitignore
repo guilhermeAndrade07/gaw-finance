@@ -13,3 +13,5 @@ evals
 staticfiles/
 backups/
 traefik/acme.json
+
+site/

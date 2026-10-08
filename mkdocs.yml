@@ -49,6 +49,7 @@ nav:
   - Arquitetura: arquitetura.md
   - Apps: apps.md
   - Deploy: deploy.md
+  - Integracao WhatsApp: evolution-whatsapp.md
   - Liberacao: liberacao.md
   - Desenvolvimento: desenvolvimento.md
   - API: api.md

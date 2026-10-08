@@ -81,7 +81,8 @@
   display: flex;
 }
 
-.signature-filter .input-group .btn.btn-icon {
+.signature-filter .input-group .btn.btn-icon,
+.list-search .input-group .btn.btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -96,10 +97,52 @@
   z-index: 2;
 }
 
-.signature-filter .input-group .btn.btn-icon svg {
+.signature-filter .input-group .btn.btn-icon svg,
+.list-search .input-group .btn.btn-icon svg {
   display: block;
   width: 16px;
   height: 16px;
+}
+
+.list-search {
+  display: block;
+  height: auto;
+  max-width: none;
+  margin-right: 0;
+  overflow: visible;
+}
+
+.list-search .app-search-box {
+  display: block;
+  vertical-align: baseline;
+}
+
+.list-search .input-group {
+  flex-wrap: nowrap;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background-color: var(--bs-body-bg);
+  overflow: hidden;
+}
+
+.list-search .form-control {
+  border: none;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  box-shadow: none;
+  background-color: transparent;
+  color: var(--bs-body-color);
+}
+
+.list-search .input-group-append {
+  display: flex;
+  margin-left: 0 !important;
+}
+
+.list-search .btn.btn-icon {
+  border: none;
+  border-left: 1px solid var(--bs-border-color);
+  border-radius: 0;
 }
 
 .signature-clear,
@@ -108,10 +151,22 @@
   white-space: nowrap;
 }
 
-.signature-active-card {
-  flex: 0 1 320px;
-  min-width: 260px;
+.signature-active-summary {
+  flex: 0 0 auto;
   margin: 0 0 0 auto;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.signature-active-summary .signature-active-value {
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.signature-active-summary .signature-active-label,
+.signature-active-summary .signature-active-period {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 991.98px) {
@@ -125,8 +180,9 @@
     max-width: 100%;
   }
 
-  .signature-active-card {
-    flex: 1 1 320px;
+  .signature-active-summary {
+    margin-left: auto;
+    text-align: right;
   }
 }
 
@@ -143,30 +199,10 @@
     align-self: flex-start;
   }
 
-  .signature-active-card {
-    width: 100%;
-    min-width: 0;
+  .signature-active-summary {
     margin-left: 0;
-    flex: 0 0 auto;
-  }
-
-  .signature-active-card .card-body {
-    padding: 0.75rem;
-  }
-
-  .signature-active-card .avatar-lg {
-    width: 48px;
-    height: 48px;
-  }
-
-  .signature-active-card .avatar-title {
-    font-size: 22px !important;
-  }
-
-  .signature-active-card h3 {
-    font-size: 1.25rem;
-    margin-top: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
+    text-align: left;
+    width: 100%;
   }
 }
 

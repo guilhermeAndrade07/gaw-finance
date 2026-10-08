@@ -293,6 +293,24 @@ class SecurityHeadersTests(TestCase):
         self.assertNotContains(response, 'https://cdn.jsdelivr.net')
 
 
+class DashboardCurrentDateTests(TestCase):
+    def test_dashboard_shows_current_date_right_of_bank_selector(self):
+        from django.utils import timezone
+        from django.utils.formats import date_format
+
+        user = User.objects.create_user(username='date-user', password='pass123')
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['today'], timezone.localdate())
+
+        html = response.content.decode()
+        self.assertNotIn('{{ today|date:', html)
+        self.assertIn(date_format(timezone.localdate(), 'D d/m/Y'), html)
+
+
 class ReadinessCheckTests(TestCase):
     def test_readiness_check_returns_ok_when_dependencies_are_ready(self):
         from unittest import mock

@@ -130,10 +130,14 @@ gaw-finance/
 ├── categories/       # Categorias
 ├── inflows/          # Entradas
 ├── outflows/         # Saidas
+├── transfers/        # Transferencias entre bancos
 ├── payment/          # Cartao de credito
 ├── signatures/       # Assinaturas recorrentes
+├── goals/            # Metas de gasto mensal
 ├── investments/      # Investimentos
 ├── reports/          # Relatorios PDF
+├── integrations/     # WhatsApp via Evolution API
+├── auditing/         # Registros de auditoria
 ├── traefik/          # Config do Traefik
 ├── scripts/          # deploy.sh, backup.sh
 ├── docs/             # Documentacao MKDocs

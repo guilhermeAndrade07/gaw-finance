@@ -39,6 +39,13 @@ Todos os endpoints exigem autenticacao JWT (`Authorization: Bearer <token>`).
 | `/api/v1/categories/` | GET, POST | Lista / Cria |
 | `/api/v1/categories/<id>/` | GET, PUT, PATCH, DELETE | CRUD |
 
+### Goals
+
+| Endpoint | Metodo | Descricao |
+|---|---|---|
+| `/api/v1/goals/` | GET, POST | Lista / Cria meta mensal |
+| `/api/v1/goals/<id>/` | GET, PUT, PATCH, DELETE | CRUD da meta |
+
 ### Inflows
 
 | Endpoint | Metodo | Descricao |

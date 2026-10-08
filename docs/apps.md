@@ -17,6 +17,7 @@ graph LR
     Investments[investments]
     Reports[reports]
     Integrations[integrations]
+    Goals[goals]
 
     App --> Accounts
     App --> Auth
@@ -30,6 +31,7 @@ graph LR
     App --> Investments
     App --> Reports
     App --> Integrations
+    App --> Goals
 ```
 
 ## app
@@ -40,7 +42,7 @@ Configuracoes globais do projeto.
 |---|---|
 | `settings.py` | Settings com django-environ |
 | `urls.py` | URLconf raiz |
-| `views.py` | Dashboard + healthcheck + AJAX expenses |
+| `views.py` | Dashboard (com data atual) + healthcheck + AJAX expenses |
 | `celery.py` | Celery app instance |
 | `tasks.py` | Tasks compartilhadas |
 | `metrics.py` | Funcoes de metricas financeiras |
@@ -108,6 +110,17 @@ Transferencias internas entre bancos, sem criacao de entrada ou saida.
 - **Views**: 3 CBVs + 2 DRF generics
 - **Regra**: somente criacao e consulta; o valor debita a origem e credita o destino.
 
+## goals
+
+Metas de gasto mensal por categoria com acompanhamento de progresso.
+
+- **Modelo**: `MonthlyGoal` (user FK, category FK opcional, value, month, year)
+- **Regras de unicidade**: 1 meta por (user, categoria, mes, ano); quando `category` e nula, 1 meta geral por (user, mes, ano) — `UniqueConstraint` condicionais no `Meta`
+- **Checks**: valor > 0 e ano entre 2000 e 2100 (`CheckConstraint`)
+- **Views**: 5 CBVs (list, create, update, delete, dashboard) + 2 DRF generics + AJAX `/api/goal-progress/`
+- **Dashboard**: grafico de progresso preenchido via `json_script` + `goal_dashboard.js` (cores theme-aware)
+- **Forms**: `MonthlyGoalForm` valida duplicidade e valor positivo, com contexto de categoria scopada por usuario
+
 ## payment
 
 Cartoes de credito e compras parceladas.
@@ -151,7 +164,7 @@ Integracao com WhatsApp via Evolution API com interpretacao por LLM.
 **Fluxo**: WhatsApp -> Evolution API -> Webhook `/api/v1/whatsapp/webhook/` -> Task Celery -> LLM interpreta -> services (outflows/inflows/reports) -> resposta via Evolution API.
 
 - **Modelos**: `WhatsAppBinding` (user, phone E.164, is_active — cadastrado no Admin), `WhatsAppMessageLog` (message_id unico para idempotencia, raw_body, intent, status, resposta)
-- **Webhook**: valida `X-Webhook-Secret`, ignora numeros nao vinculados e mensagens duplicadas
+- **Webhook**: valida `X-Webhook-Secret`, ignora numeros nao vinculados e mensagens duplicadas; extrai o numero por `remoteJidAlt`/`remoteJid`, exigindo phone numerico com ate 20 digitos (jids invalidos sao ignorados com log de aviso)
 - **LLM**: providers `opencode` e `openai` (endpoints compatíveis com API OpenAI), configurados via `LLM_PROVIDER`/`LLM_API_KEY`/`LLM_BASE_URL`/`LLM_MODEL`
 - **Resolvers**: busca fuzzy de `Bank` e `Category` por nome, sempre escopada no usuario
 - **Handlers**: registra despesas (`register_outflow`), receitas (`register_inflow`) e responde consultas (gastos do mes, por categoria, saldo de banco, ultimas despesas)

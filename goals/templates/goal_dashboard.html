@@ -120,15 +120,7 @@
 
 {% block scripts %}
 {% load static %}
-<script id="goal-dashboard-data" type="application/json">
-{
-  "labels": {{ goals_progress.labels }},
-  "percentages": {{ goals_progress.percentages }},
-  "spent": {{ goals_progress.spent }},
-  "goals": {{ goals_progress.goals }},
-  "goal_ids": {{ goals_progress.goal_ids }}
-}
-</script>
+{{ goals_data|json_script:"goal-dashboard-data" }}
 <script src="{% static 'app/vendor/chartjs/chart.umd.min.js' %}"></script>
-<script src="{% static 'app/js/goal_dashboard.js' %}?v=20260925a"></script>
+<script src="{% static 'app/js/goal_dashboard.js' %}?v=20261008a"></script>
 {% endblock %}

@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<div class="row mt-3 mb-2">
+<div class="row mt-3 mb-2 align-items-center">
   <div class="col-md-4">
     <select class="form-select" id="bankSelector" aria-label="Selecionar banco">
       <option value="">Todos os Bancos</option>
@@ -22,6 +22,9 @@
         <option value="{{ bank.id }}" {% if selected_bank_id == bank.id|stringformat:"s" %}selected{% endif %}>{{ bank.name }}</option>
       {% endfor %}
     </select>
+  </div>
+  <div class="col-md-8 mt-2 mt-md-0 text-start text-md-end">
+    <span class="text-muted fw-medium">{{ today|date:"D d/m/Y" }}</span>
   </div>
 </div>
 
@@ -255,4 +258,4 @@
 
 {{ dashboard_data|json_script:"dashboard-data" }}
 <script src="{% static 'app/vendor/chartjs/chart.umd.min.js' %}"></script>
-<script src="{% static 'app/js/dashboard.js' %}?v=20260925a"></script>
+<script src="{% static 'app/js/dashboard.js' %}?v=20261008a"></script>

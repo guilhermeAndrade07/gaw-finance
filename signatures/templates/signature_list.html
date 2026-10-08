@@ -20,7 +20,7 @@
 
 <div class="signature-toolbar mt-3 mb-3">
   <form method="get" action="{% url 'signature_list' %}" class="signature-filter">
-    <div class="app-search">
+    <div class="app-search list-search">
       <div class="app-search-box">
         <div class="input-group">
           <input type="text" class="form-control" name="name" placeholder="Buscar assinatura..." value="{{ request.GET.name }}">
@@ -39,19 +39,10 @@
     <i data-lucide="plus" class="font-16 me-1"></i> Nova Assinatura
   </a>
 
-  <div class="card signature-active-card">
-    <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div class="avatar-lg rounded-circle bg-info widget-two-icon align-self-center">
-          <i class="mdi mdi-calendar-check avatar-title font-30 text-white"></i>
-        </div>
-        <div class="wigdet-two-content media-body text-end text-truncate">
-          <p class="m-0 text-uppercase fw-medium text-truncate" title="Assinaturas Ativas">Assinaturas Ativas</p>
-          <h3 class="fw-medium my-2">R$ {{ total_signatures_value|floatformat:"2g" }}</h3>
-          <p class="m-0">Mensal</p>
-        </div>
-      </div>
-    </div>
+  <div class="signature-active-summary">
+    <p class="m-0 text-uppercase fw-medium signature-active-label" title="Assinaturas Ativas">Assinaturas Ativas</p>
+    <h3 class="fw-bold my-1 signature-active-value">R$ {{ total_signatures_value|floatformat:"2g" }}</h3>
+    <p class="m-0 signature-active-period">Mensal</p>
   </div>
 </div>
 

@@ -63,8 +63,12 @@ def _extract_message(payload):
         return None
 
     message_id = key.get('id')
-    phone = (key.get('remoteJid') or '').split('@')[0]
-    if not message_id or not phone:
+    jid = key.get('remoteJidAlt') or key.get('remoteJid') or ''
+    phone = jid.split('@')[0]
+    if not message_id or not phone or phone.isdigit() is False:
+        return None
+    if len(phone) > 20:
+        logger.warning('WhatsApp: jid muito longo ignorado. remoteJid=%s remoteJidAlt=%s', key.get('remoteJid'), key.get('remoteJidAlt'))
         return None
 
     return {

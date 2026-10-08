@@ -104,7 +104,13 @@ class MonthlyGoalDashboardView(LoginRequiredMixin, ListView):
         month, year = self._resolve_period()
         progress = metrics.get_goal_progress(self.request.user, month, year)
         context.update({
-            'goals_progress': progress,
+            'goals_data': {
+                'labels': json.loads(progress['labels']),
+                'percentages': json.loads(progress['percentages']),
+                'spent': json.loads(progress['spent']),
+                'goals': json.loads(progress['goals']),
+                'goal_ids': json.loads(progress['goal_ids']),
+            },
             'months_list': metrics.get_months_list(),
             'selected_month': month,
             'selected_year': year,
