@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
 
 class Bank(models.Model):
@@ -14,11 +14,20 @@ class Bank(models.Model):
     account = models.IntegerField()
     initial_balance = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    is_main = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['-is_main', 'name']
+        constraints = [
+            # Garante no maximo um banco principal por usuario (ignora registros orfaos)
+            models.UniqueConstraint(
+                fields=['user'],
+                condition=Q(is_main=True),
+                name='unique_main_bank_per_user',
+            ),
+        ]
 
     def __str__(self):
         return self.name

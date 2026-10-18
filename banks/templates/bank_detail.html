@@ -19,8 +19,23 @@
 </div>
 
 <div class="card mt-3">
-  <div class="card-header">
-    <h4 class="header-title">{{ object.name }}</h4>
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h4 class="header-title mb-0">
+      {{ object.name }}
+      {% if object.is_main %}
+      <span class="badge bg-success rounded-pill align-middle ms-2" title="Banco principal">
+        <i class="mdi mdi-star me-1"></i>Principal
+      </span>
+      {% endif %}
+    </h4>
+    {% if not object.is_main %}
+    <form method="post" action="{% url 'bank_set_main' object.id %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-light text-warning" title="Definir como principal">
+        <i class="mdi mdi-star-outline me-1"></i> Definir como principal
+      </button>
+    </form>
+    {% endif %}
   </div>
   <div class="card-body">
     <div class="row">

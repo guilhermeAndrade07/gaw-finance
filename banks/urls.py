@@ -8,6 +8,7 @@ urlpatterns = [
     path('banks/<int:pk>/detail/', views.BankDetailView.as_view(), name='bank_detail'),
     path('banks/<int:pk>/update/', views.BankUpdateView.as_view(), name='bank_update'),
     path('banks/<int:pk>/delete/', views.BankDeleteView.as_view(), name='bank_delete'),
+    path('banks/<int:pk>/set-main/', views.bank_set_main, name='bank_set_main'),
 
     path('api/v1/banks/', views.BankCreateListAPIView.as_view(), name='bank-create-list-api-view'),
     path('api/v1/banks/<int:pk>/', views.BankRetriveUpdateDestroyAPIView.as_view(), name='bank-detail-api-view'),

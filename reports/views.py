@@ -55,3 +55,22 @@ class CustomReportView(LoginRequiredMixin, View):
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="relatorio_personalizado.pdf"'
         return response
+
+
+class InvestmentsReportView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def get(self, request):
+        buffer = services.generate_investments_report(request.user)
+        report = GeneratedReport.objects.create(user=request.user, report_type='investments')
+        record_audit_event(
+            action=actions.REPORT_GENERATE,
+            user=request.user,
+            resource_type='GeneratedReport',
+            resource_id=report.pk,
+            description='Relatorio de investimentos gerado.',
+            metadata={'report_type': 'investments'},
+        )
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="relatorio_investimentos.pdf"'
+        return response

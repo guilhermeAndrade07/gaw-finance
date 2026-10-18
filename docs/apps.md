@@ -133,8 +133,8 @@ Cartoes de credito e compras parceladas.
 
 Assinaturas recorrentes mensais.
 
-- **Modelo**: `Signature` (user, bank, category, name, value, billing_day, is_active)
-- **Service**: `generate_signature_outflows()` - geracao mensal de cobrancas
+- **Modelos**: `Signature` (user, credit_card, category, name, value, billing_day, is_active), `SignatureCharge` (assinatura + Payment de referencia mensal)
+- **Service**: `generate_signature_charges()` - geracao mensal automatica de cobrancas no cartao (idempotente, via Celery Beat a cada hora)
 - **Views**: 5 CBVs + 1 cancel View + 2 DRF generics
 
 ## investments
@@ -153,9 +153,19 @@ Relatorios financeiros em PDF usando ReportLab.
 |---|---|---|
 | `reports/` | `ReportListView` | Pagina de listagem |
 | `reports/custom/` | `CustomReportView` | Relatorio Personalizado (PDF) |
+| `reports/investments/` | `InvestmentsReportView` | Relatorio de Investimentos (PDF) |
 
-- **Modelo**: `GeneratedReport` (rastreia relatorios gerados)
-- **Services**: `generate_custom_report()` (blocos: summary, inflows, outflows, by_category, investments)
+- **Modelo**: `GeneratedReport` (tipos: custom, investments)
+- **Services**: `generate_custom_report()` (blocos: summary, inflows, outflows, by_category, investments, credit_card), `generate_investments_report()`
+
+## banks
+
+Contas bancarias com saldo controlado.
+
+- **Modelo**: `Bank` (user, name, account_type, agency, account, initial_balance, balance, is_main)
+- **Banco principal**: flag `is_main` com constraint de unicidade por usuario (`unique_main_bank_per_user`); ordenacao `[-is_main, name]` propaga para listas, selects e dashboard
+- **Service**: `set_main_bank()` (transacional com lock) e `ensure_main_bank()` (promove o primeiro banco do usuario)
+- **Rota**: `banks/<pk>/set-main/` (POST) - define o banco como principal
 
 ## integrations
 

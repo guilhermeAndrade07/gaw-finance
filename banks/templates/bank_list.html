@@ -59,12 +59,33 @@
         <tbody>
           {% for bank in banks %}
           <tr>
-            <td><h5 class="m-0 fw-medium">{{ bank.name }}</h5></td>
+            <td>
+              <h5 class="m-0 fw-medium">
+                {{ bank.name }}
+                {% if bank.is_main %}
+                <span class="badge bg-success rounded-pill align-middle ms-1" title="Banco principal">
+                  <i class="mdi mdi-star me-1"></i>Principal
+                </span>
+                {% endif %}
+              </h5>
+            </td>
             <td>{{ bank.account_type }}</td>
             <td>{{ bank.agency }}</td>
             <td>{{ bank.account }}</td>
             <td>R$ {{ bank.current_balance|floatformat:"2g" }}</td>
             <td>
+              {% if bank.is_main %}
+              <span class="table-action-btn text-success" title="Banco principal" aria-label="Banco principal">
+                <i class="mdi mdi-star"></i>
+              </span>
+              {% else %}
+              <form method="post" action="{% url 'bank_set_main' bank.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="table-action-btn text-warning border-0 bg-transparent" title="Definir como principal" aria-label="Definir como principal">
+                  <i class="mdi mdi-star-outline"></i>
+                </button>
+              </form>
+              {% endif %}
               <a href="{% url 'bank_detail' bank.id %}" class="table-action-btn" title="Visualizar">
                 <i class="mdi mdi-eye"></i>
               </a>

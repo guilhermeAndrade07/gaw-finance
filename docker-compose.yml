@@ -91,6 +91,30 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  celery_beat:
+    build: .
+    entrypoint: ["./entrypoint-celery.sh"]
+    command: ["celery", "-A", "app", "beat", "-l", "info"]
+    env_file: .env
+    environment:
+      - DJANGO_ENV=dev
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/gaw_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=amqp://gaw_app:gaw_dev@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - EVOLUTION_API_URL=http://evolution-api:8080
+      - ALLOWED_HOSTS=localhost,127.0.0.1,app,192.168.15.75
+    volumes:
+      - media_data:/gaw-finance/media
+      - static_data:/gaw-finance/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
   evolution-api:
     image: evoapicloud/evolution-api:latest
     env_file: .env

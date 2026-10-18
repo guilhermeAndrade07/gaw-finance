@@ -4,6 +4,7 @@ from django.db import models
 class GeneratedReport(models.Model):
     REPORT_TYPES = [
         ('custom', 'Personalizado'),
+        ('investments', 'Investimentos'),
     ]
 
     user = models.ForeignKey(

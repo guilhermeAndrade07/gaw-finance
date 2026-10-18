@@ -19,7 +19,7 @@
     <select class="form-select" id="bankSelector" aria-label="Selecionar banco">
       <option value="">Todos os Bancos</option>
       {% for bank in banks %}
-        <option value="{{ bank.id }}" {% if selected_bank_id == bank.id|stringformat:"s" %}selected{% endif %}>{{ bank.name }}</option>
+        <option value="{{ bank.id }}" {% if selected_bank_id == bank.id|stringformat:"s" %}selected{% endif %}>{{ bank.name }}{% if bank.is_main %} ★ (Principal){% endif %}</option>
       {% endfor %}
     </select>
   </div>

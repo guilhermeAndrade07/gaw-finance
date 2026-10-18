@@ -11,13 +11,14 @@ class BankForm(forms.ModelForm):
 
     class Meta:
         model = models.Bank
-        fields = ['name', 'account_type', 'agency', 'account', 'initial_balance']
+        fields = ['name', 'account_type', 'agency', 'account', 'initial_balance', 'is_main']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'account_type': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
             'agency': forms.NumberInput(attrs={'class': 'form-control'}),
             'account': forms.NumberInput(attrs={'class': 'form-control'}),
             'initial_balance': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'is_main': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
             'name': 'Nome',
@@ -25,4 +26,5 @@ class BankForm(forms.ModelForm):
             'agency': 'Agência',
             'account': 'Conta',
             'initial_balance': 'Saldo Inicial',
+            'is_main': 'Definir como banco principal',
         }

@@ -15,12 +15,14 @@ from reportlab.platypus import (
 
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.db.models import Sum
 from xml.sax.saxutils import escape
 
 from inflows.models import Inflow
 from outflows.models import Outflow
 from investments.models import InvestmentAsset
 from categories.models import Category
+from payment.models import CreditCard, Payment
 from reportlab.lib.enums import TA_LEFT
 
 STYLE_TITLE = ParagraphStyle(
@@ -67,7 +69,7 @@ TABLE_STYLE = TableStyle([
     ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
 ])
 
-VALID_SECTIONS = ['summary', 'inflows', 'outflows', 'by_category', 'investments']
+VALID_SECTIONS = ['summary', 'inflows', 'outflows', 'by_category', 'investments', 'credit_card']
 
 
 def _fmt(value):
@@ -263,12 +265,118 @@ def _build_investments_block(story, user):
     story.append(asset_table)
 
 
+def _build_credit_card_block(story, user, month, year):
+    cards = CreditCard.objects.filter(user=user).select_related('bank')
+
+    story.append(Paragraph('Cartões de Crédito - Resumo', STYLE_SECTION))
+    card_data = [
+        [
+            _cell('Cartão'),
+            _cell('Banco'),
+            _cell('Limite'),
+            _cell('Utilizado'),
+            _cell('Disponível'),
+            _cell('Status'),
+        ]
+    ]
+
+    total_limit = Decimal('0')
+    total_used = Decimal('0')
+
+    for card in cards:
+        unpaid = Payment.objects.filter(card=card, paid=False).aggregate(
+            total=Sum('value')
+        )['total'] or Decimal('0')
+        available = card.credit_limit - unpaid
+        total_limit += card.credit_limit
+        total_used += unpaid
+
+        card_data.append([
+            _cell(_truncate(card.name)),
+            _cell(card.bank.name),
+            _cell(_fmt(card.credit_limit)),
+            _cell(_fmt(unpaid)),
+            _cell(_fmt(available)),
+            _cell('Ativo' if card.active else 'Inativo'),
+        ])
+
+    if len(card_data) == 1:
+        card_data.append([
+            _cell('Nenhum cartão encontrado'),
+            _cell('-'), _cell('-'), _cell('-'), _cell('-'), _cell('-'),
+        ])
+    else:
+        card_data.append([
+            _cell('TOTAL'),
+            _cell(''),
+            _cell(_fmt(total_limit)),
+            _cell(_fmt(total_used)),
+            _cell(_fmt(total_limit - total_used)),
+            _cell(''),
+        ])
+
+    card_table = Table(card_data, colWidths=[4 * cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm, 2 * cm])
+    card_table.setStyle(TABLE_STYLE)
+    card_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#d4edda')),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+    ]))
+    story.append(card_table)
+    story.append(Spacer(1, 0.8 * cm))
+
+    payments_qs, _ = _period_filter(Payment.objects.filter(user=user).select_related('card'), month, year)
+
+    story.append(Paragraph('Compras no Cartão - Período', STYLE_SECTION))
+    payment_data = [
+        [
+            _cell('Data'),
+            _cell('Compra'),
+            _cell('Cartão'),
+            _cell('Parcelas'),
+            _cell('Valor'),
+        ]
+    ]
+
+    period_total = Decimal('0')
+    for payment in payments_qs:
+        period_total += payment.value
+        payment_data.append([
+            _cell(date_format(payment.date_payment, 'd/m/Y')),
+            _cell(_truncate(payment.name)),
+            _cell(_truncate(str(payment.card) if payment.card else '-')),
+            _cell(payment.parcelas_display),
+            _cell(_fmt(payment.value)),
+        ])
+
+    if len(payment_data) == 1:
+        payment_data.append([
+            _cell('Nenhuma compra encontrada'),
+            _cell('-'), _cell('-'), _cell('-'), _cell('-'),
+        ])
+    else:
+        payment_data.append([
+            _cell('TOTAL'),
+            _cell(''), _cell(''), _cell(''),
+            _cell(_fmt(period_total)),
+        ])
+
+    payment_table = Table(payment_data, colWidths=[2.5 * cm, 6.5 * cm, 3.5 * cm, 2 * cm, 2.5 * cm])
+    payment_table.setStyle(TABLE_STYLE)
+    payment_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#d4edda')),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+    ]))
+    story.append(payment_table)
+    story.append(Spacer(1, 0.8 * cm))
+
+
 SECTION_BUILDERS = {
     'summary': _build_summary_block,
     'inflows': _build_inflows_block,
     'outflows': _build_outflows_block,
     'by_category': _build_by_category_block,
     'investments': _build_investments_block,
+    'credit_card': _build_credit_card_block,
 }
 
 
@@ -298,6 +406,20 @@ def generate_custom_report(user, sections=None, month=None, year=None):
             builder(story, user)
         else:
             builder(story, user, month, year)
+
+    doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
+    buffer.seek(0)
+    return buffer
+
+
+def generate_investments_report(user):
+    """Gera o relatorio dedicado de investimentos (carteira completa)."""
+    buffer = BytesIO()
+    doc = _build_doc(buffer, 'Relatório de Investimentos')
+    story = []
+
+    _header(story, 'Relatório de Investimentos', user.username)
+    _build_investments_block(story, user)
 
     doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
     buffer.seek(0)

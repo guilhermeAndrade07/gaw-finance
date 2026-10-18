@@ -85,6 +85,12 @@
                 <label class="form-check-label" for="sec-investments">Investimentos</label>
               </div>
             </div>
+            <div class="col-md-6 mb-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sections" value="credit_card" id="sec-credit-card">
+                <label class="form-check-label" for="sec-credit-card">Cartão de Crédito</label>
+              </div>
+            </div>
           </div>
 
           <div class="text-center">
@@ -93,6 +99,29 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar-md rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center">
+              <i data-lucide="trending-up" class="font-24 text-success"></i>
+            </div>
+            <div>
+              <h5 class="fw-semibold mb-1">Relatório de Investimentos</h5>
+              <p class="text-muted font-13 mb-0">Carteira completa: ativos, tipo, instituição e valores.</p>
+            </div>
+          </div>
+          <a href="{% url 'report_investments' %}" class="btn btn-success">
+            <i data-lucide="download" class="font-16 me-1"></i> Baixar PDF
+          </a>
+        </div>
       </div>
     </div>
   </div>
