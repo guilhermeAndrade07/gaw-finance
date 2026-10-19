@@ -79,19 +79,19 @@
             <td>
               <div class="d-flex gap-1">
                 <a href="{% url 'signature_detail' signature.id %}" class="table-action-btn" title="Visualizar">
-                  <i class="mdi mdi-eye"></i>
+                  <iconify-icon icon="mdi:eye"></iconify-icon>
                 </a>
                 <a href="{% url 'signature_update' signature.id %}" class="table-action-btn" title="Editar">
-                  <i class="mdi mdi-pencil"></i>
+                  <iconify-icon icon="mdi:pencil"></iconify-icon>
                 </a>
                 <a href="{% url 'signature_delete' signature.id %}" class="table-action-btn" title="Excluir">
-                  <i class="mdi mdi-close"></i>
+                  <iconify-icon icon="mdi:close"></iconify-icon>
                 </a>
                 {% if signature.is_active %}
                 <form action="{% url 'signature_cancel' signature.id %}" method="post" style="display: inline;">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-ghost-danger rounded-circle btn-sm btn-icon" title="Cancelar Assinatura">
-                    <i class="mdi mdi-close-circle font-16"></i>
+                    <iconify-icon icon="mdi:close-circle" class="font-16"></iconify-icon>
                   </button>
                 </form>
                 {% endif %}

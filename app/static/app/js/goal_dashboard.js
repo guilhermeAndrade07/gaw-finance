@@ -206,16 +206,16 @@
             updateLink.href = `/goals/${encodeURIComponent(goalId)}/update/`;
             updateLink.className = 'table-action-btn';
             updateLink.title = 'Editar';
-            const updateIcon = document.createElement('i');
-            updateIcon.className = 'mdi mdi-pencil';
+            const updateIcon = document.createElement('iconify-icon');
+            updateIcon.setAttribute('icon', 'mdi:pencil');
             updateLink.appendChild(updateIcon);
 
             const deleteLink = document.createElement('a');
             deleteLink.href = `/goals/${encodeURIComponent(goalId)}/delete/`;
             deleteLink.className = 'table-action-btn';
             deleteLink.title = 'Excluir';
-            const deleteIcon = document.createElement('i');
-            deleteIcon.className = 'mdi mdi-close';
+            const deleteIcon = document.createElement('iconify-icon');
+            deleteIcon.setAttribute('icon', 'mdi:close');
             deleteLink.appendChild(deleteIcon);
 
             actionsCell.append(updateLink, deleteLink);

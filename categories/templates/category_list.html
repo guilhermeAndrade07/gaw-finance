@@ -60,13 +60,13 @@
             <td>{{ category.description }}</td>
             <td>
               <a href="{% url 'category_detail' category.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
+                <iconify-icon icon="mdi:eye"></iconify-icon>
               </a>
               <a href="{% url 'category_update' category.id %}" class="table-action-btn" title="Editar">
-                <i class="mdi mdi-pencil"></i>
+                <iconify-icon icon="mdi:pencil"></iconify-icon>
               </a>
               <a href="{% url 'category_delete' category.id %}" class="table-action-btn" title="Excluir">
-                <i class="mdi mdi-close"></i>
+                <iconify-icon icon="mdi:close"></iconify-icon>
               </a>
             </td>
           </tr>

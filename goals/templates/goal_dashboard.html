@@ -98,10 +98,10 @@
             </td>
             <td>
               <a href="{% url 'goal_update' goal.id %}" class="table-action-btn" title="Editar">
-                <i class="mdi mdi-pencil"></i>
+                <iconify-icon icon="mdi:pencil"></iconify-icon>
               </a>
               <a href="{% url 'goal_delete' goal.id %}" class="table-action-btn" title="Excluir">
-                <i class="mdi mdi-close"></i>
+                <iconify-icon icon="mdi:close"></iconify-icon>
               </a>
             </td>
           </tr>
@@ -122,5 +122,5 @@
 {% load static %}
 {{ goals_data|json_script:"goal-dashboard-data" }}
 <script src="{% static 'app/vendor/chartjs/chart.umd.min.js' %}"></script>
-<script src="{% static 'app/js/goal_dashboard.js' %}?v=20261008a"></script>
+<script src="{% static 'app/js/goal_dashboard.js' %}?v=20261019-1"></script>
 {% endblock %}

@@ -38,7 +38,7 @@
   <div class="col-sm-6 text-sm-end">
     <div class="d-flex gap-2 justify-content-sm-end">
       <a href="{% url 'payment_list' %}" class="btn btn-light">
-        <i class="mdi mdi-arrow-left me-1"></i> Compras
+        <iconify-icon icon="mdi:arrow-left" class="me-1"></iconify-icon> Compras
       </a>
       <a href="{% url 'credit_card_create' %}" class="btn btn-success">
         <i data-lucide="plus" class="font-16 me-1"></i> Novo Cartão
@@ -73,13 +73,13 @@
             <td>{% if card.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Nao</span>{% endif %}</td>
             <td>
               <a href="{% url 'credit_card_detail' card.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
+                <iconify-icon icon="mdi:eye"></iconify-icon>
               </a>
               <a href="{% url 'credit_card_update' card.id %}" class="table-action-btn" title="Editar">
-                <i class="mdi mdi-pencil"></i>
+                <iconify-icon icon="mdi:pencil"></iconify-icon>
               </a>
               <a href="{% url 'credit_card_delete' card.id %}" class="table-action-btn" title="Excluir">
-                <i class="mdi mdi-close"></i>
+                <iconify-icon icon="mdi:close"></iconify-icon>
               </a>
             </td>
           </tr>

@@ -24,7 +24,7 @@
       {{ object.name }}
       {% if object.is_main %}
       <span class="badge bg-success rounded-pill align-middle ms-2" title="Banco principal">
-        <i class="mdi mdi-star me-1"></i>Principal
+        <iconify-icon icon="mdi:star" class="me-1"></iconify-icon>Principal
       </span>
       {% endif %}
     </h4>
@@ -32,7 +32,7 @@
     <form method="post" action="{% url 'bank_set_main' object.id %}" class="d-inline">
       {% csrf_token %}
       <button type="submit" class="btn btn-sm btn-light text-warning" title="Definir como principal">
-        <i class="mdi mdi-star-outline me-1"></i> Definir como principal
+        <iconify-icon icon="mdi:star-outline" class="me-1"></iconify-icon> Definir como principal
       </button>
     </form>
     {% endif %}

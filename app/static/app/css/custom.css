@@ -51,6 +51,12 @@
   }
 }
 
+.sidenav-menu .brand-text {
+  color: var(--bs-primary);
+  font-family: 'Kalam', cursive;
+  font-weight: 700;
+}
+
 .signature-toolbar {
   display: flex;
   align-items: center;

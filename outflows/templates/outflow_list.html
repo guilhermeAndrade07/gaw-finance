@@ -63,7 +63,7 @@
       <div class="col-12 col-lg-5 outflow-actions">
         <div class="outflow-inline-actions d-flex gap-2">
           <button type="submit" class="btn btn-primary">
-            <i class="mdi mdi-filter me-1"></i> Filtrar
+            <iconify-icon icon="mdi:filter" class="me-1"></iconify-icon> Filtrar
           </button>
           <a href="{% url 'outflow_list' %}" class="btn btn-light">Limpar</a>
           <a href="{% url 'outflow_create' %}" class="btn btn-danger">
@@ -102,7 +102,7 @@
             <td>{{ outflow.created_at|date:"d/m/Y H:i" }}</td>
             <td>
               <a href="{% url 'outflow_detail' outflow.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
+                <iconify-icon icon="mdi:eye"></iconify-icon>
               </a>
             </td>
           </tr>

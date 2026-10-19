@@ -58,7 +58,7 @@
         class="btn btn-success js-invoice-pay-btn"
         data-invoice-id="{{ object.id }}"
       >
-        <i class="mdi mdi-check-circle me-1"></i> Marcar como Paga
+        <iconify-icon icon="mdi:check-circle" class="me-1"></iconify-icon> Marcar como Paga
       </button>
     {% endif %}
   </div>
@@ -78,7 +78,7 @@
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Data</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">AÃƒÂ§ÃƒÂµes</span></th>
           </tr>
         </thead>
         <tbody>
@@ -91,10 +91,10 @@
             <td>{{ pay.parcelas_display }}</td>
             <td>
               <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
+                <iconify-icon icon="mdi:eye"></iconify-icon>
               </a>
               <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
-                <i class="mdi mdi-pencil"></i>
+                <iconify-icon icon="mdi:pencil"></iconify-icon>
               </a>
             </td>
           </tr>
@@ -110,6 +110,6 @@
 </div>
 
 {% load static %}
-<script src="{% static 'app/js/payment_actions.js' %}?v=20260925a"></script>
+<script src="{% static 'app/js/payment_actions.js' %}?v=20261019-1"></script>
 
 {% endblock %}

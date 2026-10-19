@@ -102,10 +102,10 @@
         if (!targetElement) return;
 
         targetElement.addEventListener('show.bs.collapse', () => {
-            chevron.classList.replace('mdi-chevron-right', 'mdi-chevron-down');
+            chevron.setAttribute('icon', 'mdi:chevron-down');
         });
         targetElement.addEventListener('hide.bs.collapse', () => {
-            chevron.classList.replace('mdi-chevron-down', 'mdi-chevron-right');
+            chevron.setAttribute('icon', 'mdi:chevron-right');
         });
     });
 })();

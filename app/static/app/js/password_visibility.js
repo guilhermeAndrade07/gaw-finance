@@ -7,8 +7,7 @@
     toggle.addEventListener('click', function () {
         var isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
-        icon.classList.toggle('mdi-eye-outline', isPassword);
-        icon.classList.toggle('mdi-eye-off-outline', !isPassword);
+        icon.setAttribute('icon', isPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline');
         toggle.setAttribute('aria-pressed', String(isPassword));
         toggle.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
         input.focus();

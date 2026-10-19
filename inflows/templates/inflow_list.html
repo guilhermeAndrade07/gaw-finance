@@ -54,7 +54,7 @@
 
       <div class="col-12 col-lg-5 inflow-actions d-flex gap-2">
         <button type="submit" class="btn btn-primary">
-          <i class="mdi mdi-filter me-1"></i> Filtrar
+          <iconify-icon icon="mdi:filter" class="me-1"></iconify-icon> Filtrar
         </button>
         <a href="{% url 'inflow_list' %}" class="btn btn-light">Limpar</a>
         <a href="{% url 'inflow_create' %}" class="btn btn-success ms-lg-auto">
@@ -87,7 +87,7 @@
             <td>{{ inflow.created_at|date:"d/m/Y H:i" }}</td>
             <td>
               <a href="{% url 'inflow_detail' inflow.id %}" class="table-action-btn" title="Visualizar">
-                <i class="mdi mdi-eye"></i>
+                <iconify-icon icon="mdi:eye"></iconify-icon>
               </a>
             </td>
           </tr>

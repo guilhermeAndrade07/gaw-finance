@@ -4,12 +4,12 @@
       <a href="{% url 'dashboard' %}" class="logo">
         <span class="logo-lg">
           <span class="brand-text fw-bold fs-4">
-            <i class="mdi mdi-bank font-22 me-1"></i>GAW Finance
+            <iconify-icon icon="mdi:bank" class="font-22 me-1"></iconify-icon>GAW Finance
           </span>
         </span>
         <span class="logo-sm">
           <span class="brand-text fw-bold fs-5">
-            <i class="mdi mdi-bank font-22"></i>
+            <iconify-icon icon="mdi:bank" class="font-22"></iconify-icon>
           </span>
         </span>
       </a>
@@ -29,7 +29,7 @@
           <a class="topbar-link dropdown-toggle drop-arrow-none px-0" data-bs-toggle="dropdown" type="button">
             <span class="avatar avatar-sm">
               <span class="avatar-title bg-primary rounded-circle">
-                <i class="mdi mdi-account font-20 text-white"></i>
+                <iconify-icon icon="mdi:account" class="font-20 text-white"></iconify-icon>
               </span>
             </span>
             <span class="d-lg-flex flex-column gap-1 d-none">
@@ -42,14 +42,14 @@
               <h6 class="text-overflow m-0">Bem-vindo!</h6>
             </div>
             <a href="{% url 'dashboard' %}" class="dropdown-item">
-              <i class="mdi mdi-chart-line me-1 font-17 align-middle"></i>
+              <iconify-icon icon="mdi:chart-line" class="me-1 font-17 align-middle"></iconify-icon>
               <span class="align-middle">Dashboard</span>
             </a>
             <div class="dropdown-divider"></div>
             <form action="{% url 'logout' %}" method="post" id="logout-form">
               {% csrf_token %}
               <button type="submit" class="dropdown-item fw-semibold text-danger border-0 bg-transparent w-100 text-start">
-                <i class="mdi mdi-logout me-1 font-17 align-middle"></i>
+                <iconify-icon icon="mdi:logout" class="me-1 font-17 align-middle"></iconify-icon>
                 <span class="align-middle">Sair</span>
               </button>
             </form>

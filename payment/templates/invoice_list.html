@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}GAW Finance - Cartão de Crédito{% endblock %}
+{% block title %}GAW Finance - CartÃƒÂ£o de CrÃƒÂ©dito{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">Cartão de Crédito</h4>
+      <h4 class="font-18 fw-semibold mb-0">CartÃƒÂ£o de CrÃƒÂ©dito</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
-        <li class="breadcrumb-item active">Cartão de Crédito</li>
+        <li class="breadcrumb-item active">CartÃƒÂ£o de CrÃƒÂ©dito</li>
       </ol>
     </div>
   </div>
@@ -24,7 +24,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-warning widget-two-icon align-self-center">
-            <i class="mdi mdi-shopping avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:shopping" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate">
@@ -41,7 +41,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-danger widget-two-icon align-self-center">
-            <i class="mdi mdi-credit-card-minus avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:credit-card-minus" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate">Saldo Utilizado</p>
@@ -56,7 +56,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-success widget-two-icon align-self-center">
-            <i class="mdi mdi-credit-card-plus avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:credit-card-plus" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate">Saldo Disponivel</p>
@@ -74,7 +74,7 @@
       <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
       <div class="col-md-3">
         <select class="form-select" name="card" required>
-          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartão</option>
+          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartÃƒÂ£o</option>
           {% for card in cards %}
             <option value="{{ card.id }}" {% if request.GET.card == card.id|stringformat:"s" %} selected {% endif %}>
               {{ card.name }} - {{ card.bank.name }}
@@ -98,7 +98,7 @@
       </div>
       <div class="col-md-3 d-flex gap-2">
         <button type="submit" class="btn btn-primary">
-          <i class="mdi mdi-filter me-1"></i> Filtrar
+          <iconify-icon icon="mdi:filter" class="me-1"></iconify-icon> Filtrar
         </button>
         <a href="{% url 'invoice_list' %}" class="btn btn-light">Limpar</a>
       </div>
@@ -107,7 +107,7 @@
   <div class="col-lg-3 text-lg-end mt-2 mt-lg-0">
     <div class="d-flex gap-2 justify-content-lg-end">
       <a href="{% url 'credit_card_list' %}" class="btn btn-light">
-        <i class="mdi mdi-credit-card me-1"></i> Cartoes
+        <iconify-icon icon="mdi:credit-card" class="me-1"></iconify-icon> Cartoes
       </a>
       {% if selected_card %}
         <a href="{% url 'payment_create' %}?card={{ selected_card.id }}" class="btn btn-success">
@@ -125,32 +125,32 @@
 <div class="mb-2 d-flex justify-content-end">
   {% if show_hidden %}
     <a href="{% url 'invoice_list' %}{% if request.GET.card %}?card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
-      <i class="mdi mdi-eye me-1"></i> Mostrar Abertas
+      <iconify-icon icon="mdi:eye" class="me-1"></iconify-icon> Mostrar Abertas
     </a>
   {% else %}
     <a href="{% url 'invoice_list' %}?show_hidden=1{% if request.GET.card %}&card={{ request.GET.card }}{% endif %}" class="btn btn-light btn-sm">
-      <i class="mdi mdi-eye-off me-1"></i> Mostrar Pagas
+      <iconify-icon icon="mdi:eye-off" class="me-1"></iconify-icon> Mostrar Pagas
     </a>
   {% endif %}
 </div>
 
 {% if not cards %}
   <div class="alert alert-warning">
-    <i class="mdi mdi-alert me-1"></i> Cadastre um cartão para vincular novas compras e acompanhar faturas.
+    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Cadastre um cartÃƒÂ£o para vincular novas compras e acompanhar faturas.
   </div>
 {% elif not selected_card %}
   <div class="alert alert-info">
-    <i class="mdi mdi-information me-1"></i> Selecione um cartão para ver suas faturas, saldo utilizado e saldo disponível.
+    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Selecione um cartÃƒÂ£o para ver suas faturas, saldo utilizado e saldo disponÃƒÂ­vel.
   </div>
 {% elif selected_card.closing_day is None or selected_card.due_day is None %}
   <div class="alert alert-warning">
-    <i class="mdi mdi-alert me-1"></i> Configure o
+    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Configure o
     <a href="{% url 'credit_card_update' selected_card.id %}">dia de fechamento e vencimento</a>
-    deste cartão para gerar faturas automaticamente.
+    deste cartÃƒÂ£o para gerar faturas automaticamente.
   </div>
 {% elif not invoices %}
   <div class="alert alert-info">
-    <i class="mdi mdi-information me-1"></i> Nenhuma fatura encontrada para este cartão.
+    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Nenhuma fatura encontrada para este cartÃƒÂ£o.
   </div>
 {% endif %}
 
@@ -160,7 +160,7 @@
   <div class="card mb-2">
     <div class="card-header d-flex justify-content-between align-items-center" id="heading-{{ invoice.id }}">
       <div class="d-flex align-items-center gap-2 flex-grow-1" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ invoice.id }}" aria-expanded="false" aria-controls="collapse-{{ invoice.id }}">
-        <i class="mdi mdi-chevron-right font-20 text-muted js-chevron"></i>
+        <iconify-icon icon="mdi:chevron-right" class="font-20 text-muted js-chevron"></iconify-icon>
         <div>
           <h5 class="m-0 fw-medium">
             Fatura {{ invoice.closing_date|date:"F Y" }}
@@ -184,7 +184,7 @@
             data-invoice-id="{{ invoice.id }}"
             title="Marcar como Paga"
           >
-            <i class="mdi mdi-check-circle font-18"></i>
+            <iconify-icon icon="mdi:check-circle" class="font-18"></iconify-icon>
           </button>
         {% endif %}
       </div>
@@ -201,7 +201,7 @@
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
-                <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">AÃƒÂ§ÃƒÂµes</span></th>
               </tr>
             </thead>
             <tbody>
@@ -222,13 +222,13 @@
                 </td>
                 <td>
                   <a href="{% url 'payment_detail' pay.id %}" class="table-action-btn" title="Visualizar">
-                    <i class="mdi mdi-eye"></i>
+                    <iconify-icon icon="mdi:eye"></iconify-icon>
                   </a>
                   <a href="{% url 'payment_update' pay.id %}" class="table-action-btn" title="Editar">
-                    <i class="mdi mdi-pencil"></i>
+                    <iconify-icon icon="mdi:pencil"></iconify-icon>
                   </a>
                   <a href="{% url 'payment_delete' pay.id %}" class="table-action-btn" title="Excluir">
-                    <i class="mdi mdi-close"></i>
+                    <iconify-icon icon="mdi:close"></iconify-icon>
                   </a>
                 </td>
               </tr>
@@ -248,6 +248,6 @@
 {% endif %}
 
 {% load static %}
-<script src="{% static 'app/js/payment_actions.js' %}?v=20260925a"></script>
+<script src="{% static 'app/js/payment_actions.js' %}?v=20261019-1"></script>
 
 {% endblock %}

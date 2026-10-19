@@ -25,7 +25,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-success widget-two-icon align-self-center">
-            <i class="mdi mdi-currency-usd avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:currency-usd" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate" title="Carteira Atual">Carteira Atual</p>
@@ -40,7 +40,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-primary widget-two-icon align-self-center">
-            <i class="mdi mdi-briefcase avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:briefcase" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate" title="Ativos Cadastrados">Ativos</p>
@@ -55,7 +55,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between">
           <div class="avatar-lg rounded-circle bg-info widget-two-icon align-self-center">
-            <i class="mdi mdi-check-circle avatar-title font-30 text-white"></i>
+            <iconify-icon icon="mdi:check-circle" class="avatar-title font-30 text-white"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
             <p class="m-0 text-uppercase fw-medium text-truncate" title="Ativos Ativos">Ativos Ativos</p>
@@ -132,16 +132,16 @@
 
           <div class="d-flex gap-1 flex-wrap">
             <a href="{% url 'investment_detail' asset.id %}" class="btn btn-light btn-sm btn-icon" title="Visualizar">
-              <i class="mdi mdi-eye"></i>
+              <iconify-icon icon="mdi:eye"></iconify-icon>
             </a>
             <a href="{% url 'investment_update' asset.id %}" class="btn btn-warning btn-sm btn-icon" title="Editar">
-              <i class="mdi mdi-pencil"></i>
+              <iconify-icon icon="mdi:pencil"></iconify-icon>
             </a>
             <a href="{% url 'investment_movement_create' %}?asset={{ asset.id }}" class="btn btn-info btn-sm btn-icon" title="Movimentar">
-              <i class="mdi mdi-arrow-left-right"></i>
+              <iconify-icon icon="mdi:arrow-left-right"></iconify-icon>
             </a>
             <a href="{% url 'investment_delete' asset.id %}" class="btn btn-danger btn-sm btn-icon" title="Excluir">
-              <i class="mdi mdi-close"></i>
+              <iconify-icon icon="mdi:close"></iconify-icon>
             </a>
           </div>
         </div>

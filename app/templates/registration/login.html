@@ -36,8 +36,8 @@
   .coin {
     position: absolute;
     border-radius: 50%;
-    border: 1.5px solid rgba(160, 221, 208, 0.18);
-    background: radial-gradient(circle at 35% 35%, rgba(160, 221, 208, 0.08), transparent 70%);
+    border: 1.5px solid rgba(168, 221, 160, 0.18);
+    background: radial-gradient(circle at 35% 35%, rgba(168, 221, 160, 0.08), transparent 70%);
     animation: float-coin 14s ease-in-out infinite;
   }
   .coin--1 { width: 120px; height: 120px; top: 12%;  left: 15%;  animation-delay: 0s;   }
@@ -68,7 +68,7 @@
     display: block;
     width: 22px;
     border-radius: 4px 4px 0 0;
-    background: linear-gradient(to top, rgba(100, 197, 177, 0.15), rgba(160, 221, 208, 0.5));
+    background: linear-gradient(to top, rgba(92, 221, 73, 0.15), rgba(168, 221, 160, 0.5));
     animation: grow-bar 6s ease-in-out infinite;
   }
   .grow-chart span:nth-child(1) { height: 60px;  animation-delay: 0s; }
@@ -96,13 +96,13 @@
     width: 54px;
     height: 54px;
     border-radius: 14px;
-    background: rgba(100, 197, 177, 0.18);
-    border: 1px solid rgba(160, 221, 208, 0.25);
+    background: rgba(92, 221, 73, 0.18);
+    border: 1px solid rgba(168, 221, 160, 0.25);
     margin-bottom: 1.75rem;
   }
   .login-visual__brand .lv-badge i {
     font-size: 28px;
-    color: #64c5b1;
+    color: #5cdd49;
   }
   .login-visual__brand h2 {
     font-size: 2.1rem;
@@ -111,7 +111,7 @@
     margin: 0 0 0.5rem 0;
     color: #f7faf9;
   }
-  .login-visual__brand h2 span { color: #64c5b1; }
+  .login-visual__brand h2 span { color: #5cdd49; }
   .login-visual__brand p {
     font-size: 1.05rem;
     line-height: 1.6;
@@ -172,8 +172,8 @@
     outline: none;
   }
   .lf-field input:focus {
-    border-color: #64c5b1;
-    box-shadow: 0 0 0 3px rgba(100, 197, 177, 0.14);
+    border-color: #5cdd49;
+    box-shadow: 0 0 0 3px rgba(92, 221, 73, 0.14);
   }
   .lf-field input::placeholder {
     color: #b0c4c0;
@@ -198,9 +198,9 @@
     border-radius: 6px;
     transition: color 0.15s ease, background 0.15s ease;
   }
-  .lf-toggle-pass:hover { color: #64c5b1; background: rgba(100, 197, 177, 0.08); }
+  .lf-toggle-pass:hover { color: #5cdd49; background: rgba(92, 221, 73, 0.08); }
   .lf-toggle-pass:focus-visible {
-    outline: 2px solid rgba(100, 197, 177, 0.35);
+    outline: 2px solid rgba(92, 221, 73, 0.35);
     outline-offset: 1px;
   }
   .lf-toggle-pass i { font-size: 20px; }
@@ -218,20 +218,20 @@
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    background: #64c5b1;
+    background: #5cdd49;
     color: #fff;
     letter-spacing: 0.3px;
     cursor: pointer;
     transition: background 0.15s ease, transform 0.1s ease;
   }
-  .lf-submit:hover { background: #55a796; }
+  .lf-submit:hover { background: #60a755; }
   .lf-submit:active { transform: scale(0.99); }
   .lf-submit:focus-visible {
-    outline: 3px solid rgba(100, 197, 177, 0.35);
+    outline: 3px solid rgba(92, 221, 73, 0.35);
     outline-offset: 2px;
   }
   .lf-link {
-    color: #64c5b1;
+    color: #5cdd49;
     text-decoration: none;
     font-weight: 500;
   }
@@ -307,7 +307,7 @@
 
     <div class="login-visual__brand">
       <div class="lv-badge">
-        <i class="mdi mdi-bank"></i>
+        <iconify-icon icon="mdi:bank"></iconify-icon>
       </div>
       <h2>GAW <span>Finance</span></h2>
       <p>Controle financeiro completo para sua empresa. Gestão de contas, transações e relatórios em um só lugar.</p>
@@ -340,7 +340,7 @@
           <div class="lf-input-wrap">
             <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
             <button type="button" class="lf-toggle-pass" id="togglePassword" aria-label="Mostrar senha" aria-pressed="false">
-              <i class="mdi mdi-eye-outline" id="eyeIcon"></i>
+              <iconify-icon icon="mdi:eye-outline" id="eyeIcon"></iconify-icon>
             </button>
           </div>
         </div>
@@ -360,5 +360,5 @@
 
 {% load static %}
 {% block scripts %}
-<script src="{% static 'app/js/password_visibility.js' %}?v=20260925a"></script>
+<script src="{% static 'app/js/password_visibility.js' %}?v=20261019-1"></script>
 {% endblock %}
