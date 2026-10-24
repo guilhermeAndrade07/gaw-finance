@@ -57,14 +57,18 @@ def readiness_check(request):
 
 @login_required(login_url='login')
 def dashboard(request):
+    has_bank_param = 'bank' in request.GET
     bank_id = request.GET.get('bank')
     selected_bank = None
 
     if bank_id:
         selected_bank = get_object_or_404(Bank, pk=bank_id, user=request.user)
+    elif not has_bank_param:
+        # Sem ?bank= na URL: usa o banco principal do usuario como default.
+        selected_bank = Bank.objects.filter(user=request.user, is_main=True).first()
 
     value_metrics = metrics.get_finance_metrics(request.user, bank=selected_bank)
-    investment_data = metrics.get_investment(request.user)
+    investment_data = metrics.get_investment(request.user, bank=selected_bank)
     value_metrics.update(investment_data)
     cash_flow = metrics.get_monthly_cash_flow(request.user, bank=selected_bank)
 

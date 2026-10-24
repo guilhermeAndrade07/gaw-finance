@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from app.mixins import UserScopedAPIMixin, UserScopedFormMixin, UserScopedQuerySetMixin
+from banks.models import Bank
 from . import models, forms, serializers
 from .services import (
     assign_invoice_to_payment,
@@ -193,11 +194,25 @@ class InvoiceListView(LoginRequiredMixin, ListView):
     def _selected_card(self):
         card_id = self.request.GET.get('card')
         if not card_id:
-            return None
+            return self._default_card()
         try:
             return models.CreditCard.objects.get(id=int(card_id), user=self.request.user)
         except (models.CreditCard.DoesNotExist, ValueError, TypeError):
+            return self._default_card()
+
+    def _default_card(self):
+        # Primeiro cartao ativo do banco principal; se o principal nao tiver cartao,
+        # usa o primeiro cartao ativo do usuario. Sem banco principal, mantem o estado vazio.
+        main_bank = Bank.objects.filter(user=self.request.user, is_main=True).first()
+        if not main_bank:
             return None
+        user_cards = models.CreditCard.objects.filter(
+            user=self.request.user, active=True,
+        ).select_related('bank')
+        card = user_cards.filter(bank=main_bank).first()
+        if card:
+            return card
+        return user_cards.first()
 
     def get_queryset(self):
         selected_card = self._selected_card()

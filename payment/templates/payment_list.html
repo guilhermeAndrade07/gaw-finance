@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}GAW Finance - CartÃƒÂ£o de CrÃƒÂ©dito{% endblock %}
+{% block title %}GAW Finance - Cartão de Crédito{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">CartÃƒÂ£o de CrÃƒÂ©dito</h4>
+      <h4 class="font-18 fw-semibold mb-0">Cartão de Crédito</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
-        <li class="breadcrumb-item active">CartÃƒÂ£o de CrÃƒÂ©dito</li>
+        <li class="breadcrumb-item active">Cartão de Crédito</li>
       </ol>
     </div>
   </div>
@@ -74,7 +74,7 @@
       <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
       <div class="col-md-3">
         <select class="form-select" name="card" required>
-          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartÃƒÂ£o</option>
+          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartão</option>
           {% for card in cards %}
             <option value="{{ card.id }}" {% if request.GET.card == card.id|stringformat:"s" %} selected {% endif %}>
               {{ card.name }} - {{ card.bank.name }}
@@ -147,11 +147,11 @@
 
 {% if not cards %}
   <div class="alert alert-warning">
-    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Cadastre um cartÃƒÂ£o para vincular novas compras e acompanhar limite utilizado.
+    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Cadastre um cartão para vincular novas compras e acompanhar limite utilizado.
   </div>
 {% elif not selected_card %}
   <div class="alert alert-info">
-    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Selecione um cartÃƒÂ£o para ver compras, saldo utilizado e saldo disponÃƒÂ­vel.
+    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Selecione um cartão para ver compras, saldo utilizado e saldo disponível.
   </div>
 {% endif %}
 
@@ -162,22 +162,22 @@
         <thead>
           <tr>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Compra</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">CartÃƒÂ£o</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">DescriÃƒÂ§ÃƒÂ£o</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Cartão</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Descrição</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Categoria</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Data da Compra</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Fatura</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">AÃƒÂ§ÃƒÂµes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
           </tr>
         </thead>
         <tbody>
           {% for pay in payment %}
           <tr id="payment-row-{{ pay.id }}" data-value="{{ pay.value|default_if_none:'0' }}" data-has-card="{% if pay.card %}1{% else %}0{% endif %}">
             <td><h5 class="m-0 fw-medium">{{ pay.name }}</h5></td>
-            <td>{{ pay.card|default:"Sem cartÃƒÂ£o" }}</td>
+            <td>{{ pay.card|default:"Sem cartão" }}</td>
             <td>{{ pay.description }}</td>
             <td>{{ pay.category }}</td>
             <td>R$ {{ pay.value|floatformat:"2g" }}</td>

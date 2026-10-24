@@ -9,6 +9,7 @@ from rest_framework.test import APIClient
 
 from banks.models import Bank
 from categories.models import Category
+from payment import forms
 from payment.models import CreditCard, Invoice, Payment
 from payment.services import (
     backfill_invoices,
@@ -456,6 +457,66 @@ class InvoiceTests(TestCase):
             },
         )
         self.assertRedirects(response, f"{reverse('invoice_list')}?card={self.card.id}")
+
+
+class InvoiceDefaultCardTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='invoice-default-user', password='pass123')
+        self.category = Category.objects.create(user=self.user, name='Mercado')
+        self.main_bank = Bank.objects.create(
+            user=self.user, name='Banco Principal', account_type='Corrente', agency=1, account=11,
+        )
+        self.main_bank.is_main = True
+        self.main_bank.save(update_fields=['is_main'])
+        self.secondary_bank = Bank.objects.create(
+            user=self.user, name='Banco Secundario', account_type='Corrente', agency=2, account=22,
+        )
+        self.main_card = CreditCard.objects.create(
+            user=self.user, bank=self.main_bank, name='Cartao Principal',
+            credit_limit=Decimal('1000.00'), closing_day=20, due_day=10,
+        )
+        self.secondary_card = CreditCard.objects.create(
+            user=self.user, bank=self.secondary_bank, name='Cartao Secundario',
+            credit_limit=Decimal('500.00'), closing_day=20, due_day=10,
+        )
+        self.client.force_login(self.user)
+
+    def test_invoice_list_defaults_to_main_bank_card(self):
+        response = self.client.get(reverse('invoice_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_card'], self.main_card)
+
+    def test_invoice_list_falls_back_to_any_card_when_main_bank_has_no_card(self):
+        self.main_card.active = False
+        self.main_card.save(update_fields=['active'])
+
+        response = self.client.get(reverse('invoice_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_card'], self.secondary_card)
+
+    def test_invoice_list_keeps_empty_when_no_main_bank(self):
+        Bank.objects.filter(user=self.user).update(is_main=False)
+
+        response = self.client.get(reverse('invoice_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.context['selected_card'])
+
+    def test_explicit_card_param_wins_over_default(self):
+        response = self.client.get(reverse('invoice_list'), {'card': self.secondary_card.id})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_card'], self.secondary_card)
+
+    def test_credit_card_form_preselects_main_bank(self):
+        form = forms.CreditCardForm(user=self.user)
+        self.assertEqual(form.fields['bank'].initial, self.main_bank.pk)
+
+    def test_credit_card_form_does_not_override_existing_instance(self):
+        form = forms.CreditCardForm(instance=self.secondary_card, user=self.user)
+        self.assertIsNone(form.fields['bank'].initial)
 
 
 class PaymentPaidToggleTests(TestCase):

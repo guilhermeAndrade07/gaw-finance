@@ -11,6 +11,12 @@ class CreditCardForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['bank'].queryset = Bank.objects.filter(user=user) if user else Bank.objects.none()
 
+        # Novo cartao: pre-seleciona o banco principal do usuario como default.
+        if user and not self.instance.pk:
+            main_bank = Bank.objects.filter(user=user, is_main=True).first()
+            if main_bank:
+                self.fields['bank'].initial = main_bank.pk
+
     class Meta:
         model = models.CreditCard
         fields = ['name', 'bank', 'credit_limit', 'closing_day', 'due_day', 'active']

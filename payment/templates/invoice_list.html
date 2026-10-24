@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}GAW Finance - CartÃƒÂ£o de CrÃƒÂ©dito{% endblock %}
+{% block title %}GAW Finance - Cartão de Crédito{% endblock %}
 
 {% block content %}
 
 <div class="card page-title-box rounded-0">
   <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2">
     <div class="flex-grow-1">
-      <h4 class="font-18 fw-semibold mb-0">CartÃƒÂ£o de CrÃƒÂ©dito</h4>
+      <h4 class="font-18 fw-semibold mb-0">Cartão de Crédito</h4>
     </div>
     <div class="text-end">
       <ol class="breadcrumb m-0 py-0">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">GAW Finance</a></li>
-        <li class="breadcrumb-item active">CartÃƒÂ£o de CrÃƒÂ©dito</li>
+        <li class="breadcrumb-item active">Cartão de Crédito</li>
       </ol>
     </div>
   </div>
@@ -74,9 +74,9 @@
       <input type="hidden" name="show_hidden" value="{% if show_hidden %}1{% else %}0{% endif %}">
       <div class="col-md-3">
         <select class="form-select" name="card" required>
-          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartÃƒÂ£o</option>
+          <option value="" {% if not selected_card %} selected {% endif %}>Selecione um cartão</option>
           {% for card in cards %}
-            <option value="{{ card.id }}" {% if request.GET.card == card.id|stringformat:"s" %} selected {% endif %}>
+            <option value="{{ card.id }}" {% if selected_card and selected_card.id == card.id %} selected {% endif %}>
               {{ card.name }} - {{ card.bank.name }}
             </option>
           {% endfor %}
@@ -136,21 +136,21 @@
 
 {% if not cards %}
   <div class="alert alert-warning">
-    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Cadastre um cartÃƒÂ£o para vincular novas compras e acompanhar faturas.
+    <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Cadastre um cartão para vincular novas compras e acompanhar faturas.
   </div>
 {% elif not selected_card %}
   <div class="alert alert-info">
-    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Selecione um cartÃƒÂ£o para ver suas faturas, saldo utilizado e saldo disponÃƒÂ­vel.
+    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Selecione um cartão para ver suas faturas, saldo utilizado e saldo disponível.
   </div>
 {% elif selected_card.closing_day is None or selected_card.due_day is None %}
   <div class="alert alert-warning">
     <iconify-icon icon="mdi:alert" class="me-1"></iconify-icon> Configure o
     <a href="{% url 'credit_card_update' selected_card.id %}">dia de fechamento e vencimento</a>
-    deste cartÃƒÂ£o para gerar faturas automaticamente.
+    deste cartão para gerar faturas automaticamente.
   </div>
 {% elif not invoices %}
   <div class="alert alert-info">
-    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Nenhuma fatura encontrada para este cartÃƒÂ£o.
+    <iconify-icon icon="mdi:information" class="me-1"></iconify-icon> Nenhuma fatura encontrada para este cartão.
   </div>
 {% endif %}
 
@@ -201,7 +201,7 @@
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Valor</span></th>
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Parcelas</span></th>
                 <th><span class="fw-semibold text-uppercase font-12 text-muted">Paga</span></th>
-                <th><span class="fw-semibold text-uppercase font-12 text-muted">AÃƒÂ§ÃƒÂµes</span></th>
+                <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
               </tr>
             </thead>
             <tbody>

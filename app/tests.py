@@ -293,6 +293,116 @@ class SecurityHeadersTests(TestCase):
         self.assertNotContains(response, 'https://cdn.jsdelivr.net')
 
 
+class DashboardMainBankDefaultTests(TestCase):
+    def setUp(self):
+        from inflows.models import Inflow
+        from outflows.models import Outflow
+
+        self.inflow_model = Inflow
+        self.outflow_model = Outflow
+
+        self.user = User.objects.create_user(username='main-bank-user', password='pass123')
+        self.main_bank = Bank.objects.create(
+            user=self.user,
+            name='Banco Principal',
+            account_type='Corrente',
+            agency=1,
+            account=11,
+            initial_balance=Decimal('1000.00'),
+        )
+        self.main_bank.is_main = True
+        self.main_bank.save(update_fields=['is_main'])
+        self.other_bank = Bank.objects.create(
+            user=self.user,
+            name='Banco Secundario',
+            account_type='Poupanca',
+            agency=2,
+            account=22,
+        )
+        self.category = Category.objects.create(user=self.user, name='Mercado')
+        self.client.force_login(self.user)
+
+    def _create_inflow(self, bank, value):
+        return self.inflow_model.objects.create(
+            user=self.user,
+            bank=bank,
+            title='Entrada',
+            value=value,
+        )
+
+    def _create_outflow(self, bank, value):
+        return self.outflow_model.objects.create(
+            user=self.user,
+            bank=bank,
+            category=self.category,
+            title='Saida',
+            value=value,
+        )
+
+    def test_dashboard_defaults_to_main_bank_without_param(self):
+        self._create_inflow(self.main_bank, Decimal('500.00'))
+        self._create_inflow(self.other_bank, Decimal('1000.00'))
+
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_bank_id'], str(self.main_bank.id))
+        # Saldo considera somente o banco principal.
+        self.assertIn('1.500,00', response.context['metrics']['total_balance'])
+
+    def test_dashboard_respects_explicit_bank_param(self):
+        self._create_inflow(self.main_bank, Decimal('500.00'))
+        self._create_inflow(self.other_bank, Decimal('1000.00'))
+
+        response = self.client.get(reverse('dashboard'), {'bank': self.other_bank.id})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_bank_id'], str(self.other_bank.id))
+        # other_bank: saldo inicial 0 + entrada de 1000.
+        self.assertIn('1.000,00', response.context['metrics']['total_balance'])
+
+    def test_dashboard_empty_bank_param_means_all_banks(self):
+        self._create_inflow(self.main_bank, Decimal('500.00'))
+        self._create_inflow(self.other_bank, Decimal('1000.00'))
+
+        response = self.client.get(reverse('dashboard'), {'bank': ''})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_bank_id'], '')
+
+    def test_dashboard_falls_back_to_no_bank_without_main(self):
+        Bank.objects.filter(user=self.user).update(is_main=False)
+
+        response = self.client.get(reverse('dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['selected_bank_id'], '')
+
+    def test_investment_respects_selected_bank(self):
+        from app import metrics as metrics_module
+
+        InvestmentAsset.objects.create(
+            user=self.user,
+            bank=self.main_bank,
+            name='Ativo Principal',
+            asset_type=InvestmentAsset.CRYPTO,
+            current_value=Decimal('300.00'),
+        )
+        InvestmentAsset.objects.create(
+            user=self.user,
+            bank=self.other_bank,
+            name='Ativo Secundario',
+            asset_type=InvestmentAsset.CRYPTO,
+            current_value=Decimal('700.00'),
+        )
+
+        with_bank = metrics_module.get_investment(self.user, bank=self.main_bank)
+        all_banks = metrics_module.get_investment(self.user)
+
+        self.assertEqual(with_bank['total_investment_value'], 300.0)
+        self.assertEqual(all_banks['total_investment_value'], 1000.0)
+
+
 class DashboardCurrentDateTests(TestCase):
     def test_dashboard_shows_current_date_right_of_bank_selector(self):
         from django.utils import timezone

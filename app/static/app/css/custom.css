@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cantata+One&display=swap');
+
 .form-card {
   width: 100%;
   max-width: 900px;
@@ -32,12 +34,14 @@
 
 .brand-text {
   color: var(--bs-primary);
-  font-family: 'Kalam', cursive;
+  font-family: 'Cantata One', serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .side-nav-title {
-  font-family: 'Kalam', cursive;
-  font-weight: 700;
+  font-family: 'Cantata One', serif;
+  font-weight: 400;
 }
 
 .card-subtitle {
@@ -53,8 +57,23 @@
 
 .sidenav-menu .brand-text {
   color: var(--bs-primary);
-  font-family: 'Kalam', cursive;
-  font-weight: 700;
+  font-family: 'Cantata One', serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.sidenav-menu .menu-text,
+.sidenav-menu .side-nav-title {
+  font-family: 'Cantata One', serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.page-title-box h4,
+.header-title {
+  font-family: 'Cantata One', serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .signature-toolbar {

@@ -188,7 +188,7 @@ def get_months_list():
     return months_list
 
 
-def get_investment(user):
+def get_investment(user, bank=None):
     if not user or not user.is_authenticated:
         return {
             'total_investment': '0,00',
@@ -196,10 +196,13 @@ def get_investment(user):
         }
 
     try:
-        total_investment = InvestmentAsset.objects.filter(
+        investment_qs = InvestmentAsset.objects.filter(
             user=user,
             is_active=True
-        ).aggregate(Sum('current_value'))['current_value__sum'] or 0
+        )
+        if bank:
+            investment_qs = investment_qs.filter(bank=bank)
+        total_investment = investment_qs.aggregate(Sum('current_value'))['current_value__sum'] or 0
         return {
             'total_investment': number_format(total_investment, decimal_pos=2, force_grouping=True),
             'total_investment_value': float(total_investment)
