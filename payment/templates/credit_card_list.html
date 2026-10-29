@@ -59,7 +59,7 @@
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Fechamento</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Vencimento</span></th>
             <th><span class="fw-semibold text-uppercase font-12 text-muted">Ativo</span></th>
-            <th><span class="fw-semibold text-uppercase font-12 text-muted">Acoes</span></th>
+            <th><span class="fw-semibold text-uppercase font-12 text-muted">Ações</span></th>
           </tr>
         </thead>
         <tbody>
@@ -70,7 +70,7 @@
             <td>R$ {{ card.credit_limit|floatformat:"2g" }}</td>
             <td>{% if card.closing_day %}Dia {{ card.closing_day }}{% else %}-{% endif %}</td>
             <td>{% if card.due_day %}Dia {{ card.due_day }}{% else %}-{% endif %}</td>
-            <td>{% if card.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Nao</span>{% endif %}</td>
+            <td>{% if card.active %}<span class="badge bg-success rounded-pill">Sim</span>{% else %}<span class="badge bg-danger rounded-pill">Não</span>{% endif %}</td>
             <td>
               <a href="{% url 'credit_card_detail' card.id %}" class="table-action-btn" title="Visualizar">
                 <iconify-icon icon="mdi:eye"></iconify-icon>

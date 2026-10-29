@@ -27,7 +27,7 @@ class BankBalanceReconciliationTests(TestCase):
 
     def test_reconcile_bank_balances_repairs_stored_balance(self):
         Inflow.objects.create(user=self.user, title='Entrada', bank=self.bank, value=Decimal('50.00'))
-        Outflow.objects.create(user=self.user, title='Saida', bank=self.bank, value=Decimal('20.00'))
+        Outflow.objects.create(user=self.user, title='Saída', bank=self.bank, value=Decimal('20.00'))
         Bank.objects.filter(pk=self.bank.pk).update(balance=Decimal('999.00'))
 
         updated = reconcile_bank_balances()

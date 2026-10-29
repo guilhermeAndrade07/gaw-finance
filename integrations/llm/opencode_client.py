@@ -14,7 +14,7 @@ class OpenCodeClient:
 
     def interpret(self, text):
         if not settings.LLM_API_KEY or not settings.LLM_BASE_URL:
-            raise LLMError('LLM_API_KEY ou LLM_BASE_URL nao configurados.')
+            raise LLMError('LLM_API_KEY ou LLM_BASE_URL não configurados.')
 
         session_id = str(uuid.uuid4())
         response = requests.post(

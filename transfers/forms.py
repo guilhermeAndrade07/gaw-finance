@@ -42,6 +42,6 @@ class BankTransferForm(forms.ModelForm):
         source = self.cleaned_data.get('source_bank')
         if source and value and value > source.current_balance:
             raise ValidationError(
-                f'Saldo insuficiente! Saldo disponivel: R$ {source.current_balance}'
+                f'Saldo insuficiente! Saldo disponível: R$ {source.current_balance}'
             )
         return value

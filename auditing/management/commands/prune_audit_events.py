@@ -5,7 +5,7 @@ from auditing.models import AuditEvent
 
 
 class Command(BaseCommand):
-    help = 'Remove eventos de auditoria anteriores ao periodo de retencao.'
+    help = 'Remove eventos de auditoria anteriores ao período de retencao.'
 
     def add_arguments(self, parser):
         parser.add_argument('--days', type=int, default=365)

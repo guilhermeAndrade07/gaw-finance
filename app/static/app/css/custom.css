@@ -255,6 +255,45 @@
   white-space: nowrap;
 }
 
+/* Sidebar fixa em todos os modos: o tema usa position:absolute no modo
+   condensed (menu de ícones), o que faz ela rolar junto com a página. */
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu {
+  position: fixed;
+}
+
+/* Ícones de ação maiores: nas tabelas (.table-action-btn) o iconify-icon
+   herda o tamanho do texto (~13px), ficando pequeno demais. Botões com
+   iconify também ganham leve aumento. BFS: lucide (svg data-lucide) já
+   renderiza em 24px via atributo, não precisa de ajuste. */
+.table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 0.45rem;
+  vertical-align: middle;
+}
+
+.table-action-btn iconify-icon,
+.btn iconify-icon {
+  font-size: 1.3rem;
+}
+
+.table-action-btn:hover {
+  background-color: var(--bs-secondary-bg);
+}
+
+/* Dashboard: cards de métrica — 5 por linha apenas em telas muito largas
+   (monitores grandes). Quebra para 3 já no breakpoint md (row-cols-md-3),
+   com as linhas incompletas centradas via justify-content-center. */
+@media (min-width: 1600px) {
+  .metrics-row > * {
+    flex: 0 0 auto;
+    width: 20%;
+  }
+}
+
 @media (max-width: 767.98px) {
   .inflow-actions {
     flex-wrap: nowrap;

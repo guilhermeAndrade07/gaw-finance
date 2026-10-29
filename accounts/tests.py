@@ -87,7 +87,7 @@ class EmailLoginTests(TestCase):
 
     def test_login_rejects_invalid_email(self):
         response = self.client.post(reverse('login'), {
-            'email': 'invalido@gawfinance.com',
+            'email': 'inválido@gawfinance.com',
             'password': 'senha-forte-123',
         })
 
@@ -242,7 +242,7 @@ class MFAFlowTests(TestCase):
         response = self.client.post(reverse('mfa_setup'), {'code': code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'codigos de recuperacao')
+        self.assertContains(response, 'códigos de recuperação')
         setup.refresh_from_db()
         self.assertIsNotNone(setup.confirmed_at)
         self.assertEqual(RecoveryCode.objects.filter(user=self.user).count(), 8)
@@ -277,7 +277,7 @@ class MFAFlowTests(TestCase):
         response = other_client.post(reverse('mfa_verify'), {'code': recovery_code})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Codigo invalido')
+        self.assertContains(response, 'Código inválido')
         self.assertFalse(other_client.session.get('mfa_verified'))
 
     def test_mfa_rejects_invalid_totp(self):
@@ -287,5 +287,5 @@ class MFAFlowTests(TestCase):
         response = self.client.post(reverse('mfa_verify'), {'code': '000000'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Codigo invalido')
+        self.assertContains(response, 'Código inválido')
         self.assertFalse(self.client.session.get('mfa_verified'))

@@ -135,7 +135,7 @@ def get_goal_progress(request):
     year = request.GET.get('year')
 
     if not month or not year:
-        return JsonResponse({'error': 'Mes e ano sao obrigatorios'}, status=400)
+        return JsonResponse({'error': 'Mês e ano sao obrigatorios'}, status=400)
 
     try:
         progress = metrics.get_goal_progress(request.user, int(month), int(year))

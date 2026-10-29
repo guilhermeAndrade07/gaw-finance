@@ -9,7 +9,7 @@ from .services import assign_invoice_to_payment
 def assign_invoice_on_create(sender, instance, created, **kwargs):
     """
     Atribui automaticamente a fatura ao payment quando ele e criado via save()
-    (nao se aplica a bulk_create, que nao dispara signals).
+    (não se aplica a bulk_create, que não dispara signals).
     """
     if created and instance.card_id and instance.date_payment and not instance.invoice_id:
         assign_invoice_to_payment(instance)

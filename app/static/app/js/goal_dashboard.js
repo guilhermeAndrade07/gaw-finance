@@ -108,7 +108,7 @@
         if (!data.labels || data.labels.length === 0) {
             const empty = document.createElement('p');
             empty.className = 'text-muted text-center';
-            empty.textContent = 'Nenhuma meta definida para este periodo.';
+            empty.textContent = 'Nenhuma meta definida para este período.';
             details.appendChild(empty);
             return;
         }
@@ -161,7 +161,7 @@
             const cell = document.createElement('td');
             cell.colSpan = 5;
             cell.className = 'text-center text-muted';
-            cell.textContent = 'Nenhuma meta para o periodo selecionado.';
+            cell.textContent = 'Nenhuma meta para o período selecionado.';
             row.appendChild(cell);
             tableBody.appendChild(row);
             return;

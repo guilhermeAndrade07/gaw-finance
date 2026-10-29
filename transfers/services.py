@@ -22,10 +22,10 @@ def create_bank_transfer(*, user, source_bank, destination_bank, value, title=No
     try:
         value = Decimal(value)
     except (InvalidOperation, TypeError, ValueError):
-        raise ValidationError('O valor da transferencia e invalido.')
+        raise ValidationError('O valor da transferência e inválido.')
 
     if value <= Decimal('0.00'):
-        raise ValidationError('O valor da transferencia deve ser maior que zero.')
+        raise ValidationError('O valor da transferência deve ser maior que zero.')
 
     with transaction.atomic():
         locked_banks = list(
@@ -38,15 +38,15 @@ def create_bank_transfer(*, user, source_bank, destination_bank, value, title=No
         destination = banks_by_id.get(destination_bank_id)
 
         if source is None:
-            raise ValidationError('O banco de origem nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco de origem não pertence ao usuario autenticado.')
         if destination is None:
-            raise ValidationError('O banco de destino nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco de destino não pertence ao usuario autenticado.')
 
         source_balance = source.current_balance
         destination_balance = destination.current_balance
         if value > source_balance:
             raise ValidationError(
-                f'Saldo insuficiente! Saldo disponivel: R$ {source_balance}'
+                f'Saldo insuficiente! Saldo disponível: R$ {source_balance}'
             )
 
         transfer = BankTransfer.objects.create(
@@ -72,7 +72,7 @@ def create_bank_transfer(*, user, source_bank, destination_bank, value, title=No
             user=user,
             resource_type='BankTransfer',
             resource_id=transfer.pk,
-            description='Transferencia registrada.',
+            description='Transferência registrada.',
             metadata={
                 'value': str(value),
                 'source_bank_id': source.pk,

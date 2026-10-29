@@ -32,12 +32,12 @@ environ.Env.read_env(BASE_DIR / '.env')
 # SECURITY WARNING: keep the secret key used in production secret!
 ENVIRONMENT = env('DJANGO_ENV', default='dev')
 if ENVIRONMENT not in {'dev', 'docker', 'test', 'prd'}:
-    raise RuntimeError(f'DJANGO_ENV invalido: {ENVIRONMENT}')
+    raise RuntimeError(f'DJANGO_ENV inválido: {ENVIRONMENT}')
 
 SECRET_KEY = env('SECRET_KEY', default='')
 if not SECRET_KEY:
     raise RuntimeError(
-        'SECRET_KEY nao definida. Configure a variavel de ambiente '
+        'SECRET_KEY não definida. Configure a variável de ambiente '
         'SECRET_KEY no arquivo .env'
     )
 
@@ -57,28 +57,28 @@ CSRF_TRUSTED_ORIGINS = [
 
 if ENVIRONMENT == 'prd':
     if DEBUG:
-        raise RuntimeError('DEBUG deve ser False em producao.')
+        raise RuntimeError('DEBUG deve ser False em produção.')
     if SECRET_KEY.startswith('django-insecure-') or len(SECRET_KEY) < 50:
-        raise RuntimeError('SECRET_KEY de producao deve ser forte e unica.')
+        raise RuntimeError('SECRET_KEY de produção deve ser forte e unica.')
     if not os.environ.get('ALLOWED_HOSTS') or not ALLOWED_HOSTS:
-        raise RuntimeError('ALLOWED_HOSTS deve ser definido em producao.')
+        raise RuntimeError('ALLOWED_HOSTS deve ser definido em produção.')
     if any('*' in host for host in ALLOWED_HOSTS):
-        raise RuntimeError('ALLOWED_HOSTS nao aceita wildcard em producao.')
+        raise RuntimeError('ALLOWED_HOSTS não aceita wildcard em produção.')
     if not CSRF_TRUSTED_ORIGINS:
-        raise RuntimeError('CSRF_TRUSTED_ORIGINS deve ser definido em producao.')
+        raise RuntimeError('CSRF_TRUSTED_ORIGINS deve ser definido em produção.')
     if any('*' in origin or not origin.startswith('https://') for origin in CSRF_TRUSTED_ORIGINS):
         raise RuntimeError('CSRF_TRUSTED_ORIGINS deve conter origens HTTPS exatas.')
 
     database_url = env('DATABASE_URL', default='')
     if not database_url.startswith(('postgres://', 'postgresql://')):
-        raise RuntimeError('DATABASE_URL de producao deve usar PostgreSQL.')
+        raise RuntimeError('DATABASE_URL de produção deve usar PostgreSQL.')
 
     celery_broker_url = env('CELERY_BROKER_URL', default='')
     if not celery_broker_url.startswith('amqp://') or 'guest:' in celery_broker_url:
-        raise RuntimeError('CELERY_BROKER_URL de producao deve usar RabbitMQ com credencial segura.')
+        raise RuntimeError('CELERY_BROKER_URL de produção deve usar RabbitMQ com credencial segura.')
 
     if not env('REDIS_URL', default='').startswith('redis://'):
-        raise RuntimeError('REDIS_URL de producao deve usar Redis.')
+        raise RuntimeError('REDIS_URL de produção deve usar Redis.')
 
 
 # Application definition
@@ -321,7 +321,7 @@ WHATSAPP_WEBHOOK_SECRET = env('WHATSAPP_WEBHOOK_SECRET', default='')
 # LLM
 LLM_PROVIDER = env('LLM_PROVIDER', default='opencode')
 if LLM_PROVIDER not in {'opencode', 'openai'}:
-    raise RuntimeError(f'LLM_PROVIDER invalido: {LLM_PROVIDER}')
+    raise RuntimeError(f'LLM_PROVIDER inválido: {LLM_PROVIDER}')
 LLM_API_KEY = env('LLM_API_KEY', default='')
 LLM_BASE_URL = env('LLM_BASE_URL', default='')
 LLM_MODEL = env('LLM_MODEL', default='gpt-4o-mini')

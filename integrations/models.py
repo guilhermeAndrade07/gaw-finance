@@ -38,7 +38,7 @@ class WhatsAppMessageLog(models.Model):
         blank=True,
     )
     message_id = models.CharField(max_length=128, unique=True)
-    direction = models.CharField(max_length=3, choices=[(DIRECTION_IN, 'Entrada'), (DIRECTION_OUT, 'Saida')])
+    direction = models.CharField(max_length=3, choices=[(DIRECTION_IN, 'Entrada'), (DIRECTION_OUT, 'Saída')])
     phone = models.CharField(max_length=20)
     raw_body = models.JSONField(null=True, blank=True)
     message_text = models.TextField(null=True, blank=True)

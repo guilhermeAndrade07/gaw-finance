@@ -12,9 +12,9 @@ from .models import InvestmentAsset, InvestmentMovement
 
 def register_investment_movement(*, user, asset, operation_type, value, movement_date, register_cash_flow, notes=''):
     if value is None or value <= Decimal('0.00'):
-        raise ValidationError('O valor da movimentacao deve ser maior que zero.')
+        raise ValidationError('O valor da movimentação deve ser maior que zero.')
     if operation_type not in {InvestmentMovement.APPORTION, InvestmentMovement.REDEMPTION}:
-        raise ValidationError('Tipo de movimentacao invalido.')
+        raise ValidationError('Tipo de movimentação inválido.')
 
     with transaction.atomic():
         locked_asset = InvestmentAsset.objects.select_for_update(of=('self',)).select_related(
@@ -22,10 +22,10 @@ def register_investment_movement(*, user, asset, operation_type, value, movement
         ).get(pk=asset.pk)
 
         if locked_asset.user_id != user.id:
-            raise ValidationError('O ativo informado nao pertence ao usuario autenticado.')
+            raise ValidationError('O ativo informado não pertence ao usuario autenticado.')
 
         if operation_type == InvestmentMovement.REDEMPTION and value > locked_asset.current_value:
-            raise ValidationError('O resgate nao pode ser maior que o valor atual do ativo.')
+            raise ValidationError('O resgate não pode ser maior que o valor atual do ativo.')
 
         movement = InvestmentMovement.objects.create(
             user=user,
@@ -42,7 +42,7 @@ def register_investment_movement(*, user, asset, operation_type, value, movement
                 category, _ = Category.objects.get_or_create(
                     user=user,
                     name='Investimento',
-                    defaults={'description': 'Aportes e movimentacoes de investimento'},
+                    defaults={'description': 'Aportes e movimentações de investimento'},
                 )
                 from outflows.services import register_outflow
 
@@ -73,7 +73,7 @@ def register_investment_movement(*, user, asset, operation_type, value, movement
             user=user,
             resource_type='InvestmentMovement',
             resource_id=movement.pk,
-            description='Movimentacao de investimento registrada.',
+            description='Movimentação de investimento registrada.',
             metadata={
                 'asset_id': locked_asset.pk,
                 'operation_type': operation_type,

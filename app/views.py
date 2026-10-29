@@ -148,5 +148,5 @@ def get_expenses_by_month(request):
         })
     except Exception:
         import logging
-        logging.getLogger(__name__).exception('Erro ao buscar despesas por mes')
+        logging.getLogger(__name__).exception('Erro ao buscar despesas por mês')
         return JsonResponse({'error': 'Erro ao processar os dados.', 'success': False}, status=500)

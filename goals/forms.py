@@ -26,7 +26,7 @@ class MonthlyGoalForm(forms.ModelForm):
         labels = {
             'category': 'Categoria',
             'value': 'Valor da Meta (R$)',
-            'month': 'Mes',
+            'month': 'Mês',
             'year': 'Ano',
         }
 
@@ -51,6 +51,6 @@ class MonthlyGoalForm(forms.ModelForm):
             if qs.exists():
                 label = category.name if category else 'Sem categoria'
                 raise ValidationError(
-                    f'Ja existe uma meta para "{label}" em {models.MONTHS_PT_BR.get(month, month)}/{year}.'
+                    f'Já existe uma meta para "{label}" em {models.MONTHS_PT_BR.get(month, month)}/{year}.'
                 )
         return cleaned_data

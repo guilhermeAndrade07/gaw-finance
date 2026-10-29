@@ -60,7 +60,7 @@ class LoginView(auth_views.LoginView):
             user=None,
             resource_type='User',
             resource_id='',
-            description='Tentativa de login invalida.',
+            description='Tentativa de login inválida.',
             status='failure',
             request=self.request,
         )
@@ -206,7 +206,7 @@ def mfa_setup(request):
                     'setup_completed': True,
                 })
 
-            form.add_error('code', 'Codigo invalido. Tente novamente.')
+            form.add_error('code', 'Código inválido. Tente novamente.')
     else:
         form = MFASetupForm()
 
@@ -296,11 +296,11 @@ def mfa_verify(request):
                 user=request.user,
                 resource_type='MFASetup',
                 resource_id=setup.pk,
-                description='Tentativa de verificacao MFA invalida.',
+                description='Tentativa de verificação MFA inválida.',
                 status='failure',
                 request=request,
             )
-            form.add_error('code', 'Codigo invalido. Tente novamente.')
+            form.add_error('code', 'Código inválido. Tente novamente.')
     else:
         form = MFAVerifyForm()
 

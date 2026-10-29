@@ -82,12 +82,12 @@ class HandleOutflowTests(TestCase):
     def test_invalid_value(self):
         response = handle_outflow(self.user, {'value': None, 'bank': 'Nubank'})
         self.assertEqual(Outflow.objects.count(), 0)
-        self.assertIn('Nao consegui identificar o valor', response)
+        self.assertIn('Não consegui identificar o valor', response)
 
     def test_unknown_bank(self):
         response = handle_outflow(self.user, {'value': '10.00', 'bank': 'Inexistente'})
         self.assertEqual(Outflow.objects.count(), 0)
-        self.assertIn('Nao encontrei esse banco', response)
+        self.assertIn('Não encontrei esse banco', response)
 
     def test_insufficient_balance(self):
         response = handle_outflow(self.user, {
@@ -113,7 +113,7 @@ class HandleInflowTests(TestCase):
 
     def test_unknown_bank(self):
         response = handle_inflow(self.user, {'value': '10.00', 'bank': 'Inexistente'})
-        self.assertIn('Nao encontrei esse banco', response)
+        self.assertIn('Não encontrei esse banco', response)
 
 
 class HandleQueryTests(TestCase):
@@ -132,7 +132,7 @@ class HandleQueryTests(TestCase):
 
     def test_unknown_query_type(self):
         response = handle_query(self.user, {'query_type': 'unknown'})
-        self.assertIn('Nao entendi', response)
+        self.assertIn('Não entendi', response)
 
 
 class ProcessInterpretationTests(TestCase):
@@ -162,7 +162,7 @@ class ProcessInterpretationTests(TestCase):
         mock_interpret.return_value = {'intent': 'unknown'}
         from integrations.handlers import process_message
         response, _ = process_message(self.user, 'ola')
-        self.assertIn('Nao entendi', response)
+        self.assertIn('Não entendi', response)
 
 
 class ParseInterpretationTests(TestCase):
@@ -179,7 +179,7 @@ class ParseInterpretationTests(TestCase):
     def test_invalid_json_raises(self):
         from integrations.llm.base import LLMError, parse_interpretation
         with self.assertRaises(LLMError):
-            parse_interpretation('nao sou json')
+            parse_interpretation('não sou json')
 
     def test_invalid_intent_normalized(self):
         from integrations.llm.base import parse_interpretation

@@ -4,7 +4,7 @@ INTENTS = ('outflow', 'inflow', 'query', 'unknown')
 QUERY_TYPES = ('month_expenses', 'category_expenses', 'bank_balance', 'recent_outflows', 'unknown')
 
 SYSTEM_PROMPT = (
-    'Voce e um interpretador de mensagens financeiras em portugues brasileiro. '
+    'Você e um interpretador de mensagens financeiras em portugues brasileiro. '
     'Analise a mensagem do usuario e retorne APENAS um JSON valido, sem texto extra, '
     'com este formato exato:\n'
     '{\n'
@@ -21,11 +21,11 @@ SYSTEM_PROMPT = (
     '- "recebi", "ganhei", "entrei" => intent=inflow.\n'
     '- perguntas sobre gastos/saldos/historico => intent=query.\n'
     '- Valores: "R$ 45,90" => "45.90". Se o valor tiver apenas "45" entenda como "45.00".\n'
-    '- "quanto gastei esse mes" => query_type=month_expenses.\n'
+    '- "quanto gastei esse mês" => query_type=month_expenses.\n'
     '- "quanto gastei com alimentacao" => query_type=category_expenses e category preenchida.\n'
     '- "quanto tenho no nubank" => query_type=bank_balance e bank preenchido.\n'
     '- "ultimas despesas" => query_type=recent_outflows.\n'
-    '- Nao invente valores, categorias ou bancos que nao estao na mensagem.'
+    '- Não invente valores, categorias ou bancos que não estao na mensagem.'
 )
 
 EXAMPLES = [
@@ -65,9 +65,9 @@ def parse_interpretation(raw_text):
     try:
         data = json.loads(raw_text)
     except (json.JSONDecodeError, TypeError):
-        raise LLMError('Resposta do LLM nao e um JSON valido.')
+        raise LLMError('Resposta do LLM não e um JSON valido.')
     if not isinstance(data, dict):
-        raise LLMError('Resposta do LLM invalida.')
+        raise LLMError('Resposta do LLM inválida.')
     intent = data.get('intent')
     if intent not in INTENTS:
         intent = 'unknown'

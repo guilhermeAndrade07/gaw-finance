@@ -70,7 +70,7 @@ class OwnershipIsolationTests(TestCase):
             (
                 'outflow-create-list-api-view',
                 {
-                    'title': 'Saida',
+                    'title': 'Saída',
                     'bank': self.bank.pk,
                     'category': self.other_category.pk,
                     'value': '10.00',
@@ -79,7 +79,7 @@ class OwnershipIsolationTests(TestCase):
             (
                 'transfer-create-list-api-view',
                 {
-                    'title': 'Transferencia',
+                    'title': 'Transferência',
                     'source_bank': self.bank.pk,
                     'destination_bank': self.other_bank.pk,
                     'value': '10.00',
@@ -176,7 +176,7 @@ class OwnershipIsolationTests(TestCase):
             ),
             (
                 'outflow-create-list-api-view',
-                {'title': 'Saida', 'bank': self.bank.pk, 'value': '-1.00'},
+                {'title': 'Saída', 'bank': self.bank.pk, 'value': '-1.00'},
             ),
             (
                 'payment-create-list-api-view',
@@ -241,7 +241,7 @@ class OwnershipIsolationTests(TestCase):
                 Payment.objects.create(
                     user=self.user,
                     card=self.card,
-                    name='Compra invalida',
+                    name='Compra inválida',
                     category=self.category,
                     date_payment='2026-01-10',
                     value=Decimal('-1.00'),
@@ -335,7 +335,7 @@ class DashboardMainBankDefaultTests(TestCase):
             user=self.user,
             bank=bank,
             category=self.category,
-            title='Saida',
+            title='Saída',
             value=value,
         )
 

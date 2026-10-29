@@ -51,10 +51,10 @@ class BankTransfer(models.Model):
             raise ValidationError('O banco de origem e o banco de destino devem ser diferentes.')
 
         if self.user_id and self.source_bank_id and self.source_bank.user_id != self.user_id:
-            raise ValidationError('O banco de origem nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco de origem não pertence ao usuario autenticado.')
 
         if self.user_id and self.destination_bank_id and self.destination_bank.user_id != self.user_id:
-            raise ValidationError('O banco de destino nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco de destino não pertence ao usuario autenticado.')
 
     def __str__(self):
         return f'{self.source_bank} -> {self.destination_bank} - R$ {self.value}'

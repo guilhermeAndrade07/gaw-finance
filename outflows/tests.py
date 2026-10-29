@@ -76,7 +76,7 @@ class OutflowBalanceSignalTests(TestCase):
 
         form = OutflowForm(
             data={
-                'title': 'Saida valida',
+                'title': 'Saída valida',
                 'bank': self.bank.id,
                 'category': self.category.id,
                 'value': '50.00',
@@ -91,7 +91,7 @@ class OutflowBalanceSignalTests(TestCase):
 
         form = OutflowForm(
             data={
-                'title': 'Saida acima do saldo',
+                'title': 'Saída acima do saldo',
                 'bank': self.bank.id,
                 'category': self.category.id,
                 'value': '150.00',
@@ -105,7 +105,7 @@ class OutflowBalanceSignalTests(TestCase):
     def test_pre_save_rejects_outflow_above_available_balance(self):
         outflow = Outflow(
             user=self.user,
-            title='Saida acima do saldo',
+            title='Saída acima do saldo',
             bank=self.bank,
             category=self.category,
             value=Decimal('150.00'),
@@ -135,7 +135,7 @@ class OutflowBalanceSignalTests(TestCase):
 
         Outflow.objects.create(
             user=self.user,
-            title='Saida de 50 reais',
+            title='Saída de 50 reais',
             bank=self.bank,
             category=self.category,
             value=Decimal('50.00'),
@@ -184,7 +184,7 @@ class OutflowServiceTests(TestCase):
             user=self.user,
             bank=self.bank,
             value=Decimal('40.00'),
-            title='Saida service',
+            title='Saída service',
             category=self.category,
         )
 
@@ -207,7 +207,7 @@ class OutflowServiceTests(TestCase):
             user=self.user,
             outflow=outflow,
             value=Decimal('20.00'),
-            title='Saida service nova',
+            title='Saída service nova',
             bank=self.second_bank,
             category=self.category,
         )

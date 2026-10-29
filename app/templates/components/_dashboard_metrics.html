@@ -15,20 +15,20 @@
 </div>
 
 <div class="row mt-3 mb-2 align-items-center">
-  <div class="col-md-4">
-    <select class="form-select" id="bankSelector" aria-label="Selecionar banco">
+  <div class="col-12 col-md-3">
+    <select class="form-select" id="bankSelector" aria-label="Selecionar banco" style="max-width: 280px;">
       <option value="">Todos os Bancos</option>
       {% for bank in banks %}
         <option value="{{ bank.id }}" {% if selected_bank_id == bank.id|stringformat:"s" %}selected{% endif %}>{{ bank.name }}{% if bank.is_main %} ★ (Principal){% endif %}</option>
       {% endfor %}
     </select>
   </div>
-  <div class="col-md-8 mt-2 mt-md-0 text-start text-md-end">
+  <div class="col-12 col-md-9 mt-2 mt-md-0 text-start text-md-end">
     <span class="text-muted fw-medium">{{ today|date:"D d/m/Y" }}</span>
   </div>
 </div>
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 mt-3">
+<div class="row metrics-row row-cols-1 row-cols-sm-2 row-cols-md-3 mt-3 justify-content-center mx-auto" style="max-width: 1500px;">
   <div class="col mb-3">
     <div class="card h-100">
       <div class="card-body py-2 px-3">
@@ -53,7 +53,7 @@
             <iconify-icon icon="mdi:arrow-down-bold" class="text-white" style="font-size:22px;"></iconify-icon>
           </div>
           <div class="wigdet-two-content media-body text-end text-truncate">
-            <p class="m-0 text-uppercase fw-medium text-truncate" title="Entradas no Mes">Entradas no Mes</p>
+            <p class="m-0 text-uppercase fw-medium text-truncate" title="Entradas no Mês">Entradas no Mês</p>
             <h3 class="fw-medium my-1">R$ {{ metrics.inflows_month }}</h3>
             <p class="m-0">Receitas</p>
           </div>
@@ -113,10 +113,10 @@
 
 <div class="row mt-4">
   <div class="col-xl-8">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-header">
         <h4 class="header-title">Fluxo de Caixa Mensal</h4>
-        <p class="card-subtitle">Entradas e saidas ao longo do tempo.</p>
+        <p class="card-subtitle">Entradas e saídas ao longo do tempo.</p>
       </div>
       <div class="card-body">
         <canvas id="cashFlowChart"></canvas>
@@ -125,18 +125,18 @@
   </div>
 
   <div class="col-xl-4">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-header">
         <h4 class="header-title">Despesas por Categoria</h4>
         <p class="card-subtitle">Distribuicao mensal.</p>
       </div>
       <div class="card-body">
-        <select class="form-select mb-3" id="monthSelector" aria-label="Selecionar mes">
+        <select class="form-select mb-3" id="monthSelector" aria-label="Selecionar mês">
           {% for month in months_list %}
             <option value="{{ month.value }}">{{ month.display }}</option>
           {% endfor %}
         </select>
-        <p class="mb-3 fw-bold text-danger">Total gasto no mes: <span id="monthlyExpenseTotal">R$ 0,00</span></p>
+        <p class="mb-3 fw-bold text-danger">Total gasto no mês: <span id="monthlyExpenseTotal">R$ 0,00</span></p>
         <canvas id="categoryChart"></canvas>
       </div>
     </div>
@@ -144,23 +144,28 @@
 </div>
 
 <div class="row mt-4">
-  <div class="col-12">
+  <div class="col-xl-8">
     <div class="card">
-      <div class="card-header">
-        <h4 class="header-title">Metas de Gasto - Mes Atual</h4>
-        <p class="card-subtitle">Resumo do progresso das suas metas de gastos por categoria.</p>
+      <div class="card-header d-flex justify-content-between align-items-start">
+        <div>
+          <h4 class="header-title">Metas de Gasto - Mês Atual</h4>
+          <p class="card-subtitle">Resumo do progresso das suas metas de gastos por categoria.</p>
+        </div>
+        <a href="{% url 'goal_dashboard' %}" class="btn btn-info btn-sm">
+          <i data-lucide="bar-chart-horizontal" class="font-16 me-1"></i> Ver Dashboard de Metas
+        </a>
       </div>
       <div class="card-body">
         {% if goal_status.total == 0 %}
           <div class="text-center py-3">
-            <p class="text-muted mb-2">Voce ainda nao definiu metas para este mes.</p>
+            <p class="text-muted mb-2">Você ainda não definiu metas para este mês.</p>
             <a href="{% url 'goal_create' %}" class="btn btn-primary btn-sm">
               <i data-lucide="plus" class="font-16 me-1"></i> Criar Primeira Meta
             </a>
           </div>
         {% else %}
           <div class="row text-center">
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="card h-100">
                 <div class="card-body py-2 px-3">
                   <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
@@ -171,7 +176,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="card h-100">
                 <div class="card-body py-2 px-3">
                   <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
@@ -182,7 +187,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="card h-100">
                 <div class="card-body py-2 px-3">
                   <div class="rounded-circle bg-danger d-inline-flex align-items-center justify-content-center mb-2" style="width:48px;height:48px;">
@@ -192,11 +197,6 @@
                   <p class="text-uppercase fw-medium font-12 text-muted m-0">Acima de 100%</p>
                 </div>
               </div>
-            </div>
-            <div class="col-md-3 mb-3 d-flex align-items-center">
-              <a href="{% url 'goal_dashboard' %}" class="btn btn-info w-100">
-                <i data-lucide="bar-chart-horizontal" class="font-16 me-1"></i> Ver Dashboard de Metas
-              </a>
             </div>
           </div>
         {% endif %}
@@ -240,14 +240,14 @@
               {% if transaction.tipo == "Entrada" %}
                 <span class="badge bg-success rounded-pill">Entrada</span>
               {% else %}
-                <span class="badge bg-danger rounded-pill">Saida</span>
+                <span class="badge bg-danger rounded-pill">Saída</span>
               {% endif %}
             </td>
             <td>{{ transaction.created_at|date:"d/m/Y" }}</td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6" class="text-center text-muted">Nenhuma transacao registrada</td>
+            <td colspan="6" class="text-center text-muted">Nenhuma transação registrada</td>
           </tr>
           {% endfor %}
         </tbody>

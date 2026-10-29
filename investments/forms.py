@@ -126,6 +126,6 @@ class InvestmentMovementForm(forms.ModelForm):
         value = cleaned_data.get('value')
 
         if asset and operation_type == InvestmentMovement.REDEMPTION and value and value > asset.current_value:
-            self.add_error('value', 'O resgate nao pode ser maior que o valor atual do ativo.')
+            self.add_error('value', 'O resgate não pode ser maior que o valor atual do ativo.')
 
         return cleaned_data

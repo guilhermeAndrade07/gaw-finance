@@ -45,10 +45,10 @@ def _normalize_value(raw_value):
 def handle_outflow(user, interpretation):
     value = _normalize_value(interpretation.get('value'))
     if value is None:
-        return 'Nao consegui identificar o valor da despesa. Tente: "gastei R$ 45,90 no almoço".'
+        return 'Não consegui identificar o valor da despesa. Tente: "gastei R$ 45,90 no almoço".'
     bank = resolve_bank(user, interpretation.get('bank'))
     if bank is None:
-        return 'Nao encontrei esse banco no seu cadastro. Verifique o nome do banco e tente novamente.'
+        return 'Não encontrei esse banco no seu cadastro. Verifique o nome do banco e tente novamente.'
     title = interpretation.get('title') or 'Despesa via WhatsApp'
     category = resolve_category(user, interpretation.get('category'))
     try:
@@ -60,7 +60,7 @@ def handle_outflow(user, interpretation):
             category=category,
         )
     except ValidationError as error:
-        return f'Nao foi possivel registrar: {"; ".join(error.messages)}'
+        return f'Não foi possível registrar: {"; ".join(error.messages)}'
     category_text = f'\nCategoria: {category.name}' if category else ''
     return (
         f'Despesa registrada!\n'
@@ -73,15 +73,15 @@ def handle_outflow(user, interpretation):
 def handle_inflow(user, interpretation):
     value = _normalize_value(interpretation.get('value'))
     if value is None:
-        return 'Nao consegui identificar o valor da receita. Tente: "recebi R$ 1.000,00".'
+        return 'Não consegui identificar o valor da receita. Tente: "recebi R$ 1.000,00".'
     bank = resolve_bank(user, interpretation.get('bank'))
     if bank is None:
-        return 'Nao encontrei esse banco no seu cadastro. Verifique o nome do banco e tente novamente.'
+        return 'Não encontrei esse banco no seu cadastro. Verifique o nome do banco e tente novamente.'
     title = interpretation.get('title') or 'Receita via WhatsApp'
     try:
         inflow = register_inflow(user=user, bank=bank, value=value, title=title[:100])
     except ValidationError as error:
-        return f'Nao foi possivel registrar: {"; ".join(error.messages)}'
+        return f'Não foi possível registrar: {"; ".join(error.messages)}'
     return (
         f'Receita registrada!\n'
         f'Valor: {_format_money(inflow.value)}\n'
@@ -96,30 +96,30 @@ def _query_month_expenses(user):
     total = Outflow.objects.filter(user=user, created_at__gte=start).aggregate(
         total=Sum('value'),
     )['total'] or Decimal('0')
-    return f'Voce gastou {_format_money(total)} neste mes.'
+    return f'Você gastou {_format_money(total)} neste mês.'
 
 
 def _query_category_expenses(user, category_name):
     category = resolve_category(user, category_name)
     if category is None:
-        return 'Nao encontrei essa categoria no seu cadastro.'
+        return 'Não encontrei essa categoria no seu cadastro.'
     total = Outflow.objects.filter(user=user, category=category).aggregate(
         total=Sum('value'),
     )['total'] or Decimal('0')
-    return f'Voce gastou {_format_money(total)} com "{category.name}".'
+    return f'Você gastou {_format_money(total)} com "{category.name}".'
 
 
 def _query_bank_balance(user, bank_name):
     bank = resolve_bank(user, bank_name)
     if bank is None:
-        return 'Nao encontrei esse banco no seu cadastro.'
+        return 'Não encontrei esse banco no seu cadastro.'
     return f'Saldo atual do {bank.name}: {_format_money(bank.current_balance)}.'
 
 
 def _query_recent_outflows(user, limit=5):
     outflows = Outflow.objects.filter(user=user).select_related('bank', 'category')[:limit]
     if not outflows:
-        return 'Voce nao tem despesas registradas.'
+        return 'Você não tem despesas registradas.'
     lines = ['Suas ultimas despesas:']
     for outflow in outflows:
         date = timezone.localtime(outflow.created_at).strftime('%d/%m')
@@ -139,8 +139,8 @@ def handle_query(user, interpretation):
     handler = handlers.get(query_type)
     if handler is None:
         return (
-            'Nao entendi sua pergunta. Voce pode tentar:\n'
-            '- "Quanto gastei esse mes?"\n'
+            'Não entendi sua pergunta. Você pode tentar:\n'
+            '- "Quanto gastei esse mês?"\n'
             '- "Quanto gastei com alimentacao?"\n'
             '- "Quanto tenho no Nubank?"\n'
             '- "Ultimas 5 despesas"'
@@ -157,10 +157,10 @@ def process_interpretation(user, interpretation):
     if intent == 'query':
         return handle_query(user, interpretation)
     return (
-        'Nao entendi sua mensagem. Exemplos do que posso fazer:\n'
+        'Não entendi sua mensagem. Exemplos do que posso fazer:\n'
         '- "Gastei R$ 45,90 no almoço, categoria alimentacao, banco Nubank"\n'
         '- "Recebi R$ 500,00"\n'
-        '- "Quanto gastei esse mes?"'
+        '- "Quanto gastei esse mês?"'
     )
 
 

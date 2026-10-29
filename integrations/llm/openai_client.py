@@ -9,7 +9,7 @@ class OpenAIClient:
 
     def interpret(self, text):
         if not settings.LLM_API_KEY:
-            raise LLMError('LLM_API_KEY nao configurada.')
+            raise LLMError('LLM_API_KEY não configurada.')
 
         base_url = (settings.LLM_BASE_URL or 'https://api.openai.com/v1').rstrip('/')
 

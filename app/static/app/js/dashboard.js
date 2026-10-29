@@ -200,7 +200,7 @@
             if (bankValue) {
                 params.set('bank', bankValue);
             } else {
-                // Mantem ?bank= vazio na URL para nao cair no fallback do banco principal.
+                // Mantém ?bank= vazio na URL para não cair no fallback do banco principal.
                 params.set('bank', '');
             }
             window.location.search = params.toString();

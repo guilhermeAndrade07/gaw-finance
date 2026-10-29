@@ -6,7 +6,7 @@
   <div class="card-body">
     {% if setup_completed %}
       <h4 class="fw-semibold mb-1">MFA ativado</h4>
-      <p class="text-muted">Guarde os codigos de recuperacao em um local seguro. Cada codigo pode ser usado apenas uma vez.</p>
+      <p class="text-muted">Guarde os códigos de recuperação em um local seguro. Cada código pode ser usado apenas uma vez.</p>
 
       <div class="alert alert-warning">
         <ul class="mb-0 font-monospace">
@@ -19,7 +19,7 @@
       <a href="/" class="btn btn-primary">Continuar</a>
     {% else %}
       <h4 class="fw-semibold mb-1">Configurar MFA TOTP</h4>
-      <p class="text-muted mb-4">Escaneie o QR Code no seu aplicativo autenticador e informe o codigo gerado.</p>
+      <p class="text-muted mb-4">Escaneie o QR Code no seu aplicativo autenticador e informe o código gerado.</p>
 
       <div class="row g-4 align-items-center">
         <div class="col-md-4 text-center">
@@ -42,7 +42,7 @@
           <form method="post" class="row g-3">
             {% csrf_token %}
             <div class="col-12">
-              <label class="form-label" for="{{ form.code.id_for_label }}">Codigo</label>
+              <label class="form-label" for="{{ form.code.id_for_label }}">Código</label>
               {{ form.code }}
             </div>
             <div class="col-12">

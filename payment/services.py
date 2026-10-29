@@ -89,9 +89,9 @@ def assign_invoice_to_payment(payment):
 
 def _validate_payment_owner(user, card, category):
     if card.user_id != user.id:
-        raise ValidationError('O cartao informado nao pertence ao usuario autenticado.')
+        raise ValidationError('O cartao informado não pertence ao usuario autenticado.')
     if category is not None and category.user_id != user.id:
-        raise ValidationError('A categoria informada nao pertence ao usuario autenticado.')
+        raise ValidationError('A categoria informada não pertence ao usuario autenticado.')
 
 
 def _validate_credit_limit(user, card, value):
@@ -104,7 +104,7 @@ def _validate_credit_limit(user, card, value):
 
     if value > credit_available:
         raise ValidationError(
-            f'Limite insuficiente! Limite disponivel: R$ {credit_available}'
+            f'Limite insuficiente! Limite disponível: R$ {credit_available}'
         )
 
 
@@ -237,7 +237,7 @@ def mark_payment_paid(*, user, payment_id):
         'invoice_id', flat=True,
     ).first()
     if invoice_id is None and not Payment.objects.filter(pk=payment_id, user=user).exists():
-        raise ValidationError('A compra nao pertence ao usuario autenticado.')
+        raise ValidationError('A compra não pertence ao usuario autenticado.')
 
     with transaction.atomic():
         if invoice_id is not None:
@@ -274,7 +274,7 @@ def mark_payment_unpaid(*, user, payment_id):
         'invoice_id', flat=True,
     ).first()
     if invoice_id is None and not Payment.objects.filter(pk=payment_id, user=user).exists():
-        raise ValidationError('A compra nao pertence ao usuario autenticado.')
+        raise ValidationError('A compra não pertence ao usuario autenticado.')
 
     with transaction.atomic():
         if invoice_id is not None:

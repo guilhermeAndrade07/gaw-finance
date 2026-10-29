@@ -63,7 +63,7 @@ class AccountEditForm(forms.Form):
         if not name:
             raise forms.ValidationError('Informe um nome.')
         if Account.objects.exclude(pk=self.instance.pk if self.instance else None).filter(name__iexact=name).exists():
-            raise forms.ValidationError('Ja existe uma conta com este nome.')
+            raise forms.ValidationError('Já existe uma conta com este nome.')
         return name
 
     def clean_username(self):
@@ -72,14 +72,14 @@ class AccountEditForm(forms.Form):
             raise forms.ValidationError('Informe um usuario.')
         qs = User.objects.exclude(pk=self.instance.user.pk if self.instance else None)
         if qs.filter(username__iexact=username).exists():
-            raise forms.ValidationError('Ja existe um usuario com este nome.')
+            raise forms.ValidationError('Já existe um usuario com este nome.')
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
         qs = User.objects.exclude(pk=self.instance.user.pk if self.instance else None)
         if qs.filter(email__iexact=email).exists():
-            raise forms.ValidationError('Ja existe uma conta com este email.')
+            raise forms.ValidationError('Já existe uma conta com este email.')
         return email
 
     def save(self):
@@ -116,7 +116,7 @@ class InviteAcceptForm(forms.Form):
         if not name:
             raise forms.ValidationError('Informe um nome para a conta.')
         if User.objects.filter(username__iexact=name).exists():
-            raise forms.ValidationError('Ja existe uma conta com este nome.')
+            raise forms.ValidationError('Já existe uma conta com este nome.')
         return name
 
     def clean(self):
@@ -125,7 +125,7 @@ class InviteAcceptForm(forms.Form):
         confirm_password = cleaned_data.get('confirm_password')
 
         if password and confirm_password and password != confirm_password:
-            self.add_error('confirm_password', 'A confirmacao de senha nao confere.')
+            self.add_error('confirm_password', 'A confirmação de senha não confere.')
 
         if password:
             try:
@@ -142,7 +142,7 @@ class InviteAcceptForm(forms.Form):
 class MFASetupForm(forms.Form):
     code = forms.CharField(
         max_length=8,
-        label='Codigo do autenticador',
+        label='Código do autenticador',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'inputmode': 'numeric',
@@ -154,9 +154,10 @@ class MFASetupForm(forms.Form):
 class MFAVerifyForm(forms.Form):
     code = forms.CharField(
         max_length=32,
-        label='Codigo do autenticador ou codigo de recuperacao',
+        label='Código do autenticador ou código de recuperação',
         widget=forms.TextInput(attrs={
-            'class': 'form-control',
+            'class': 'form-control text-center font-monospace d-block mx-auto',
+            'style': 'max-width: 240px; letter-spacing: .15em;',
             'autocomplete': 'one-time-code',
         }),
     )

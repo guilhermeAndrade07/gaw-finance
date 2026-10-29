@@ -1,0 +1,57 @@
+{% comment %}
+Modal de sucesso reutilizável (usado após criar entrada/saída).
+
+Uso:
+  {% include 'components/_success_modal.html' with success_message="Entrada registrada com sucesso!" list_url_name='inflow_list' %}
+
+Vars esperadas:
+  success_message : texto exibido no corpo do modal
+  list_url_name   : nome da rota Django da listagem (usado em {% url %})
+
+Abre automaticamente quando a URL contém ?created=1 (adicionado no redirect
+da view). O parâmetro é removido da URL em seguida para o refresh não reabrir.
+{% endcomment %}
+
+{% load static %}
+
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <iconify-icon icon="mdi:check-decagram" width="64" height="64" class="text-success"></iconify-icon>
+        <h5 class="mt-2 mb-1 fw-semibold">Concluído!</h5>
+        <p class="text-muted mb-3">{{ success_message }}</p>
+
+        {% if action %}
+        <div class="card border-0 bg-body-tertiary mb-4 text-start">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center py-1">
+              <span class="text-muted font-13">Ação</span>
+              <span class="font-13 fw-semibold">{{ action }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center py-1 border-top border-opacity-25">
+              <span class="text-muted font-13">Título</span>
+              <span class="font-13 fw-semibold text-truncate ms-2">{{ title }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center py-1 border-top border-opacity-25">
+              <span class="text-muted font-13">Valor</span>
+              <span class="font-13 fw-semibold">R$ {{ value|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+            <iconify-icon icon="mdi:plus" class="me-1"></iconify-icon> Registrar Novamente
+          </button>
+          <a href="{% url list_url_name %}" class="btn btn-light">
+            <iconify-icon icon="mdi:arrow-left" class="me-1"></iconify-icon> Voltar à Lista
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'app/js/custom/success_modal.js' %}?v=20261029a" defer></script>

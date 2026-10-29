@@ -121,7 +121,7 @@ def whatsapp_webhook(request):
     ).select_related('user').first()
 
     if binding is None:
-        logger.info('WhatsApp: numero nao vinculado %s', message['phone'])
+        logger.info('WhatsApp: numero não vinculado %s', message['phone'])
         log.result_status = WhatsAppMessageLog.STATUS_IGNORED
         log.save(update_fields=['result_status', 'update_at'])
         return JsonResponse({'detail': 'unbound number'}, status=200)

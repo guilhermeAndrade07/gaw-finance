@@ -4,7 +4,7 @@ from signatures.services import generate_signature_charges
 
 
 class Command(BaseCommand):
-    help = 'Gera cobrancas de assinaturas ativas no cartao de credito para o mes corrente.'
+    help = 'Gera cobrancas de assinaturas ativas no cartao de credito para o mês corrente.'
 
     def handle(self, *args, **options):
         generate_signature_charges()

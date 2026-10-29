@@ -175,7 +175,7 @@ class InvestmentMovementCreateView(LoginRequiredMixin, FormView):
             form.add_error(None, exc)
             return self.form_invalid(form)
 
-        messages.success(self.request, 'Movimentacao registrada com sucesso.')
+        messages.success(self.request, 'Movimentação registrada com sucesso.')
         return HttpResponseRedirect(reverse('investment_detail', kwargs={'pk': asset.pk}))
 
 

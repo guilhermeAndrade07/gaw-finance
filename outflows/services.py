@@ -13,7 +13,7 @@ def _normalize_value(value):
     try:
         normalized = Decimal(value)
     except (InvalidOperation, TypeError, ValueError):
-        raise ValidationError('O valor da saida e invalido.')
+        raise ValidationError('O valor da saida e inválido.')
     if normalized <= Decimal('0.00'):
         raise ValidationError('O valor da saida deve ser maior que zero.')
     return normalized
@@ -27,7 +27,7 @@ def _lock_banks(user, bank_ids):
     banks_by_id = {bank.pk: bank for bank in locked_banks}
     for bank_id in bank_ids:
         if banks_by_id.get(bank_id) is None:
-            raise ValidationError('O banco informado nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco informado não pertence ao usuario autenticado.')
     return banks_by_id
 
 
@@ -35,7 +35,7 @@ def _validate_category(user, category):
     if category is None:
         return None
     if category.user_id != user.id:
-        raise ValidationError('A categoria informada nao pertence ao usuario autenticado.')
+        raise ValidationError('A categoria informada não pertence ao usuario autenticado.')
     return category
 
 
@@ -60,7 +60,7 @@ def register_outflow(*, user, bank, value, title=None, category=None):
         available_balance = locked_bank.current_balance
         if value > available_balance:
             raise ValidationError(
-                f'Saldo insuficiente! Saldo disponivel: R$ {available_balance}'
+                f'Saldo insuficiente! Saldo disponível: R$ {available_balance}'
             )
 
         instance = Outflow(
@@ -79,7 +79,7 @@ def register_outflow(*, user, bank, value, title=None, category=None):
             user=user,
             resource_type='Outflow',
             resource_id=instance.pk,
-            description='Saida registrada.',
+            description='Saída registrada.',
             metadata={'value': str(value), 'bank_id': locked_bank.pk, 'category_id': category.pk if category else None},
         )
         return instance
@@ -87,10 +87,10 @@ def register_outflow(*, user, bank, value, title=None, category=None):
 
 def update_outflow(*, user, outflow, value, title=None, bank=None, category=None):
     if not outflow.pk:
-        raise ValidationError('A saida informada nao existe.')
+        raise ValidationError('A saida informada não existe.')
     original = Outflow.objects.get(pk=outflow.pk)
     if original.user_id != user.id:
-        raise ValidationError('A saida nao pertence ao usuario autenticado.')
+        raise ValidationError('A saida não pertence ao usuario autenticado.')
 
     target_bank = bank or original.bank
     bank_id = target_bank.pk
@@ -117,7 +117,7 @@ def update_outflow(*, user, outflow, value, title=None, bank=None, category=None
             user=user,
             resource_type='Outflow',
             resource_id=original.pk,
-            description='Saida atualizada.',
+            description='Saída atualizada.',
             metadata={'value': str(value), 'bank_id': bank_id},
         )
         return original
@@ -125,7 +125,7 @@ def update_outflow(*, user, outflow, value, title=None, bank=None, category=None
 
 def delete_outflow(*, user, outflow):
     if outflow.user_id != user.id:
-        raise ValidationError('A saida nao pertence ao usuario autenticado.')
+        raise ValidationError('A saida não pertence ao usuario autenticado.')
     bank_id = outflow.bank_id
 
     with transaction.atomic():
@@ -138,7 +138,7 @@ def delete_outflow(*, user, outflow):
             user=user,
             resource_type='Outflow',
             resource_id=outflow.pk,
-            description='Saida excluida.',
+            description='Saída excluida.',
             metadata={'bank_id': bank_id},
         )
         return True

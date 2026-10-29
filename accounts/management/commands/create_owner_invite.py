@@ -21,7 +21,7 @@ class Command(BaseCommand):
         base_url = options['base_url'].rstrip('/')
 
         if User.objects.filter(email__iexact=email).exists():
-            raise CommandError('Ja existe um usuario com este email.')
+            raise CommandError('Já existe um usuario com este email.')
 
         if days < 1 or days > 30:
             raise CommandError('O convite deve expirar entre 1 e 30 dias.')

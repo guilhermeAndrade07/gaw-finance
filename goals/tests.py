@@ -208,7 +208,7 @@ class MonthlyGoalTests(TestCase):
             html,
             re.S,
         )
-        self.assertIsNotNone(match, 'elemento json_script nao encontrado')
+        self.assertIsNotNone(match, 'elemento json_script não encontrado')
         payload = json.loads(match.group(1))
         self.assertEqual(payload['labels'], ['Alimentacao'])
         self.assertEqual(payload['goals'], [300.0])

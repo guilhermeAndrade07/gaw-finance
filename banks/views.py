@@ -75,7 +75,7 @@ class BankDeleteView(LoginRequiredMixin, UserScopedQuerySetMixin, DeleteView):
 @login_required
 @require_POST
 def bank_set_main(request, pk):
-    """POST-only: define o banco como principal (acao de estado)."""
+    """POST-only: define o banco como principal (ação de estado)."""
     bank = get_object_or_404(models.Bank, pk=pk, user=request.user)
     services.set_main_bank(request.user, bank)
     return redirect('bank_list')

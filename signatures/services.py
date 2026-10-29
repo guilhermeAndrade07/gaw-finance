@@ -12,14 +12,14 @@ from .models import Signature, SignatureCharge
 def generate_signature_charges():
     """
     Percorre todas as assinaturas ATIVAS com cartao de credito vinculado e
-    gera um Payment (compra no cartao) para o mes corrente caso o dia de
-    cobranca ja tenha sido alcancado e ainda nao tenha sido gerado neste mes.
+    gera um Payment (compra no cartao) para o mês corrente caso o dia de
+    cobranca já tenha sido alcancado e ainda não tenha sido gerado neste mês.
 
     A geracao e idempotente: cada assinatura gera no maximo uma cobranca por
-    mes, controlada pelos campos last_generated_month / last_generated_year.
+    mês, controlada pelos campos last_generated_month / last_generated_year.
 
     O date_payment do Payment reflete o dia real da cobranca (billing_day
-    clampado para o ultimo dia valido do mes), e nao o dia em que o service
+    clampado para o ultimo dia valido do mês), e não o dia em que o service
     rodou, para garantir que a cobranca seja atribuida ao ciclo correto.
     """
     today = timezone.localdate()

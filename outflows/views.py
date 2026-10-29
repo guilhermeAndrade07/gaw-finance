@@ -52,7 +52,7 @@ class OutflowListView(LoginRequiredMixin, UserScopedQuerySetMixin, ListView):
         context['months'] = [
             ('1', 'Janeiro'),
             ('2', 'Fevereiro'),
-            ('3', 'Marco'),
+            ('3', 'Março'),
             ('4', 'Abril'),
             ('5', 'Maio'),
             ('6', 'Junho'),
@@ -71,7 +71,7 @@ class OutflowCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
     model = models.Outflow
     template_name = 'outflow_create.html'
     form_class = forms.OutflowForm
-    success_url = reverse_lazy('outflow_list')
+    success_url = reverse_lazy('outflow_create')
 
     def form_valid(self, form):
         try:
@@ -85,7 +85,18 @@ class OutflowCreateView(LoginRequiredMixin, UserScopedFormMixin, CreateView):
         except ValidationError as exc:
             form.add_error(None, exc)
             return self.form_invalid(form)
-        return HttpResponseRedirect(self.get_success_url())
+        self.request.session['last_created'] = {
+            'action': 'Saída',
+            'title': form.cleaned_data.get('title') or '(sem título)',
+            'value': str(form.cleaned_data['value']),
+        }
+        return HttpResponseRedirect(f'{self.get_success_url()}?created=1')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('created') == '1':
+            context.update(self.request.session.pop('last_created', {}))
+        return context
 
 
 class OutflowDetailView(LoginRequiredMixin, UserScopedQuerySetMixin, DetailView):

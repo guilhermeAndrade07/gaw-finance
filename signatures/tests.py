@@ -100,7 +100,7 @@ class SignatureChargeTests(TestCase):
         self._create_signature(billing_day=31)
         last_day = calendar.monthrange(self.today.year, self.today.month)[1]
         if self.today.day < last_day:
-            self.skipTest('Dia atual ainda nao alcancou o fim do mes curto')
+            self.skipTest('Dia atual ainda não alcançou o fim do mês curto')
 
         generate_signature_charges()
         payment = Payment.objects.filter(user=self.user, card=self.card).first()
@@ -114,7 +114,7 @@ class SignatureChargeTests(TestCase):
         future_day = self.today.day + 1
         last_day = calendar.monthrange(self.today.year, self.today.month)[1]
         if future_day > last_day:
-            self.skipTest('Nao ha dia futuro valido neste mes')
+            self.skipTest('Não ha dia futuro valido neste mês')
         self._create_signature(billing_day=future_day)
         generate_signature_charges()
         self.assertFalse(Payment.objects.filter(user=self.user, card=self.card).exists())

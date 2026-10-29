@@ -660,7 +660,7 @@ class PaymentServiceTests(TestCase):
             register_payment(
                 user=self.user,
                 card=self.other_card,
-                name='Compra invalida',
+                name='Compra inválida',
                 date_payment=date(2026, 6, 10),
                 value=Decimal('100.00'),
             )

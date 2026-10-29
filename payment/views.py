@@ -201,8 +201,8 @@ class InvoiceListView(LoginRequiredMixin, ListView):
             return self._default_card()
 
     def _default_card(self):
-        # Primeiro cartao ativo do banco principal; se o principal nao tiver cartao,
-        # usa o primeiro cartao ativo do usuario. Sem banco principal, mantem o estado vazio.
+        # Primeiro cartao ativo do banco principal; se o principal não tiver cartao,
+        # usa o primeiro cartao ativo do usuario. Sem banco principal, mantém o estado vazio.
         main_bank = Bank.objects.filter(user=self.request.user, is_main=True).first()
         if not main_bank:
             return None

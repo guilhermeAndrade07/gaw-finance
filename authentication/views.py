@@ -38,7 +38,7 @@ class TokenLogoutView(APIView):
             serializer.is_valid(raise_exception=True)
         except TokenError:
             return Response(
-                {'refresh': ['Token invalido ou expirado.']},
+                {'refresh': ['Token inválido ou expirado.']},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

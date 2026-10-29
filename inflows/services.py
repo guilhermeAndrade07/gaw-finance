@@ -13,7 +13,7 @@ def _normalize_value(value):
     try:
         normalized = Decimal(value)
     except (InvalidOperation, TypeError, ValueError):
-        raise ValidationError('O valor da entrada e invalido.')
+        raise ValidationError('O valor da entrada e inválido.')
     if normalized <= Decimal('0.00'):
         raise ValidationError('O valor da entrada deve ser maior que zero.')
     return normalized
@@ -27,7 +27,7 @@ def _lock_banks(user, bank_ids):
     banks_by_id = {bank.pk: bank for bank in locked_banks}
     for bank_id in bank_ids:
         if banks_by_id.get(bank_id) is None:
-            raise ValidationError('O banco informado nao pertence ao usuario autenticado.')
+            raise ValidationError('O banco informado não pertence ao usuario autenticado.')
     return banks_by_id
 
 
@@ -67,10 +67,10 @@ def register_inflow(*, user, bank, value, title=None):
 
 def update_inflow(*, user, inflow, value, title=None, bank=None):
     if not inflow.pk:
-        raise ValidationError('A entrada informada nao existe.')
+        raise ValidationError('A entrada informada não existe.')
     original = Inflow.objects.get(pk=inflow.pk)
     if original.user_id != user.id:
-        raise ValidationError('A entrada nao pertence ao usuario autenticado.')
+        raise ValidationError('A entrada não pertence ao usuario autenticado.')
 
     target_bank = bank or original.bank
     bank_id = target_bank.pk
@@ -103,7 +103,7 @@ def update_inflow(*, user, inflow, value, title=None, bank=None):
 
 def delete_inflow(*, user, inflow):
     if inflow.user_id != user.id:
-        raise ValidationError('A entrada nao pertence ao usuario autenticado.')
+        raise ValidationError('A entrada não pertence ao usuario autenticado.')
     bank_id = inflow.bank_id
 
     with transaction.atomic():

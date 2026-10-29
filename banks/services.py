@@ -17,7 +17,7 @@ def reconcile_bank_balances():
 
 
 def user_has_main_bank(user, exclude_pk=None):
-    """Retorna True se o usuario ja possui um banco principal."""
+    """Retorna True se o usuario já possui um banco principal."""
     queryset = Bank.objects.filter(user=user, is_main=True)
     if exclude_pk:
         queryset = queryset.exclude(pk=exclude_pk)
@@ -28,7 +28,7 @@ def set_main_bank(user, bank):
     """Define ``bank`` como o banco principal do usuario.
 
     Demais bancos do usuario perdem a flag principal. Executa dentro de uma
-    transacao atomica com lock na linha alvo, evitando condicoes de corrida
+    transação atomica com lock na linha alvo, evitando condicoes de corrida
     que violariam a constraint ``unique_main_bank_per_user`` (pois removemos a
     flag dos demais antes de promover o alvo).
     """
@@ -44,7 +44,7 @@ def set_main_bank(user, bank):
 def ensure_main_bank(user, bank):
     """Garante que o usuario possua um banco principal.
 
-    Usado na criacao/edicao de bancos: se o usuario ainda nao tiver nenhum
+    Usado na criacao/edicao de bancos: se o usuario ainda não tiver nenhum
     banco principal (ex.: primeiro banco cadastrado), promove ``bank``.
     """
     if user is None or user.pk is None:

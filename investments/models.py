@@ -18,7 +18,7 @@ class InvestmentAsset(models.Model):
 
     ASSET_TYPE_CHOICES = [
         (FIXED_INCOME, 'Renda Fixa'),
-        (VARIABLE_INCOME, 'Renda Variavel'),
+        (VARIABLE_INCOME, 'Renda Variável'),
         (CRYPTO, 'Cripto'),
         (FUNDS, 'Fundos'),
     ]
@@ -104,7 +104,7 @@ class InvestmentMovement(models.Model):
     def clean(self):
 
         if self.value is None or self.value <= Decimal('0.00'):
-            raise ValidationError('O valor da movimentacao deve ser maior que zero.')
+            raise ValidationError('O valor da movimentação deve ser maior que zero.')
 
     def __str__(self):
         return f'{self.get_operation_type_display()} - {self.asset.name}'
