@@ -20,13 +20,16 @@ from django.views.generic import ListView
 from auditing import actions
 from auditing.services import record_audit_event
 from authentication.services import blacklist_user_tokens
+from categories.defaults import create_default_categories
 from .forms import (
     AccountEditForm,
     EmailAuthenticationForm,
     InviteAcceptForm,
     MFASetupForm,
     MFAVerifyForm,
+    PasswordChangeFormStyled,
 )
+from .middleware import mfa_verification_is_valid
 from .models import Account, Invite, MFASetup, RecoveryCode
 from .rate_limit import (
     is_invite_rate_limited,
@@ -111,6 +114,8 @@ def invite_accept(request, token):
                 account.name = form.cleaned_data['name']
                 account.save(update_fields=['name', 'updated_at'])
 
+                create_default_categories(user)
+
                 invite.used_at = timezone.now()
                 invite.save(update_fields=['used_at'])
 
@@ -193,6 +198,7 @@ def mfa_setup(request):
 
                 request.session['mfa_verified'] = True
                 request.session['mfa_verified_user_id'] = request.user.pk
+                request.session['mfa_verified_at'] = timezone.now().timestamp()
                 record_audit_event(
                     action=actions.MFA_SETUP_SUCCESS,
                     user=request.user,
@@ -244,7 +250,7 @@ def mfa_verify(request):
     if not setup:
         return redirect('mfa_setup')
 
-    if request.session.get('mfa_verified') and request.session.get('mfa_verified_user_id') == request.user.pk:
+    if mfa_verification_is_valid(request.session, request.user.pk):
         return redirect('/')
 
     if request.method == 'POST':
@@ -282,6 +288,7 @@ def mfa_verify(request):
             if verified:
                 request.session['mfa_verified'] = True
                 request.session['mfa_verified_user_id'] = request.user.pk
+                request.session['mfa_verified_at'] = timezone.now().timestamp()
                 record_audit_event(
                     action=actions.MFA_VERIFY_SUCCESS,
                     user=request.user,
@@ -307,8 +314,10 @@ def mfa_verify(request):
     return render(request, 'accounts/mfa_verify.html', {'form': form})
 
 
-class PasswordChangeView(auth_views.PasswordChangeView):
+class PasswordChangeView(LoginRequiredMixin, auth_views.PasswordChangeView):
+    login_url = 'login'
     template_name = 'accounts/password_change.html'
+    form_class = PasswordChangeFormStyled
     success_url = reverse_lazy('password_change_done')
 
     def form_valid(self, form):
@@ -325,5 +334,6 @@ class PasswordChangeView(auth_views.PasswordChangeView):
         return response
 
 
-class PasswordChangeDoneView(auth_views.PasswordChangeDoneView):
+class PasswordChangeDoneView(LoginRequiredMixin, auth_views.PasswordChangeDoneView):
+    login_url = 'login'
     template_name = 'accounts/password_change_done.html'

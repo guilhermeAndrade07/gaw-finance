@@ -1,0 +1,569 @@
+/* ============================================================
+   GAW Finance — Apple Skin (design system "Lumora/Apple")
+   Referência: app/static/design/apple/iphone/index.html
+
+   Estratégia: skin progressiva. Mantém Adminox (Bootstrap) por
+   baixo e sobrepõe os tokens do design Apple via variáveis CSS.
+   Deve ser carregado APÓS custom.css.
+
+   Regra do sistema: UMA cor de ação (verde #5cdd49, herdada do
+  Adminox) + superfícies brancas/parchment + hairlines 1px.
+   Botões são pílulas; cards têm raio 18px e não carregam sombra;
+   a única "elevação" é o blur do topbar.
+
+   * Identidade preservada: .brand-text continua em Cantata One.
+   ============================================================ */
+
+:root {
+  /* ---- Tokens Apple → GAW (verde no lugar do Action Blue) ---- */
+  --ad-primary: #5cdd49;
+  --ad-primary-hover: #48cf35;
+  --ad-primary-active: #37b825;
+  --ad-on-primary: #ffffff;
+  /* Bootstrap primary-bg-subtle já é #eaf6e8 (verde pálido) — serve de tinte */
+  --ad-primary-subtle: #eaf6e8;
+
+  --ad-ink: #1d1d1f;          /* headline + corpo escuro */
+  --ad-ink-80: #333333;       /* corpo */
+  --ad-muted: #7a7a7a;        /* texto secundário / fine print */
+
+  --ad-canvas: #ffffff;       /* superfícies de página/input */
+  --ad-parchment: #f5f5f7;    /* fundo de página (off-white de assinatura) */
+  --ad-hairline: #e0e0e0;     /* 1px borders */
+  --ad-divider: #f0f0f0;      /* separadores internos */
+
+  /* ---- Escala de raios Apple: 6 → 11 → 12 → 18 → pill ---- */
+  --bs-border-radius: 0.75rem;        /* inputs e controles: 12px */
+  --bs-border-radius-sm: 0.375rem;
+  --bs-border-radius-lg: 1.125rem;    /* cards: 18px */
+  --bs-border-radius-xl: 1.125rem;
+  --bs-btn-border-radius: 9999px;     /* a pílula É o sinal de ação */
+
+  /* ---- Tipografia: Inter como UI face ---- */
+  --bs-body-font-family: 'Inter','SF Pro Text',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+
+  /* ---- Superfícies e textos (light) ---- */
+  --bs-body-bg: var(--ad-parchment);
+  --bs-body-color: var(--ad-ink-80);
+  --bs-border-color: var(--ad-hairline);
+  --bs-border-color-translucent: var(--ad-hairline);
+
+  /* Sombra: cards não carregam sombra, mas elementos flutuantes (flyout
+     da sidebar condensed, tooltips) mantêm a sombra suave do tema */
+  --bs-box-shadow: 0px 0px 35px 0px rgba(154, 161, 171, 0.15);
+  --bs-box-shadow-sm: none;
+  --bs-box-shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --bs-box-shadow-xl: 0 24px 80px rgba(0, 0, 0, 0.18);
+}
+
+/* ==== Modo escuro — tiles Apple (near-black, não azul escuro) ==== */
+:root[data-bs-theme=dark] {
+  --ad-ink: #f5f5f7;
+  --ad-ink-80: #d1d1d6;
+  --ad-muted: #98989d;
+  --ad-canvas: #1c1c1e;
+  --ad-parchment: #161618;
+  --ad-hairline: #2c2c2e;
+  --ad-divider: #232325;
+  --ad-primary: #77ef6b;          /* verde mais vivo sobre escuro */
+  --ad-primary-hover: #8bf580;
+  --ad-primary-active: #64e355;
+  --bs-body-bg: var(--ad-parchment);
+  --bs-body-color: var(--ad-ink-80);
+  --bs-border-color: var(--ad-hairline);
+  --bs-border-color-translucent: var(--ad-hairline);
+  --bs-box-shadow: 0px 0px 35px 0px rgba(26, 27, 34, 0.5);
+}
+
+/* ============================================================
+   Tipografia
+   ============================================================ */
+body { letter-spacing: -0.1px; }
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--bs-body-font-family);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--ad-ink);
+}
+
+/* Títulos de página/cards: cantata sai, entra Inter (sobrepõe custom.css) */
+.page-title-box h4,
+.header-title {
+  font-family: var(--bs-body-font-family);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--ad-ink);
+}
+
+.card-subtitle {
+  font-family: var(--bs-body-font-family);
+  font-weight: 400;
+  color: var(--ad-muted);
+}
+
+/* Idioma de conteúdo: cores de texto do ink Apple em superfícies claras */
+.text-muted { color: var(--ad-muted) !important; }
+
+/* ============================================================
+   Botões — a pílula é o sinal de ação
+   ============================================================ */
+.btn {
+  font-family: var(--bs-body-font-family);
+  letter-spacing: -0.1px;
+  border: none;
+  -webkit-transition: background-color .15s ease, border-color .15s ease,
+    color .15s ease, box-shadow .15s ease, transform .06s ease;
+  transition: background-color .15s ease, border-color .15s ease,
+    color .15s ease, box-shadow .15s ease, transform .06s ease;
+}
+
+.btn:active { transform: scale(0.96); }
+
+/* Hover/press do verde: um passo de profundidade, não um segundo tom de cinza */
+.btn-primary,
+.btn-success {
+  --bs-btn-hover-bg: var(--ad-primary-hover);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-bg: var(--ad-primary-active);
+  --bs-btn-active-border-color: transparent;
+}
+/* Dark: verde mais fundo para que o texto branco não ofusque */
+:root[data-bs-theme=dark] .btn-primary,
+:root[data-bs-theme=dark] .btn-success {
+  --bs-btn-bg: #35a027;
+  --bs-btn-color: #ffffff;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-bg: #3fb131;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-bg: #2c8c20;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-border-color: transparent;
+}
+
+/* Botão secundário estilo Apple: transparente + borda 1px da cor de ação */
+.btn-info {
+  --bs-btn-color: var(--ad-primary);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--ad-primary);
+  --bs-btn-hover-color: var(--ad-ink);
+  --bs-btn-hover-bg: var(--ad-primary-subtle);
+  --bs-btn-hover-border-color: var(--ad-primary-hover);
+  --bs-btn-active-color: var(--ad-ink);
+  --bs-btn-active-bg: var(--ad-primary-subtle);
+  --bs-btn-active-border-color: var(--ad-primary-hover);
+}
+
+/* Pearl capsule: botão utilitário leve, mas VISÍVEL sobre o parchment
+   (antes era fill sem borda e desaparecia no fundo) */
+.btn-light,
+.btn-outline-light {
+  --bs-btn-bg: var(--ad-canvas);
+  --bs-btn-color: var(--ad-ink-80);
+  --bs-btn-border-color: var(--ad-hairline);
+  --bs-btn-hover-color: var(--ad-primary);
+  --bs-btn-hover-bg: var(--ad-parchment);
+  --bs-btn-hover-border-color: var(--ad-primary);
+  --bs-btn-active-color: var(--ad-primary);
+  --bs-btn-active-bg: var(--ad-parchment);
+  --bs-btn-active-border-color: var(--ad-primary-hover);
+  box-shadow: none;
+}
+:root[data-bs-theme=dark] .btn-light,
+:root[data-bs-theme=dark] .btn-outline-light {
+  --bs-btn-bg: var(--ad-canvas);
+  --bs-btn-color: var(--ad-ink-80);
+  --bs-btn-border-color: var(--ad-hairline);
+  --bs-btn-hover-color: var(--ad-primary);
+  --bs-btn-hover-bg: var(--ad-divider);
+  --bs-btn-hover-border-color: var(--ad-primary);
+  --bs-btn-active-bg: var(--ad-divider);
+}
+
+/* Chips de ação em tabelas: 44×44-ish circulares, sem sombra */
+.table-action-btn { border-radius: 50%; }
+
+/* ============================================================
+   Cards — raio 18px, hairline 1px, sem sombra
+   ============================================================ */
+.card {
+  --bs-card-border-width: 1px;
+  --bs-card-border-color: var(--ad-hairline);
+  --bs-card-border-radius: 1.125rem;
+  --bs-card-inner-border-radius: calc(1.125rem - 1px);
+  --bs-card-bg: var(--ad-canvas);
+  --bs-card-box-shadow: none;
+  --bs-card-cap-padding-y: 1.125rem;
+  --bs-card-cap-bg: transparent;
+}
+
+/* Página: canvas físico e o card do título em hairline (sobrepõe rounded-0) */
+.page-title-box.rounded-0 { border-radius: 1.125rem !important; }
+
+/* Divider interno macio */
+.border-top, .border-bottom { border-color: var(--ad-hairline) !important; }
+
+/* ============================================================
+   Navegação — topbar translúcida (sub-nav) e sidebar hairline
+   ============================================================ */
+/* Todas as variantes de cor do topbar convergem para o estilo blur Apple */
+:root[data-topbar-color=brand],
+:root[data-topbar-color=dark],
+:root[data-bs-theme=dark][data-topbar-color=dark],
+:root[data-bs-theme=dark][data-topbar-color=light] {
+  --bs-topbar-bg: rgba(245, 245, 247, 0.85);
+  --bs-topbar-item-color: var(--ad-muted);
+  --bs-topbar-item-hover-color: var(--ad-primary);
+  --bs-topbar-search-bg: var(--ad-canvas);
+}
+
+/* Novo default da marca: brand = blur claro (antes era faixa verde sólida) */
+:root[data-topbar-color=brand] {
+  --bs-topbar-item-hover-color: var(--ad-primary-hover);
+}
+
+:root[data-bs-theme=dark][data-topbar-color=brand],
+:root[data-bs-theme=dark][data-topbar-color=dark],
+:root[data-bs-theme=dark][data-topbar-color=light] {
+  --bs-topbar-bg: rgba(22, 22, 24, 0.85);
+  --bs-topbar-item-color: var(--ad-muted);
+  --bs-topbar-item-hover-color: var(--ad-primary);
+  --bs-topbar-search-bg: var(--ad-canvas);
+}
+
+/* Novo default da marca: brand = blur claro (antes era faixa verde sólida) */
+:root[data-topbar-color=brand] {
+  --bs-topbar-item-color: var(--ad-muted);
+  --bs-topbar-item-hover-color: var(--ad-primary-hover);
+  --bs-topbar-search-bg: var(--ad-canvas);
+}
+
+.app-topbar {
+  border-bottom: 1px solid var(--ad-hairline);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* O logo mantém o verde como marca — texto ink para contraste no blur */
+.app-topbar .brand-text { color: var(--ad-primary); }
+
+/* Sidebar: converte qualquer variante para hairline light Apple */
+:root[data-menu-color=dark],
+:root[data-menu-color=light] {
+  --bs-menu-bg: var(--ad-canvas);
+  --bs-menu-item-color: var(--ad-muted);
+  --bs-menu-item-hover-color: var(--ad-ink);
+  --bs-menu-item-hover-bg: var(--ad-parchment);
+  --bs-menu-item-active-color: var(--ad-primary);
+  --bs-menu-item-active-bg: var(--ad-primary-subtle);
+}
+
+:root[data-bs-theme=dark][data-menu-color=dark],
+:root[data-bs-theme=dark][data-menu-color=light] {
+  --bs-menu-bg: var(--ad-parchment);
+  --bs-menu-item-color: var(--ad-muted);
+  --bs-menu-item-hover-color: var(--ad-ink);
+  --bs-menu-item-hover-bg: var(--ad-canvas);
+  --bs-menu-item-active-color: var(--ad-primary);
+  --bs-menu-item-active-bg: rgba(92, 221, 73, 0.14);
+}
+
+.sidenav-menu {
+  box-shadow: none !important;
+  border-right: 1px solid var(--ad-hairline) !important;
+}
+
+.munu-text, .menu-text,
+.sidenav-menu .menu-text,
+.sidenav-menu .side-nav-title { font-family: var(--bs-body-font-family); }
+
+.sidenav-menu .menu-text { letter-spacing: -0.1px; }
+
+/* ============================================================
+   Sidebar condensed — flyout no hover
+   Label flutuante e submenu ganham o card Apple: fundo, hairline,
+   raio top-left quadrado (ancora na coluna) e sombra suave.
+   ============================================================ */
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover .side-nav-link .menu-text {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  z-index: 1035;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 16px;
+  margin-left: 3px;
+  background: var(--ad-canvas);
+  border: 1px solid var(--ad-hairline);
+  border-radius: 0 12px 12px 12px;
+  box-shadow: none;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  -webkit-animation: ad-flyout-in 120ms ease-out;
+  animation: ad-flyout-in 120ms ease-out;
+}
+
+/* Hover no condensed: apenas o nome — sem verde de item ativo/hover
+   vazando para o flyout (nem no texto, nem no chip atrás do ícone) */
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover .side-nav-link .menu-text {
+  color: var(--ad-ink-80);
+}
+
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover > .side-nav-link,
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover > .side-nav-link.active {
+  position: relative; /* âncora do flyout: bubble resolve contra o link, não contra a sidebar */
+  background: transparent;
+  color: var(--bs-menu-item-color);
+  /* Tema expande o link p/ 240px com vidro verde borrado no hover — mata os dois */
+  width: auto;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover > .side-nav-link .menu-icon {
+  background: transparent;
+  border-radius: 0;
+}
+
+html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover > .collapse > .sub-menu {
+  border: 1px solid var(--ad-hairline);
+  border-radius: 0 12px 12px 12px;
+  -webkit-box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  margin-top: 2px;
+  -webkit-animation: ad-flyout-in 120ms ease-out;
+  animation: ad-flyout-in 120ms ease-out;
+}
+
+.sub-menu .side-nav-link { font-size: 0.82rem; }
+
+@keyframes ad-flyout-in {
+  from { opacity: 0; -webkit-transform: translateX(-4px); transform: translateX(-4px); }
+  to   { opacity: 1; -webkit-transform: translateX(0);    transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover .side-nav-link .menu-text,
+  html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu .side-nav .side-nav-item:hover > .collapse > .sub-menu {
+    animation: none;
+  }
+}
+
+/* "Navegação", "Financeiro"...: eyebrow Apple (antes: Cantata One) */
+.side-nav-title {
+  font-family: var(--bs-body-font-family);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ad-muted);
+}
+
+/* ============================================================
+   Formulários — controles com raio 12px, foco em verde suave
+   ============================================================ */
+.form-control, .form-select, .form-check-input { background-color: var(--ad-canvas); }
+
+.form-control { color: var(--ad-ink); }
+.form-control::placeholder { color: var(--ad-muted); }
+
+.form-control:focus,
+.form-select:focus {
+  color: var(--ad-ink);
+  border-color: var(--ad-primary);
+  box-shadow: 0 0 0 3px rgba(92, 221, 73, 0.15);
+}
+
+.form-select > option { color: var(--ad-ink); background: var(--ad-canvas); }
+
+/* ============================================================
+   Tabelas — hairline 1px, linhas resolvem contra o card branco
+   ============================================================ */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--ad-divider);
+  --bs-table-hover-color: var(--ad-ink);
+}
+
+.table-hover > tbody > tr:last-child > *,
+.table > :not(caption) > tr:last-child > * { border-bottom: 1px solid var(--ad-divider); }
+
+/* ============================================================
+   Progresso — trilha na cor do card (o gray do tema não vaza
+   no dark) e percentual com peso legível
+   ============================================================ */
+.progress {
+  --bs-progress-bg: var(--ad-divider);
+  --bs-progress-box-shadow: none;
+  --bs-progress-border-radius: 9999px;
+  --bs-progress-bar-color: var(--ad-ink);
+}
+
+.progress-bar { font-weight: 600; letter-spacing: -0.1px; }
+
+/* Detalhes (dashboard de metas): a lista mora DENTRO do card —
+   no dark o secondary-bg do tema pinta uma faixa cinza por cima */
+.list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-color: var(--ad-ink-80);
+  --bs-list-group-border-color: var(--ad-divider);
+}
+
+:root[data-bs-theme=dark] .list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-color: var(--ad-ink-80);
+  --bs-list-group-border-color: var(--ad-divider);
+}
+
+#goalDetails .badge,
+.goal-details .badge { font-weight: 600; }
+
+/* Barras de progresso de metas: trilha pílula fina + percentual na
+   ponta direita (some de dentro do fill quando a barra é curta) */
+.goal-progress { flex: 1 1 auto; height: 10px !important; }
+
+.goal-progress-value {
+  flex: 0 0 auto;
+  min-width: 3.4rem;
+  text-align: right;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chips de zona (Detalhes do dashboard de metas):
+   tinta translúcida + texto da mesma família — pílula legível
+   em light e dark, em vez de fundo chapado com texto preto */
+.badge-zone {
+  font-weight: 600;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0.5em 0.75em;
+  border-radius: 9999px;
+  letter-spacing: -0.1px;
+}
+
+.badge-zone-low  { background: rgba(44, 200, 97, 0.14);  color: #1f7a33; }
+.badge-zone-warn { background: rgba(255, 169, 28, 0.16); color: #965000; }
+.badge-zone-high { background: rgba(249, 106, 116, 0.15); color: #c24550; }
+
+:root[data-bs-theme=dark] .badge-zone-low  { background: rgba(92, 221, 73, 0.16);   color: #77ef6b; }
+:root[data-bs-theme=dark] .badge-zone-warn { background: rgba(255, 169, 28, 0.16);  color: #ffa91c; }
+:root[data-bs-theme=dark] .badge-zone-high { background: rgba(249, 106, 116, 0.18); color: #f96a74; }
+
+/* ============================================================
+   Dropdowns, modais, badges — superfície flutuante com hairline
+   ============================================================ */
+.dropdown-menu {
+  --bs-dropdown-border-color: var(--ad-hairline);
+  --bs-dropdown-border-radius: 0.875rem;
+  --bs-dropdown-link-hover-bg: var(--ad-parchment);
+  --bs-dropdown-link-hover-color: var(--ad-ink);
+  --bs-dropdown-divider-bg: var(--ad-divider);
+  --bs-dropdown-header-color: var(--ad-muted);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-bs-theme=dark] .dropdown-menu {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  --bs-modal-border-radius: 1.125rem;
+  border: 1px solid var(--ad-hairline);
+  background: var(--ad-canvas);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-bs-theme=dark] .modal-content { box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55); }
+
+/* ============================================================
+   Chip de conta (topbar) e menus flutuantes
+   ============================================================ */
+.nav-user .topbar-link {
+  padding: 3px 8px;
+  border-radius: 9999px;
+  color: var(--ad-ink);
+  -webkit-transition: background-color .15s ease, transform .06s ease;
+  transition: background-color .15s ease, transform .06s ease;
+}
+
+.nav-user .topbar-link:hover { background: var(--ad-parchment); }
+.nav-user .topbar-link:active { transform: scale(0.97); }
+
+:root[data-bs-theme=dark] .nav-user .topbar-link:hover {
+  background: var(--ad-canvas);
+}
+
+.nav-user .avatar-sm {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+}
+
+.nav-user .avatar-title {
+  font-family: var(--bs-body-font-family);
+  letter-spacing: 0;
+}
+
+/* Itens do menu: blocos flutuantes com hover recuo, estilo Apple */
+.dropdown-item {
+  --bs-dropdown-item-padding-y: 0.45rem;
+  --bs-dropdown-item-padding-x: 0.85rem;
+}
+
+.dropdown-menu > li > .dropdown-item,
+.dropdown-menu .noti-title > div,
+.dropdown-menu > form .dropdown-item {
+  border-radius: 0.6rem;
+  margin: 0.15rem 0.4rem;
+}
+
+.dropdown-item .me-1 { margin-right: 0.6rem !important; }
+
+.dropdown-divider { border-color: var(--ad-divider); opacity: 1; }
+
+/* ============================================================
+   Paginação — pílulas na mesma gramática dos botões
+   ============================================================ */
+.pagination .page-link {
+  border: none;
+  border-radius: 9999px !important;
+  margin: 0 2px;
+  color: var(--ad-muted);
+  font-weight: 500;
+  background: transparent;
+}
+.pagination .page-link:hover { background: var(--ad-parchment); color: var(--ad-ink); }
+.pagination .page-item.active .page-link {
+  background: var(--ad-primary);
+  color: var(--ad-on-primary);
+}
+
+/* ============================================================
+   Breadcrumb, footer, detalhes
+   ============================================================ */
+.breadcrumb-item + .breadcrumb-item::before { color: var(--ad-muted); }
+.breadcrumb-item a { color: var(--ad-muted); }
+.breadcrumb-item.active { color: var(--ad-ink); }
+
+.footer { color: var(--ad-muted); font-size: 0.78rem; }
+
+.app-search .form-control,
+.app-search .btn { border-radius: 9999px; }
+
+/* ============================================================
+   Qualidade de piso — foco visível e motion com respeito
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--ad-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active { transform: none; }
+}

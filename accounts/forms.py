@@ -1,10 +1,42 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 
 from .models import Account
+
+
+class PasswordChangeFormStyled(PasswordChangeForm):
+    """Troca de senha (senha atual + nova + confirmação) com markup
+    Bootstrap consistente e copy pt-BR alinhada ao design do app."""
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(user, *args, **kwargs)
+
+        self.fields['old_password'].widget.attrs.update({
+            'class': 'form-control',
+            'autocomplete': 'current-password',
+            'placeholder': '••••••••',
+        })
+
+        self.fields['old_password'].label = 'Senha atual'
+
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control',
+            'autocomplete': 'new-password',
+            'placeholder': '••••••••',
+        })
+        self.fields['new_password1'].label = 'Nova senha'
+        self.fields['new_password1'].help_text = 'Mínimo de 8 caracteres. Evite senhas numéricas ou muito comuns.'
+
+        self.fields['new_password2'].widget.attrs.update({
+            'class': 'form-control',
+            'autocomplete': 'new-password',
+            'placeholder': '••••••••',
+        })
+        self.fields['new_password2'].label = 'Repetir nova senha'
 
 
 class EmailAuthenticationForm(AuthenticationForm):

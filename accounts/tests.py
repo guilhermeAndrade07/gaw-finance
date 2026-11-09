@@ -12,6 +12,8 @@ from django.utils import timezone
 
 from accounts.models import Account, Invite, MFASetup, RecoveryCode
 from banks.models import Bank
+from categories.defaults import DEFAULT_CATEGORY_NAMES
+from categories.models import Category
 
 
 class RateLimitTests(TestCase):
@@ -168,6 +170,32 @@ class OwnerInviteTests(TestCase):
         self.assertTrue(invite.is_used)
         self.assertFalse(invite.is_valid)
 
+    def test_invite_accept_creates_default_categories(self):
+        token = Invite.generate_token()
+        invite = Invite.objects.create(
+            email='owner@gawfinance.com',
+            token_hash=Invite.hash_token(token),
+            is_superuser=True,
+            expires_at=timezone.now() + timedelta(days=7),
+        )
+
+        response = self.client.post(
+            reverse('invite_accept', kwargs={'token': token}),
+            data={
+                'name': 'Guilherme',
+                'password': 'senha-forte-123',
+                'confirm_password': 'senha-forte-123',
+            },
+        )
+
+        user = User.objects.get(username='Guilherme')
+        categories = list(
+            Category.objects.filter(user=user).values_list('name', flat=True),
+        )
+
+        self.assertRedirects(response, reverse('mfa_setup'))
+        self.assertEqual(sorted(categories), sorted(DEFAULT_CATEGORY_NAMES))
+
     def test_expired_invite_cannot_be_used(self):
         token = Invite.generate_token()
         Invite.objects.create(
@@ -289,3 +317,70 @@ class MFAFlowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Código inválido')
         self.assertFalse(self.client.session.get('mfa_verified'))
+
+
+class PasswordChangeTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='troca-senha',
+            email='troca-senha@gawfinance.com',
+            password='senha-atual-123',
+        )
+        self.client.force_login(self.user)
+        Account.objects.get_or_create(user=self.user)
+
+    def test_anonymous_is_redirected_to_login(self):
+        anon_client = Client()
+        response = anon_client.get(reverse('password_change'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])
+
+    def test_done_page_requires_login(self):
+        anon_client = Client()
+        response = anon_client.get(reverse('password_change_done'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])
+
+    def test_page_renders_the_three_fields(self):
+        response = self.client.get(reverse('password_change'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Senha atual')
+        self.assertContains(response, 'Nova senha')
+        self.assertContains(response, 'Repetir nova senha')
+
+    def test_rejects_wrong_current_password(self):
+        response = self.client.post(reverse('password_change'), {
+            'old_password': 'senha-errada',
+            'new_password1': 'nova-senha-forte-456',
+            'new_password2': 'nova-senha-forte-456',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('senha-atual-123'))
+
+    def test_rejects_mismatched_confirmation(self):
+        response = self.client.post(reverse('password_change'), {
+            'old_password': 'senha-atual-123',
+            'new_password1': 'nova-senha-forte-456',
+            'new_password2': 'outra-senha-789',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Os dois campos de senha não correspondem.')
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('senha-atual-123'))
+
+    def test_changes_password_and_redirects_to_done(self):
+        response = self.client.post(reverse('password_change'), {
+            'old_password': 'senha-atual-123',
+            'new_password1': 'nova-senha-forte-456',
+            'new_password2': 'nova-senha-forte-456',
+        })
+
+        self.assertRedirects(response, reverse('password_change_done'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('nova-senha-forte-456'))

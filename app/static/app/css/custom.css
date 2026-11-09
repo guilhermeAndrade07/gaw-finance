@@ -245,14 +245,53 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .outflow-inline-actions {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
 }
 
 .outflow-transfer {
   white-space: nowrap;
+}
+
+/* Base: em telas < lg a linha de ações sai da direita e vira fila própria */
+@media (max-width: 991.98px) {
+  .outflow-actions {
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .outflow-inline-actions {
+    width: 100%;
+  }
+
+  .outflow-transfer {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .signature-toolbar {
+    flex-direction: column;
+  }
+
+  .signature-filter {
+    width: 100%;
+  }
+
+  .signature-create {
+    align-self: flex-start;
+  }
+
+  .signature-active-summary {
+    margin-left: 0;
+    text-align: left;
+    width: 100%;
+  }
 }
 
 /* Sidebar fixa em todos os modos: o tema usa position:absolute no modo
@@ -296,7 +335,8 @@ html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu {
 
 @media (max-width: 767.98px) {
   .inflow-actions {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
   }
 
   .outflow-actions {
@@ -306,6 +346,7 @@ html[data-sidenav-size=condensed]:not([data-layout=topnav]) .sidenav-menu {
 
   .outflow-inline-actions {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .outflow-transfer {

@@ -122,6 +122,14 @@ LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/login/'
 
+# Mantém o usuário autenticado por um dia inteiro após o login completo
+# (email + senha + código do autenticador). A verificação MFA também vale
+# 24h; após esse período é pedido somente o código do autenticador,
+# sem precisar repetir email e senha.
+SESSION_COOKIE_AGE = 24 * 60 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+MFA_VERIFICATION_VALIDITY_HOURS = 24
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',

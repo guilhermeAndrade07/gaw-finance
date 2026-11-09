@@ -128,14 +128,27 @@
             nameElement.textContent = data.labels[i];
 
             const percentageElement = document.createElement('span');
-            percentageElement.className = 'badge';
-            percentageElement.style.backgroundColor = colorForPercentage(data.percentages[i] || 0);
-            percentageElement.style.color = '#000';
-            percentageElement.textContent = `${(data.percentages[i] || 0).toFixed(1)}%`;
+            const pct = data.percentages[i] || 0;
+            percentageElement.className = 'badge badge-zone ' + (pct > 100 ? 'badge-zone-high' : pct >= 70 ? 'badge-zone-warn' : 'badge-zone-low');
+            percentageElement.textContent = `${pct.toFixed(1)}%`;
+
+            const spentVal = data.spent[i] || 0;
+            const goalVal = data.goals[i] || 0;
+            const remaining = goalVal - spentVal;
 
             const valuesElement = document.createElement('p');
             valuesElement.className = 'mb-0 text-muted small';
-            valuesElement.textContent = `R$ ${formatBRL(data.spent[i] || 0)} de R$ ${formatBRL(data.goals[i] || 0)}`;
+            valuesElement.textContent = `R$ ${formatBRL(spentVal)} de R$ ${formatBRL(goalVal)}`;
+
+            const remainingElement = document.createElement('span');
+            if (remaining >= 0) {
+                remainingElement.className = 'fw-semibold text-success';
+                remainingElement.textContent = ` · Restante: R$ ${formatBRL(remaining)}`;
+            } else {
+                remainingElement.className = 'fw-semibold text-danger';
+                remainingElement.textContent = ` · Excedido em: R$ ${formatBRL(Math.abs(remaining))}`;
+            }
+            valuesElement.appendChild(remainingElement);
 
             itemHeader.append(nameElement, percentageElement);
             item.append(itemHeader, valuesElement);
@@ -182,23 +195,30 @@
             appendTextCell(row, `R$ ${formatBRL(data.spent[index] || 0)}`);
 
             const progressCell = document.createElement('td');
-            const progress = document.createElement('div');
             const percentage = Number(data.percentages[index] || 0);
+
+            const progress = document.createElement('div');
             progress.className = 'progress-bar progress-bar-cell';
             progress.setAttribute('role', 'progressbar');
             progress.style.width = `${Math.min(percentage, 100)}%`;
-            progress.style.color = '#000';
             progress.setAttribute('aria-valuenow', percentage);
             progress.setAttribute('aria-valuemin', '0');
             progress.setAttribute('aria-valuemax', '100');
-            progress.textContent = `${percentage}%`;
+            progress.setAttribute('aria-label', `Progresso da meta: ${percentage}%`);
             progress.style.backgroundColor = colorForPercentage(percentage);
 
             const progressWrapper = document.createElement('div');
-            progressWrapper.className = 'progress';
-            progressWrapper.style.height = '20px';
+            progressWrapper.className = 'progress goal-progress';
             progressWrapper.appendChild(progress);
-            progressCell.appendChild(progressWrapper);
+
+            const caption = document.createElement('span');
+            caption.className = 'goal-progress-value';
+            caption.textContent = `${percentage}%`;
+
+            const progressRow = document.createElement('div');
+            progressRow.className = 'd-flex align-items-center gap-2';
+            progressRow.append(progressWrapper, caption);
+            progressCell.appendChild(progressRow);
             row.appendChild(progressCell);
 
             const actionsCell = document.createElement('td');

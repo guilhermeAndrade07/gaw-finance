@@ -35,29 +35,29 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-lg-2 col-md-4">
-        <select class="form-select" name="month">
-          <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Mêses</option>
-          {% for month_value, month_label in months %}
-            <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-12 col-lg-2 col-md-4">
-        <select class="form-select" name="year">
-          <option value="" {% if not request.GET.year %} selected {% endif %}>Todos os Anos</option>
-          {% for year in years reversed %}
-            <option value="{{ year }}" {% if request.GET.year == year|stringformat:'s' %} selected {% endif %}>{{ year }}</option>
-          {% endfor %}
-        </select>
+      <div class="col-12 col-lg-auto">
+        <div class="d-flex gap-2 flex-wrap">
+          <select class="form-select" name="month" style="width: 155px;">
+            <option value="" {% if not request.GET.month %} selected {% endif %}>Todos os Meses</option>
+            {% for month_value, month_label in months %}
+              <option value="{{ month_value }}" {% if request.GET.month == month_value %} selected {% endif %}>{{ month_label }}</option>
+            {% endfor %}
+          </select>
+          <select class="form-select" name="year" style="width: 145px;">
+            <option value="" {% if not request.GET.year %} selected {% endif %}>Todos os Anos</option>
+            {% for year in years reversed %}
+              <option value="{{ year }}" {% if request.GET.year == year|stringformat:'s' %} selected {% endif %}>{{ year }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary">
+            <iconify-icon icon="mdi:filter" class="me-1"></iconify-icon> Filtrar
+          </button>
+          <a href="{% url 'inflow_list' %}" class="btn btn-light">Limpar</a>
+        </div>
       </div>
 
-      <div class="col-12 col-lg-5 inflow-actions d-flex gap-2">
-        <button type="submit" class="btn btn-primary">
-          <iconify-icon icon="mdi:filter" class="me-1"></iconify-icon> Filtrar
-        </button>
-        <a href="{% url 'inflow_list' %}" class="btn btn-light">Limpar</a>
-        <a href="{% url 'inflow_create' %}" class="btn btn-success ms-lg-auto">
+      <div class="col-12 col-lg-auto ms-lg-auto inflow-actions d-flex gap-2">
+        <a href="{% url 'inflow_create' %}" class="btn btn-success">
           <i data-lucide="plus" class="font-16 me-1"></i> Nova Entrada
         </a>
       </div>
