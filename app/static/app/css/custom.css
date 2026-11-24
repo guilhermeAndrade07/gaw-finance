@@ -7,6 +7,10 @@
   margin-left: auto;
 }
 
+.form-card-sm {
+  max-width: 640px;
+}
+
 @media (max-width: 767.98px) {
 @font-face {
   font-family: 'Kalam';
@@ -49,7 +53,8 @@
   font-weight: 400;
 }
 
-.form-card {
+.form-card,
+.form-card-sm {
 
     max-width: 100%;
   }
